@@ -1,15 +1,42 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
+import { ActivityIndicator, View, StyleSheet } from 'react-native';
+import { useAuthStore } from '../store/authStore';
+import { COLORS } from '../config/theme';
 import AuthNavigator from './AuthNavigator';
+import MainNavigator from './MainNavigator';
 
 const RootNavigator = () => {
-  // For now, we only show AuthNavigator
-  // Later will add MainNavigator after login
+  const { isAuthenticated, isLoading, initialize } = useAuthStore();
+
+  // Initialize auth state from storage on app start
+  useEffect(() => {
+    initialize();
+  }, [initialize]);
+
+  // Show loading screen while initializing
+  if (isLoading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color={COLORS.primary} />
+      </View>
+    );
+  }
+
   return (
     <NavigationContainer>
-      <AuthNavigator />
+      {isAuthenticated ? <MainNavigator /> : <AuthNavigator />}
     </NavigationContainer>
   );
 };
+
+const styles = StyleSheet.create({
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: COLORS.white,
+  },
+});
 
 export default RootNavigator;
