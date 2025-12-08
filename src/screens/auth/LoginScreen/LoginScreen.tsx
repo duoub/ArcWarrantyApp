@@ -46,9 +46,16 @@ const LoginScreen = () => {
     try {
       setIsLoading(true);
       const response = await authService.login(data);
+
+      // Log response để debug - xem được trong iOS Simulator console
+      console.log('✅ Login Response:', JSON.stringify(response, null, 2));
+      console.log('👤 User Info:', response.user);
+      console.log('🔑 Token:', response.token);
+
       login(response.token, response.user);
       Alert.alert('Đăng nhập thành công', response.message || 'Chào mừng bạn trở lại!');
     } catch (error) {
+      console.log('❌ Login Error:', error);
       Alert.alert(
         'Đăng nhập thất bại',
         error instanceof Error ? error.message : 'Đã có lỗi xảy ra. Vui lòng thử lại.'
