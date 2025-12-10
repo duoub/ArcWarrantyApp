@@ -116,8 +116,6 @@ const WarrantyActivationScreen = () => {
       {/* Custom Header */}
       <CustomHeader
         title="Kích hoạt bảo hành"
-        rightIcon={<Text style={styles.helpIcon}>❓</Text>}
-        onRightPress={handleHelp}
       />
 
       <KeyboardAvoidingView
@@ -138,9 +136,18 @@ const WarrantyActivationScreen = () => {
             name="serial"
             render={({ field: { onChange, onBlur, value } }) => (
               <View style={styles.inputContainer}>
-                <Text style={styles.inputLabel}>
-                  Số serial <Text style={styles.required}>*</Text>
-                </Text>
+                <View style={styles.labelRow}>
+                  <Text style={styles.inputLabel}>
+                    Số serial <Text style={styles.required}>*</Text>
+                  </Text>
+                  <TouchableOpacity
+                    style={styles.infoButton}
+                    onPress={handleHelp}
+                    activeOpacity={0.7}
+                  >
+                    <Text style={styles.infoIcon}>ℹ️</Text>
+                  </TouchableOpacity>
+                </View>
                 <View
                   style={[
                     styles.inputWrapper,
@@ -313,7 +320,7 @@ const WarrantyActivationScreen = () => {
 
           {/* Info Box */}
           <View style={styles.infoBox}>
-            <Text style={styles.infoIcon}>ℹ️</Text>
+            <Text style={styles.infoBoxIcon}>ℹ️</Text>
             <Text style={styles.infoText}>
               Vui lòng điền đầy đủ thông tin để kích hoạt bảo hành. Thông tin
               này sẽ được sử dụng cho việc hỗ trợ và bảo hành sản phẩm.
@@ -378,11 +385,22 @@ const styles = StyleSheet.create({
   inputContainer: {
     marginBottom: SPACING.md,
   },
+  labelRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: SPACING.xs,
+  },
   inputLabel: {
     fontSize: 14,
     fontWeight: '600',
     color: COLORS.textPrimary,
-    marginBottom: SPACING.xs,
+  },
+  infoButton: {
+    padding: 4,
+  },
+  infoIcon: {
+    fontSize: 18,
   },
   required: {
     color: COLORS.error,
@@ -434,7 +452,7 @@ const styles = StyleSheet.create({
     borderColor: COLORS.accent + '30',
     marginBottom: SPACING.lg,
   },
-  infoIcon: {
+  infoBoxIcon: {
     fontSize: 18,
     marginRight: SPACING.sm,
     marginTop: 2,

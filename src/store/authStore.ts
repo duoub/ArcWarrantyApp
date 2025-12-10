@@ -6,7 +6,6 @@
 import { create } from 'zustand';
 import { User } from '../types/auth';
 import { storage, StorageKeys } from '../utils/storage';
-import { authService } from '../api/authService';
 
 interface AuthState {
   // State
@@ -22,7 +21,7 @@ interface AuthState {
   setLoading: (isLoading: boolean) => void;
   setError: (error: string | null) => void;
   login: (token: string, user: User) => void;
-  logout: () => Promise<void>;
+  logout: () => void;
   initialize: () => void;
   clearError: () => void;
 }
@@ -54,27 +53,19 @@ export const useAuthStore = create<AuthState>((set) => ({
     });
   },
 
-  // Logout - Clear storage and state
-  logout: async () => {
-    try {
-      // Call logout API
-      await authService.logout();
-    } catch (error) {
-      // Continue logout even if API fails
-      console.error('Logout API error:', error);
-    } finally {
-      // Clear storage
-      storage.delete(StorageKeys.AUTH_TOKEN);
-      storage.delete(StorageKeys.USER_DATA);
+  // Logout - Clear storage and state (client-side only)
+  logout: () => {
+    // Clear storage using MMKV's remove method
+    storage.remove(StorageKeys.AUTH_TOKEN);
+    storage.remove(StorageKeys.USER_DATA);
 
-      // Clear state
-      set({
-        token: null,
-        user: null,
-        isAuthenticated: false,
-        error: null,
-      });
-    }
+    // Clear state
+    set({
+      token: null,
+      user: null,
+      isAuthenticated: false,
+      error: null,
+    });
   },
 
   // Initialize - Load auth state from storage on app start
@@ -94,8 +85,8 @@ export const useAuthStore = create<AuthState>((set) => ({
     } catch (error) {
       console.error('Failed to initialize auth:', error);
       // Clear invalid storage
-      storage.delete(StorageKeys.AUTH_TOKEN);
-      storage.delete(StorageKeys.USER_DATA);
+      storage.remove(StorageKeys.AUTH_TOKEN);
+      storage.remove(StorageKeys.USER_DATA);
     }
   },
 }));

@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Platform } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Platform, Image } from 'react-native';
 import { COLORS, SPACING, SHADOWS } from '../config/theme';
 
 interface CustomHeaderProps {
@@ -32,13 +32,21 @@ const CustomHeader: React.FC<CustomHeaderProps> = ({
         {/* Title */}
         <Text style={styles.headerTitle}>{title}</Text>
 
-        {/* Right Icon */}
+        {/* Right Side - Logo or Icon */}
         {rightIcon && onRightPress ? (
           <TouchableOpacity onPress={onRightPress} style={styles.rightButton}>
             {rightIcon}
           </TouchableOpacity>
         ) : (
-          <View style={styles.rightButton} />
+          <View style={styles.logoContainer}>
+            <View style={styles.logoCircle}>
+              <Image
+                source={require('../assets/images/logo.png')}
+                style={styles.logo}
+                resizeMode="contain"
+              />
+            </View>
+          </View>
         )}
       </View>
     </View>
@@ -76,6 +84,25 @@ const styles = StyleSheet.create({
     height: 40,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  logoContainer: {
+    width: 40,
+    height: 40,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  logoCircle: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: COLORS.white,
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 4,
+  },
+  logo: {
+    width: 28,
+    height: 28,
   },
 });
 

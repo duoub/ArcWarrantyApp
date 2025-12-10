@@ -12,9 +12,13 @@ import {
   StatusBar,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
 import { COLORS, SPACING, BORDER_RADIUS, SHADOWS } from '../../../config/theme';
 import { useAuthStore } from '../../../store/authStore';
 import CustomHeader from '../../../components/CustomHeader';
+import { HomeStackParamList } from '../../../navigation/MainNavigator';
+
+type HomeScreenNavigationProp = StackNavigationProp<HomeStackParamList, 'Home'>;
 
 const { width } = Dimensions.get('window');
 const BANNER_WIDTH = width - SPACING.lg * 2;
@@ -36,7 +40,7 @@ const MOCK_REWARDS = {
 };
 
 const HomeScreen = () => {
-  const navigation = useNavigation();
+  const navigation = useNavigation<HomeScreenNavigationProp>();
   const { user, isAuthenticated } = useAuthStore();
 
   const [currentBannerIndex, setCurrentBannerIndex] = useState(0);
@@ -70,7 +74,8 @@ const HomeScreen = () => {
   };
 
   const handleSalesProgramPress = () => {
-    Alert.alert('Gói chương trình sale', 'Chức năng đang phát triển');
+    // Navigate to SalesProgram screen within HomeStack
+    navigation.navigate('SalesProgram');
   };
 
   const handleInventoryPress = () => {

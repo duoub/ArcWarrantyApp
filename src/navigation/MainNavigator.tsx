@@ -1,18 +1,36 @@
 import React from 'react';
 import { Text, View, TouchableOpacity, StyleSheet } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { createStackNavigator } from '@react-navigation/stack';
 import { COLORS, SPACING, SHADOWS } from '../config/theme';
 import HomeScreen from '../screens/main/HomeScreen/HomeScreen';
+import MenuScreen from '../screens/main/MenuScreen/MenuScreen';
 import WarrantyActivationScreen from '../screens/main/WarrantyActivationScreen/WarrantyActivationScreen';
 import InOutScreen from '../screens/main/InOutScreen/InOutScreen';
+import ProfileScreen from '../screens/main/ProfileScreen/ProfileScreen';
+import SalesProgramScreen from '../screens/main/SalesProgramScreen/SalesProgramScreen';
+import DealerListScreen from '../screens/main/DealerListScreen/DealerListScreen';
 
 export type MainTabParamList = {
-  Home: undefined;
-  InOut: undefined;
+  HomeStack: undefined;
+  Menu: undefined;
+  InOutStack: undefined;
   WarrantyActivation: undefined;
-  // Add more screens later: Profile, etc.
+  Profile: undefined;
 };
 
+export type HomeStackParamList = {
+  Home: undefined;
+  SalesProgram: undefined;
+};
+
+export type InOutStackParamList = {
+  InOut: undefined;
+  DealerList: undefined;
+};
+
+const HomeStack = createStackNavigator<HomeStackParamList>();
+const InOutStack = createStackNavigator<InOutStackParamList>();
 const Tab = createBottomTabNavigator<MainTabParamList>();
 
 // Custom Tab Button Component for Center Button
@@ -27,6 +45,26 @@ const CenterTabButton = ({ onPress, focused }: { onPress: () => void; focused: b
     </View>
   </TouchableOpacity>
 );
+
+// Home Stack Navigator
+const HomeStackNavigator = () => {
+  return (
+    <HomeStack.Navigator screenOptions={{ headerShown: false }}>
+      <HomeStack.Screen name="Home" component={HomeScreen} />
+      <HomeStack.Screen name="SalesProgram" component={SalesProgramScreen} />
+    </HomeStack.Navigator>
+  );
+};
+
+// InOut Stack Navigator
+const InOutStackNavigator = () => {
+  return (
+    <InOutStack.Navigator screenOptions={{ headerShown: false }}>
+      <InOutStack.Screen name="InOut" component={InOutScreen} />
+      <InOutStack.Screen name="DealerList" component={DealerListScreen} />
+    </InOutStack.Navigator>
+  );
+};
 
 const MainNavigator = () => {
   return (
@@ -58,8 +96,8 @@ const MainNavigator = () => {
       }}
     >
       <Tab.Screen
-        name="Home"
-        component={HomeScreen}
+        name="HomeStack"
+        component={HomeStackNavigator}
         options={{
           title: 'Trang chủ',
           headerShown: false,
@@ -69,8 +107,19 @@ const MainNavigator = () => {
         }}
       />
       <Tab.Screen
-        name="InOut"
-        component={InOutScreen}
+        name="WarrantyActivation"
+        component={WarrantyActivationScreen}
+        options={{
+          title: 'Kích hoạt',
+          headerShown: false,
+          tabBarIcon: ({ color }) => (
+            <Text style={{ fontSize: 24 }}>✅</Text>
+          ),
+        }}
+      />
+      <Tab.Screen
+        name="InOutStack"
+        component={InOutStackNavigator}
         options={{
           title: 'IN/OUT',
           headerShown: false,
@@ -87,17 +136,27 @@ const MainNavigator = () => {
         }}
       />
       <Tab.Screen
-        name="WarrantyActivation"
-        component={WarrantyActivationScreen}
+        name="Profile"
+        component={ProfileScreen}
         options={{
-          title: 'Kích hoạt',
+          title: 'Tài khoản',
           headerShown: false,
           tabBarIcon: ({ color }) => (
-            <Text style={{ fontSize: 24 }}>✅</Text>
+            <Text style={{ fontSize: 24 }}>👤</Text>
           ),
         }}
       />
-      {/* Add more tabs later */}
+      <Tab.Screen
+        name="Menu"
+        component={MenuScreen}
+        options={{
+          title: 'Menu',
+          headerShown: false,
+          tabBarIcon: ({ color }) => (
+            <Text style={{ fontSize: 24 }}>📋</Text>
+          ),
+        }}
+      />
     </Tab.Navigator>
   );
 };

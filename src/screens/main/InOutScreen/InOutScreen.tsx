@@ -10,12 +10,17 @@ import {
   StatusBar,
   Image,
 } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { COLORS, SPACING, BORDER_RADIUS, SHADOWS } from '../../../config/theme';
 import CustomHeader from '../../../components/CustomHeader';
 import { useAuthStore } from '../../../store/authStore';
+import { InOutStackParamList } from '../../../navigation/MainNavigator';
+
+type InOutScreenNavigationProp = StackNavigationProp<InOutStackParamList, 'InOut'>;
 
 // Validation Schema
 const inOutSchema = z.object({
@@ -25,6 +30,7 @@ const inOutSchema = z.object({
 type InOutFormData = z.infer<typeof inOutSchema>;
 
 const InOutScreen = () => {
+  const navigation = useNavigation<InOutScreenNavigationProp>();
   const [isLoading, setIsLoading] = useState(false);
   const { user } = useAuthStore();
   const [customerInfo] = useState({
@@ -67,7 +73,7 @@ const InOutScreen = () => {
   };
 
   const handleSelectDealer = () => {
-    Alert.alert('Chọn đại lý', 'Chức năng chọn sell out cho đại lý đang phát triển');
+    navigation.navigate('DealerList');
   };
 
   const handleSaveInfo = async (data: InOutFormData) => {
