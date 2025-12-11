@@ -10,10 +10,14 @@ import InOutScreen from '../screens/main/InOutScreen/InOutScreen';
 import ProfileScreen from '../screens/main/ProfileScreen/ProfileScreen';
 import SalesProgramScreen from '../screens/main/SalesProgramScreen/SalesProgramScreen';
 import DealerListScreen from '../screens/main/DealerListScreen/DealerListScreen';
+import WarrantyStationListScreen from '../screens/main/WarrantyStationListScreen/WarrantyStationListScreen';
+import WarrantyReportScreen from '../screens/main/WarrantyReportScreen/WarrantyReportScreen';
+import WarrantyLookupScreen from '../screens/main/WarrantyLookupScreen/WarrantyLookupScreen';
+import ProductLookupScreen from '../screens/main/ProductLookupScreen/ProductLookupScreen';
 
 export type MainTabParamList = {
   HomeStack: undefined;
-  Menu: undefined;
+  MenuStack: undefined;
   InOutStack: undefined;
   WarrantyActivation: undefined;
   Profile: undefined;
@@ -24,12 +28,21 @@ export type HomeStackParamList = {
   SalesProgram: undefined;
 };
 
+export type MenuStackParamList = {
+  Menu: undefined;
+  WarrantyStationList: undefined;
+  WarrantyReport: undefined;
+  WarrantyLookup: undefined;
+  ProductLookup: undefined;
+};
+
 export type InOutStackParamList = {
   InOut: undefined;
   DealerList: undefined;
 };
 
 const HomeStack = createStackNavigator<HomeStackParamList>();
+const MenuStack = createStackNavigator<MenuStackParamList>();
 const InOutStack = createStackNavigator<InOutStackParamList>();
 const Tab = createBottomTabNavigator<MainTabParamList>();
 
@@ -53,6 +66,19 @@ const HomeStackNavigator = () => {
       <HomeStack.Screen name="Home" component={HomeScreen} />
       <HomeStack.Screen name="SalesProgram" component={SalesProgramScreen} />
     </HomeStack.Navigator>
+  );
+};
+
+// Menu Stack Navigator
+const MenuStackNavigator = () => {
+  return (
+    <MenuStack.Navigator screenOptions={{ headerShown: false }}>
+      <MenuStack.Screen name="Menu" component={MenuScreen} />
+      <MenuStack.Screen name="WarrantyStationList" component={WarrantyStationListScreen} />
+      <MenuStack.Screen name="WarrantyReport" component={WarrantyReportScreen} />
+      <MenuStack.Screen name="WarrantyLookup" component={WarrantyLookupScreen} />
+      <MenuStack.Screen name="ProductLookup" component={ProductLookupScreen} />
+    </MenuStack.Navigator>
   );
 };
 
@@ -147,8 +173,8 @@ const MainNavigator = () => {
         }}
       />
       <Tab.Screen
-        name="Menu"
-        component={MenuScreen}
+        name="MenuStack"
+        component={MenuStackNavigator}
         options={{
           title: 'Menu',
           headerShown: false,

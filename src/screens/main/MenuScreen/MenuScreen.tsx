@@ -8,8 +8,18 @@ import {
   StatusBar,
   Alert,
 } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { CompositeNavigationProp } from '@react-navigation/native';
+import { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
 import { COLORS, SPACING, BORDER_RADIUS, SHADOWS } from '../../../config/theme';
 import CustomHeader from '../../../components/CustomHeader';
+import { MenuStackParamList, MainTabParamList } from '../../../navigation/MainNavigator';
+
+type MenuScreenNavigationProp = CompositeNavigationProp<
+  StackNavigationProp<MenuStackParamList, 'Menu'>,
+  BottomTabNavigationProp<MainTabParamList>
+>;
 
 interface MenuItem {
   icon: string;
@@ -23,6 +33,8 @@ interface MenuSection {
 }
 
 const MenuScreen = () => {
+  const navigation = useNavigation<MenuScreenNavigationProp>();
+
   // Menu sections with items
   const menuSections: MenuSection[] = [
     {
@@ -51,22 +63,22 @@ const MenuScreen = () => {
         {
           icon: '✅',
           label: 'Kích hoạt bảo hành',
-          onPress: () => Alert.alert('Kích hoạt bảo hành', 'Chức năng đang phát triển'),
+          onPress: () => navigation.navigate('WarrantyActivation'),
         },
         {
           icon: '🔍',
           label: 'Tra cứu bảo hành',
-          onPress: () => Alert.alert('Tra cứu bảo hành', 'Chức năng đang phát triển'),
+          onPress: () => navigation.navigate('WarrantyLookup'),
         },
         {
           icon: '🛠️',
           label: 'Báo ca bảo hành',
-          onPress: () => Alert.alert('Báo ca bảo hành', 'Chức năng đang phát triển'),
+          onPress: () => navigation.navigate('WarrantyReport'),
         },
         {
           icon: '✓',
           label: 'Tra cứu sản phẩm chính hãng',
-          onPress: () => Alert.alert('Tra cứu sản phẩm chính hãng', 'Chức năng đang phát triển'),
+          onPress: () => navigation.navigate('ProductLookup'),
         },
         {
           icon: '📄',
@@ -76,7 +88,7 @@ const MenuScreen = () => {
         {
           icon: '🏭',
           label: 'Hệ thống điểm bảo hành',
-          onPress: () => Alert.alert('Hệ thống điểm bảo hành', 'Chức năng đang phát triển'),
+          onPress: () => navigation.navigate('WarrantyStationList'),
         },
       ],
     },

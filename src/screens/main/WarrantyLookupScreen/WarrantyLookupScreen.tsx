@@ -1,0 +1,433 @@
+import React, { useState } from 'react';
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+  ScrollView,
+  ActivityIndicator,
+  Alert,
+  StatusBar,
+} from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import { COLORS, SPACING, BORDER_RADIUS, SHADOWS } from '../../../config/theme';
+import CustomHeader from '../../../components/CustomHeader';
+
+interface WarrantyInfo {
+  serial: string;
+  productName: string;
+  customerName: string;
+  phone: string;
+  address: string;
+  purchaseDate: string;
+  warrantyExpiry: string;
+  status: 'active' | 'expired' | 'not_found';
+}
+
+const WarrantyLookupScreen = () => {
+  const navigation = useNavigation();
+  const [keyword, setKeyword] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [result, setResult] = useState<WarrantyInfo | null>(null);
+
+  const handleScanQR = () => {
+    Alert.alert(
+      'Quét mã QR',
+      'Tính năng quét mã QR đang được phát triển.',
+      [{ text: 'OK' }]
+    );
+  };
+
+  const handleSearch = async () => {
+    if (!keyword.trim()) {
+      Alert.alert('Thông báo', 'Vui lòng nhập số serial hoặc thông tin khách hàng');
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+      setResult(null);
+
+      // TODO: Replace with actual API call
+      // Simulate API call
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
+      // Mock data
+      const mockResult: WarrantyInfo = {
+        serial: keyword,
+        productName: 'Điều hòa AKITO 12000 BTU',
+        customerName: 'Nguyễn Văn A',
+        phone: '0912345678',
+        address: '123 Nguyễn Trãi, Q.1, TP.HCM',
+        purchaseDate: '15/01/2024',
+        warrantyExpiry: '15/01/2026',
+        status: 'active',
+      };
+
+      setResult(mockResult);
+    } catch (error) {
+      Alert.alert(
+        'Lỗi',
+        'Không thể tra cứu thông tin bảo hành. Vui lòng thử lại.'
+      );
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const getStatusInfo = (status: string) => {
+    switch (status) {
+      case 'active':
+        return {
+          text: 'Còn bảo hành',
+          color: COLORS.success,
+          bgColor: '#E8F5E9',
+        };
+      case 'expired':
+        return {
+          text: 'Hết hạn bảo hành',
+          color: COLORS.error,
+          bgColor: '#FFEBEE',
+        };
+      default:
+        return {
+          text: 'Không tìm thấy',
+          color: COLORS.gray500,
+          bgColor: COLORS.gray100,
+        };
+    }
+  };
+
+  return (
+    <View style={styles.container}>
+      <StatusBar barStyle="light-content" backgroundColor={COLORS.primary} />
+
+      <CustomHeader
+        title="Tra cứu bảo hành"
+        leftIcon={<Text style={styles.backIcon}>‹</Text>}
+        onLeftPress={() => navigation.goBack()}
+      />
+
+      <ScrollView
+        style={styles.scrollView}
+        showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
+      >
+        {/* Page Title */}
+        <View style={styles.pageHeader}>
+          <Text style={styles.pageTitle}>
+            Tra cứu bảo hành sản phẩm
+          </Text>
+        </View>
+
+        {/* Search Card */}
+        <View style={styles.searchCard}>
+          <Text style={styles.searchLabel}>
+            Nhập thông tin tra cứu
+          </Text>
+          <View style={styles.searchWrapper}>
+            <Text style={styles.searchIcon}>🔍</Text>
+            <TextInput
+              style={styles.searchInput}
+              placeholder="Số Serial / Tên / SĐT khách hàng"
+              placeholderTextColor={COLORS.gray400}
+              value={keyword}
+              onChangeText={setKeyword}
+              onSubmitEditing={handleSearch}
+              returnKeyType="search"
+              editable={!isLoading}
+            />
+            <TouchableOpacity
+              onPress={handleScanQR}
+              style={styles.scanButton}
+              disabled={isLoading}
+            >
+              <Text style={styles.scanIcon}>📷</Text>
+            </TouchableOpacity>
+          </View>
+
+          <TouchableOpacity
+            style={[styles.searchButton, isLoading && styles.searchButtonDisabled]}
+            onPress={handleSearch}
+            activeOpacity={0.8}
+            disabled={isLoading}
+          >
+            {isLoading ? (
+              <ActivityIndicator color={COLORS.white} size="small" />
+            ) : (
+              <Text style={styles.searchButtonText}>Tra cứu</Text>
+            )}
+          </TouchableOpacity>
+        </View>
+
+        {/* Result Card */}
+        {result && (
+          <View style={styles.resultCard}>
+            <View style={styles.resultHeader}>
+              <Text style={styles.resultTitle}>Thông tin bảo hành</Text>
+              <View
+                style={[
+                  styles.statusBadge,
+                  { backgroundColor: getStatusInfo(result.status).bgColor },
+                ]}
+              >
+                <Text
+                  style={[
+                    styles.statusText,
+                    { color: getStatusInfo(result.status).color },
+                  ]}
+                >
+                  {getStatusInfo(result.status).text}
+                </Text>
+              </View>
+            </View>
+
+            <View style={styles.resultBody}>
+              {/* Serial */}
+              <View style={styles.infoRow}>
+                <Text style={styles.infoLabel}>Số serial:</Text>
+                <Text style={styles.infoValue}>{result.serial}</Text>
+              </View>
+
+              {/* Product Name */}
+              <View style={styles.infoRow}>
+                <Text style={styles.infoLabel}>Sản phẩm:</Text>
+                <Text style={styles.infoValue}>{result.productName}</Text>
+              </View>
+
+              {/* Customer Name */}
+              <View style={styles.infoRow}>
+                <Text style={styles.infoLabel}>Khách hàng:</Text>
+                <Text style={styles.infoValue}>{result.customerName}</Text>
+              </View>
+
+              {/* Phone */}
+              <View style={styles.infoRow}>
+                <Text style={styles.infoLabel}>Số điện thoại:</Text>
+                <Text style={styles.infoValue}>{result.phone}</Text>
+              </View>
+
+              {/* Address */}
+              <View style={styles.infoRow}>
+                <Text style={styles.infoLabel}>Địa chỉ:</Text>
+                <Text style={styles.infoValue}>{result.address}</Text>
+              </View>
+
+              {/* Divider */}
+              <View style={styles.divider} />
+
+              {/* Purchase Date */}
+              <View style={styles.infoRow}>
+                <Text style={styles.infoLabel}>Ngày mua:</Text>
+                <Text style={styles.infoValue}>{result.purchaseDate}</Text>
+              </View>
+
+              {/* Warranty Expiry */}
+              <View style={styles.infoRow}>
+                <Text style={styles.infoLabel}>Hết hạn BH:</Text>
+                <Text style={[styles.infoValue, styles.infoValueHighlight]}>
+                  {result.warrantyExpiry}
+                </Text>
+              </View>
+            </View>
+          </View>
+        )}
+
+        {/* Info Box */}
+        <View style={styles.infoBox}>
+          <Text style={styles.infoBoxIcon}>ℹ️</Text>
+          <Text style={styles.infoText}>
+            Bạn có thể tra cứu thông tin bảo hành bằng số serial sản phẩm,
+            tên khách hàng hoặc số điện thoại đã đăng ký.
+          </Text>
+        </View>
+
+        <View style={styles.bottomSpacing} />
+      </ScrollView>
+    </View>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: COLORS.background,
+  },
+  scrollView: {
+    flex: 1,
+  },
+  backIcon: {
+    fontSize: 32,
+    color: COLORS.white,
+    fontWeight: '300',
+  },
+
+  // Page Header
+  pageHeader: {
+    backgroundColor: COLORS.white,
+    marginHorizontal: SPACING.lg,
+    marginTop: SPACING.md,
+    padding: SPACING.md,
+    borderRadius: BORDER_RADIUS.lg,
+    ...SHADOWS.sm,
+  },
+  pageTitle: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: COLORS.textPrimary,
+    textAlign: 'center',
+  },
+
+  // Search Card
+  searchCard: {
+    backgroundColor: COLORS.white,
+    marginHorizontal: SPACING.lg,
+    marginTop: SPACING.md,
+    padding: SPACING.lg,
+    borderRadius: BORDER_RADIUS.xl,
+    ...SHADOWS.md,
+  },
+  searchLabel: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: COLORS.textPrimary,
+    marginBottom: SPACING.sm,
+  },
+  searchWrapper: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: COLORS.gray50,
+    borderRadius: BORDER_RADIUS.md,
+    borderWidth: 1,
+    borderColor: COLORS.gray200,
+    paddingHorizontal: SPACING.md,
+    marginBottom: SPACING.md,
+  },
+  searchIcon: {
+    fontSize: 20,
+    marginRight: SPACING.sm,
+  },
+  searchInput: {
+    flex: 1,
+    fontSize: 15,
+    color: COLORS.textPrimary,
+    paddingVertical: SPACING.md,
+  },
+  scanButton: {
+    padding: SPACING.xs,
+    marginLeft: SPACING.xs,
+  },
+  scanIcon: {
+    fontSize: 24,
+  },
+  searchButton: {
+    backgroundColor: COLORS.primary,
+    paddingVertical: 0,
+    alignItems: 'center',
+    justifyContent: 'center',
+    height: 48,
+    borderRadius: BORDER_RADIUS.md,
+    ...SHADOWS.sm,
+  },
+  searchButtonText: {
+    fontSize: 15,
+    fontWeight: '700',
+    color: COLORS.white,
+    letterSpacing: 0.5,
+  },
+  searchButtonDisabled: {
+    opacity: 0.6,
+  },
+
+  // Result Card
+  resultCard: {
+    backgroundColor: COLORS.white,
+    marginHorizontal: SPACING.lg,
+    marginTop: SPACING.md,
+    borderRadius: BORDER_RADIUS.xl,
+    overflow: 'hidden',
+    ...SHADOWS.md,
+  },
+  resultHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    padding: SPACING.md,
+    backgroundColor: COLORS.primary + '12',
+    borderBottomWidth: 1,
+    borderBottomColor: COLORS.gray200,
+  },
+  resultTitle: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: COLORS.textPrimary,
+  },
+  statusBadge: {
+    paddingHorizontal: SPACING.sm,
+    paddingVertical: SPACING.xs,
+    borderRadius: BORDER_RADIUS.sm,
+  },
+  statusText: {
+    fontSize: 12,
+    fontWeight: '700',
+  },
+  resultBody: {
+    padding: SPACING.md,
+  },
+  infoRow: {
+    flexDirection: 'row',
+    marginBottom: SPACING.sm,
+  },
+  infoLabel: {
+    fontSize: 14,
+    color: COLORS.textSecondary,
+    fontWeight: '600',
+    width: 120,
+  },
+  infoValue: {
+    flex: 1,
+    fontSize: 14,
+    color: COLORS.textPrimary,
+    fontWeight: '500',
+  },
+  infoValueHighlight: {
+    color: COLORS.primary,
+    fontWeight: '700',
+  },
+  divider: {
+    height: 1,
+    backgroundColor: COLORS.gray200,
+    marginVertical: SPACING.sm,
+  },
+
+  // Info Box
+  infoBox: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    backgroundColor: COLORS.accent + '15',
+    borderRadius: BORDER_RADIUS.md,
+    padding: SPACING.md,
+    borderWidth: 1,
+    borderColor: COLORS.accent + '30',
+    marginHorizontal: SPACING.lg,
+    marginTop: SPACING.md,
+  },
+  infoBoxIcon: {
+    fontSize: 18,
+    marginRight: SPACING.sm,
+    marginTop: 2,
+  },
+  infoText: {
+    flex: 1,
+    fontSize: 13,
+    color: COLORS.textSecondary,
+    lineHeight: 18,
+  },
+
+  bottomSpacing: {
+    height: SPACING.xl,
+  },
+});
+
+export default WarrantyLookupScreen;
