@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Image, StyleSheet, ViewStyle } from 'react-native';
 import { COLORS } from '../config/theme';
 
@@ -12,6 +12,11 @@ const Avatar: React.FC<AvatarProps> = ({ uri, size = 40, style }) => {
   const [imageError, setImageError] = useState(false);
   const avatarSize = size;
   const borderRadius = size / 2;
+
+  // Reset imageError when uri changes
+  useEffect(() => {
+    setImageError(false);
+  }, [uri]);
 
   // Always show default avatar if no URI is provided or if image fails to load
   const showDefaultAvatar = !uri || uri.trim() === '' || imageError;

@@ -8,9 +8,12 @@ import {
   StatusBar,
   Alert,
   Switch,
+  Platform,
+  PermissionsAndroid,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
+import ImagePicker from 'react-native-image-crop-picker';
 import { COLORS, SPACING, BORDER_RADIUS, SHADOWS } from '../../../config/theme';
 import CustomHeader from '../../../components/CustomHeader';
 import Avatar from '../../../components/Avatar';
@@ -21,13 +24,95 @@ type ProfileScreenNavigationProp = StackNavigationProp<ProfileStackParamList, 'P
 
 const ProfileScreen = () => {
   const navigation = useNavigation<ProfileScreenNavigationProp>();
-  const { user, logout } = useAuthStore();
+  const { user, logout, updateAvatar } = useAuthStore();
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
   const [showPersonalInfo, setShowPersonalInfo] = useState(true);
   const [showBankInfo, setShowBankInfo] = useState(false);
 
   const handleChangeAvatar = () => {
-    Alert.alert('Đổi ảnh đại diện', 'Chức năng đang phát triển');
+    Alert.alert(
+      'Đổi ảnh đại diện',
+      'Chọn nguồn ảnh',
+      [
+        {
+          text: 'Chụp ảnh',
+          onPress: () => handleTakePhoto(),
+        },
+        {
+          text: 'Thư viện',
+          onPress: () => handlePickFromLibrary(),
+        },
+        {
+          text: 'Hủy',
+          style: 'cancel',
+        },
+      ],
+      { cancelable: true }
+    );
+  };
+
+  const handleTakePhoto = async () => {
+    try {
+      // Request camera permission for Android
+      if (Platform.OS === 'android') {
+        const granted = await PermissionsAndroid.request(
+          PermissionsAndroid.PERMISSIONS.CAMERA,
+          {
+            title: 'Quyền truy cập Camera',
+            message: 'Ứng dụng cần quyền truy cập camera để chụp ảnh.',
+            buttonNeutral: 'Hỏi sau',
+            buttonNegative: 'Từ chối',
+            buttonPositive: 'Đồng ý',
+          }
+        );
+        if (granted !== PermissionsAndroid.RESULTS.GRANTED) {
+          Alert.alert('Lỗi', 'Bạn cần cấp quyền truy cập camera để tiếp tục.');
+          return;
+        }
+      }
+
+      const image = await ImagePicker.openCamera({
+        width: 400,
+        height: 400,
+        cropping: true,
+        cropperCircleOverlay: true,
+        enableRotationGesture: true,
+        freeStyleCropEnabled: false,
+        mediaType: 'photo',
+        compressImageQuality: 0.8,
+      });
+
+      updateAvatar(image.path);
+      Alert.alert('Thành công', 'Ảnh đại diện đã được cập nhật!');
+    } catch (error: any) {
+      if (error.code !== 'E_PICKER_CANCELLED') {
+        Alert.alert('Lỗi', 'Không thể chụp ảnh. Vui lòng thử lại.');
+        console.error('Camera error:', error);
+      }
+    }
+  };
+
+  const handlePickFromLibrary = async () => {
+    try {
+      const image = await ImagePicker.openPicker({
+        width: 400,
+        height: 400,
+        cropping: true,
+        cropperCircleOverlay: true,
+        enableRotationGesture: true,
+        freeStyleCropEnabled: false,
+        mediaType: 'photo',
+        compressImageQuality: 0.8,
+      });
+
+      updateAvatar(image.path);
+      Alert.alert('Thành công', 'Ảnh đại diện đã được cập nhật!');
+    } catch (error: any) {
+      if (error.code !== 'E_PICKER_CANCELLED') {
+        Alert.alert('Lỗi', 'Không thể chọn ảnh. Vui lòng thử lại.');
+        console.error('Image picker error:', error);
+      }
+    }
   };
 
   const handleEditPersonalInfo = () => {

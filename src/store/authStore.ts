@@ -24,6 +24,7 @@ interface AuthState {
   logout: () => void;
   initialize: () => void;
   clearError: () => void;
+  updateAvatar: (avatarUri: string) => void;
 }
 
 export const useAuthStore = create<AuthState>((set) => ({
@@ -88,5 +89,19 @@ export const useAuthStore = create<AuthState>((set) => ({
       storage.remove(StorageKeys.AUTH_TOKEN);
       storage.remove(StorageKeys.USER_DATA);
     }
+  },
+
+  // Update Avatar - Update user avatar in state and storage
+  updateAvatar: (avatarUri) => {
+    set((state) => {
+      if (!state.user) return state;
+
+      const updatedUser = { ...state.user, avatar: avatarUri };
+      storage.set(StorageKeys.USER_DATA, JSON.stringify(updatedUser));
+
+      return {
+        user: updatedUser,
+      };
+    });
   },
 }));
