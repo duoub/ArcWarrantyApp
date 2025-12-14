@@ -295,7 +295,11 @@ const WarrantyReportScreen = () => {
                   editable={!isLoading}
                 />
                 <TouchableOpacity onPress={handleScanQR} style={styles.scanButton}>
-                  <Text style={styles.scanIcon}>⚡</Text>
+                  <Image
+                    source={require('../../../assets/images/scan_me.png')}
+                    style={styles.scanImage}
+                    resizeMode="contain"
+                  />
                 </TouchableOpacity>
               </View>
             </View>
@@ -631,6 +635,10 @@ const styles = StyleSheet.create({
   },
   scanIcon: {
     fontSize: 24,
+  },
+  scanImage: {
+    width: 32,
+    height: 32,
   },
 
   // Select Fields

@@ -12,6 +12,7 @@ import {
   Alert,
   SafeAreaView,
   StatusBar,
+  Image,
 } from 'react-native';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -173,7 +174,11 @@ const WarrantyActivationScreen = () => {
                     onPress={handleScanQR}
                     disabled={isLoading}
                   >
-                    <Text style={styles.scanIcon}>⚡</Text>
+                    <Image
+                      source={require('../../../assets/images/scan_me.png')}
+                      style={styles.scanImage}
+                      resizeMode="contain"
+                    />
                   </TouchableOpacity>
                 </View>
                 {errors.serial && (
@@ -444,6 +449,10 @@ const styles = StyleSheet.create({
   },
   scanIcon: {
     fontSize: 24,
+  },
+  scanImage: {
+    width: 32,
+    height: 32,
   },
   errorText: {
     fontSize: 12,

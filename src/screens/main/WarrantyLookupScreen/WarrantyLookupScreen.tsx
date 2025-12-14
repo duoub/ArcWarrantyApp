@@ -9,6 +9,7 @@ import {
   ActivityIndicator,
   Alert,
   StatusBar,
+  Image,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { COLORS, SPACING, BORDER_RADIUS, SHADOWS } from '../../../config/theme';
@@ -137,7 +138,7 @@ const WarrantyLookupScreen = () => {
             <Text style={styles.searchIcon}>🔍</Text>
             <TextInput
               style={styles.searchInput}
-              placeholder="Số Serial / Tên / SĐT khách hàng"
+              placeholder="Số Serial / Tên / SĐT"
               placeholderTextColor={COLORS.gray400}
               value={keyword}
               onChangeText={setKeyword}
@@ -150,7 +151,11 @@ const WarrantyLookupScreen = () => {
               style={styles.scanButton}
               disabled={isLoading}
             >
-              <Text style={styles.scanIcon}>⚡</Text>
+              <Image
+                source={require('../../../assets/images/scan_me.png')}
+                style={styles.scanImage}
+                resizeMode="contain"
+              />
             </TouchableOpacity>
           </View>
 
@@ -335,6 +340,10 @@ const styles = StyleSheet.create({
   },
   scanIcon: {
     fontSize: 24,
+  },
+  scanImage: {
+    width: 32,
+    height: 32,
   },
   searchButton: {
     backgroundColor: COLORS.primary,

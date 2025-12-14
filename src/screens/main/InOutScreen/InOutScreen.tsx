@@ -18,6 +18,7 @@ import { z } from 'zod';
 import { COLORS, SPACING, BORDER_RADIUS, SHADOWS } from '../../../config/theme';
 import CustomHeader from '../../../components/CustomHeader';
 import Avatar from '../../../components/Avatar';
+import BarcodeScanner from '../../../components/BarcodeScanner';
 import { useAuthStore } from '../../../store/authStore';
 import { InOutStackParamList } from '../../../navigation/MainNavigator';
 
@@ -33,6 +34,7 @@ type InOutFormData = z.infer<typeof inOutSchema>;
 const InOutScreen = () => {
   const navigation = useNavigation<InOutScreenNavigationProp>();
   const [isLoading, setIsLoading] = useState(false);
+  const [showScanner, setShowScanner] = useState(false);
   const { user } = useAuthStore();
   const [customerInfo] = useState({
     id: 0,
@@ -66,11 +68,12 @@ const InOutScreen = () => {
   });
 
   const handleScanQR = () => {
-    Alert.alert(
-      'Quét mã QR',
-      'Tính năng quét mã QR đang được phát triển. Vui lòng nhập serial thủ công.',
-      [{ text: 'OK' }]
-    );
+    setShowScanner(true);
+  };
+
+  const handleScanComplete = (data: string) => {
+    setValue('serial', data);
+    setShowScanner(false);
   };
 
   const handleSelectDealer = () => {
@@ -222,6 +225,14 @@ const InOutScreen = () => {
         {/* Bottom Spacing */}
         <View style={styles.bottomSpacing} />
       </View>
+
+      {/* Barcode Scanner Modal */}
+      <BarcodeScanner
+        visible={showScanner}
+        onClose={() => setShowScanner(false)}
+        onScan={handleScanComplete}
+        title="Quét mã sản phẩm"
+      />
     </View>
   );
 };
