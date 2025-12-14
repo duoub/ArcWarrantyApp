@@ -17,6 +17,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { COLORS, SPACING, BORDER_RADIUS, SHADOWS } from '../../../config/theme';
 import CustomHeader from '../../../components/CustomHeader';
+import Avatar from '../../../components/Avatar';
 import { useAuthStore } from '../../../store/authStore';
 import { InOutStackParamList } from '../../../navigation/MainNavigator';
 
@@ -115,12 +116,7 @@ const InOutScreen = () => {
         {/* Customer Info Card - Hiển thị thông tin user đã login hoặc dealer được chọn */}
         <View style={styles.customerCard}>
           <View style={styles.customerHeader}>
-            <View style={styles.avatarContainer}>
-              <Image
-                source={require('../../../assets/images/user.jpg')}
-                style={styles.avatarImage}
-              />
-            </View>
+            <Avatar uri={user?.avatar} size={50} style={styles.avatarContainer} />
             <View style={styles.customerInfo}>
               <Text style={styles.customerName}>
                 {customerInfo.name || (user ? user.name : 'Chưa chọn đại lý')}
@@ -255,18 +251,7 @@ const styles = StyleSheet.create({
     marginBottom: SPACING.sm,
   },
   avatarContainer: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    backgroundColor: COLORS.gray100,
-    overflow: 'hidden',
-    borderWidth: 2,
-    borderColor: COLORS.gray200,
     marginRight: SPACING.md,
-  },
-  avatarImage: {
-    width: '100%',
-    height: '100%',
   },
   customerInfo: {
     flex: 1,

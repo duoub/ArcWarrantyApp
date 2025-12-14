@@ -16,6 +16,7 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { COLORS, SPACING, BORDER_RADIUS, SHADOWS } from '../../../config/theme';
 import { useAuthStore } from '../../../store/authStore';
 import CustomHeader from '../../../components/CustomHeader';
+import Avatar from '../../../components/Avatar';
 import { HomeStackParamList } from '../../../navigation/MainNavigator';
 
 type HomeScreenNavigationProp = StackNavigationProp<HomeStackParamList, 'Home'>;
@@ -140,9 +141,7 @@ const HomeScreen = () => {
       {isAuthenticated && user && (
         <View style={styles.userCard}>
           <View style={styles.userLeft}>
-            <View style={styles.avatarContainer}>
-              <Text style={styles.avatarIcon}>👤</Text>
-            </View>
+            <Avatar uri={user.avatar} size={48} />
             <View style={styles.userInfo}>
               <Text style={styles.userName}>{user.name}</Text>
               <Text style={styles.userEmail}>{user.email}</Text>
@@ -290,18 +289,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: SPACING.md,
-  },
-  avatarContainer: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    backgroundColor: COLORS.gray100,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: SPACING.md,
-  },
-  avatarIcon: {
-    fontSize: 24,
+    gap: SPACING.md,
   },
   userInfo: {
     flex: 1,

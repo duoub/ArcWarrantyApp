@@ -7,19 +7,35 @@ import {
   TouchableOpacity,
   StatusBar,
   Alert,
-  Image,
   Switch,
 } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
 import { COLORS, SPACING, BORDER_RADIUS, SHADOWS } from '../../../config/theme';
 import CustomHeader from '../../../components/CustomHeader';
+import Avatar from '../../../components/Avatar';
 import { useAuthStore } from '../../../store/authStore';
+import { ProfileStackParamList } from '../../../navigation/MainNavigator';
+
+type ProfileScreenNavigationProp = StackNavigationProp<ProfileStackParamList, 'Profile'>;
 
 const ProfileScreen = () => {
+  const navigation = useNavigation<ProfileScreenNavigationProp>();
   const { user, logout } = useAuthStore();
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
+  const [showPersonalInfo, setShowPersonalInfo] = useState(true);
+  const [showBankInfo, setShowBankInfo] = useState(false);
 
-  const handleEditProfile = () => {
-    Alert.alert('Chỉnh sửa thông tin', 'Chức năng đang phát triển');
+  const handleChangeAvatar = () => {
+    Alert.alert('Đổi ảnh đại diện', 'Chức năng đang phát triển');
+  };
+
+  const handleEditPersonalInfo = () => {
+    navigation.navigate('EditProfile', { section: 'personal' });
+  };
+
+  const handleEditBankInfo = () => {
+    navigation.navigate('EditProfile', { section: 'bank' });
   };
 
   const handleChangePassword = () => {
@@ -60,28 +76,20 @@ const ProfileScreen = () => {
       >
         {/* User Profile Card */}
         <View style={styles.profileCard}>
-          <View style={styles.avatarContainer}>
-            {user?.avatar ? (
-              <Image
-                source={{ uri: user.avatar }}
-                style={styles.avatarImage}
-              />
-            ) : (
-              <Image
-                source={require('../../../assets/images/user.jpg')}
-                style={styles.avatarImage}
-              />
-            )}
+          <View style={styles.avatarWrapper}>
+            <Avatar uri={user?.avatar} size={100} />
+            <TouchableOpacity
+              style={styles.changeAvatarButton}
+              onPress={handleChangeAvatar}
+              activeOpacity={0.8}
+            >
+              <Text style={styles.cameraIcon}>📷</Text>
+            </TouchableOpacity>
           </View>
 
           <Text style={styles.userName}>{user?.name || 'Người dùng'}</Text>
-          <Text style={styles.userEmail}>{user?.email || ''}</Text>
-          {user?.phone && (
-            <Text style={styles.userPhone}>📞 {user.phone}</Text>
-          )}
 
           <View style={styles.roleContainer}>
-            <Text style={styles.roleLabel}>Vai trò:</Text>
             <View style={styles.roleBadge}>
               <Text style={styles.roleText}>
                 {user?.role === 'admin' && 'Quản trị viên'}
@@ -91,14 +99,123 @@ const ProfileScreen = () => {
               </Text>
             </View>
           </View>
+        </View>
 
+        {/* Personal Information Section */}
+        <View style={styles.section}>
           <TouchableOpacity
-            style={styles.editButton}
-            onPress={handleEditProfile}
+            style={styles.sectionHeader}
+            onPress={() => setShowPersonalInfo(!showPersonalInfo)}
             activeOpacity={0.7}
           >
-            <Text style={styles.editButtonText}>Chỉnh sửa thông tin</Text>
+            <View style={styles.sectionHeaderLeft}>
+              <Text style={styles.sectionIcon}>👤</Text>
+              <Text style={styles.sectionTitle}>Thông tin cá nhân</Text>
+            </View>
+            <Text style={styles.chevronIcon}>{showPersonalInfo ? '▼' : '▶'}</Text>
           </TouchableOpacity>
+
+          {showPersonalInfo && (
+            <View style={styles.infoCard}>
+              <View style={styles.infoRow}>
+                <View style={styles.infoItem}>
+                  <Text style={styles.infoLabel}>📧 Email</Text>
+                  <Text style={styles.infoValue}>{user?.email || 'Chưa cập nhật'}</Text>
+                </View>
+              </View>
+
+              <View style={styles.infoRow}>
+                <View style={styles.infoItem}>
+                  <Text style={styles.infoLabel}>📱 Điện thoại</Text>
+                  <Text style={styles.infoValue}>{user?.phone || 'Chưa cập nhật'}</Text>
+                </View>
+              </View>
+
+              <View style={styles.infoRow}>
+                <View style={styles.infoItem}>
+                  <Text style={styles.infoLabel}>🆔 CCCD/CMND</Text>
+                  <Text style={styles.infoValue}>{user?.cccd || 'Chưa cập nhật'}</Text>
+                </View>
+              </View>
+
+              <View style={styles.infoRow}>
+                <View style={styles.infoItem}>
+                  <Text style={styles.infoLabel}>📍 Địa chỉ</Text>
+                  <Text style={styles.infoValue}>{user?.address || 'Chưa cập nhật'}</Text>
+                </View>
+              </View>
+
+              <View style={styles.infoRow}>
+                <View style={styles.infoItem}>
+                  <Text style={styles.infoLabel}>🏙️ Tỉnh/Thành phố</Text>
+                  <Text style={styles.infoValue}>{user?.city || 'Chưa cập nhật'}</Text>
+                </View>
+              </View>
+
+              <View style={styles.infoRow}>
+                <View style={styles.infoItem}>
+                  <Text style={styles.infoLabel}>🏷️ Mã số thuế</Text>
+                  <Text style={styles.infoValue}>{user?.taxCode || 'Chưa cập nhật'}</Text>
+                </View>
+              </View>
+
+              <TouchableOpacity
+                style={styles.editSectionButton}
+                onPress={handleEditPersonalInfo}
+                activeOpacity={0.7}
+              >
+                <Text style={styles.editSectionButtonText}>✏️ Chỉnh sửa</Text>
+              </TouchableOpacity>
+            </View>
+          )}
+        </View>
+
+        {/* Bank Information Section */}
+        <View style={styles.section}>
+          <TouchableOpacity
+            style={styles.sectionHeader}
+            onPress={() => setShowBankInfo(!showBankInfo)}
+            activeOpacity={0.7}
+          >
+            <View style={styles.sectionHeaderLeft}>
+              <Text style={styles.sectionIcon}>🏦</Text>
+              <Text style={styles.sectionTitle}>Thông tin ngân hàng</Text>
+            </View>
+            <Text style={styles.chevronIcon}>{showBankInfo ? '▼' : '▶'}</Text>
+          </TouchableOpacity>
+
+          {showBankInfo && (
+            <View style={styles.infoCard}>
+              <View style={styles.infoRow}>
+                <View style={styles.infoItem}>
+                  <Text style={styles.infoLabel}>🏦 Ngân hàng</Text>
+                  <Text style={styles.infoValue}>{user?.bankName || 'Chưa cập nhật'}</Text>
+                </View>
+              </View>
+
+              <View style={styles.infoRow}>
+                <View style={styles.infoItem}>
+                  <Text style={styles.infoLabel}>💳 Số tài khoản</Text>
+                  <Text style={styles.infoValue}>{user?.bankAccountNumber || 'Chưa cập nhật'}</Text>
+                </View>
+              </View>
+
+              <View style={styles.infoRow}>
+                <View style={styles.infoItem}>
+                  <Text style={styles.infoLabel}>👤 Tên tài khoản</Text>
+                  <Text style={styles.infoValue}>{user?.bankAccountName || 'Chưa cập nhật'}</Text>
+                </View>
+              </View>
+
+              <TouchableOpacity
+                style={styles.editSectionButton}
+                onPress={handleEditBankInfo}
+                activeOpacity={0.7}
+              >
+                <Text style={styles.editSectionButtonText}>✏️ Chỉnh sửa</Text>
+              </TouchableOpacity>
+            </View>
+          )}
         </View>
 
         {/* Settings Section */}
@@ -178,45 +295,36 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     ...SHADOWS.md,
   },
-  avatarContainer: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-    backgroundColor: COLORS.gray100,
-    overflow: 'hidden',
-    borderWidth: 3,
-    borderColor: COLORS.primary,
+  avatarWrapper: {
+    position: 'relative',
     marginBottom: SPACING.md,
   },
-  avatarImage: {
-    width: '100%',
-    height: '100%',
+  changeAvatarButton: {
+    position: 'absolute',
+    bottom: 0,
+    right: 0,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: COLORS.primary,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 3,
+    borderColor: COLORS.white,
+    ...SHADOWS.md,
+  },
+  cameraIcon: {
+    fontSize: 18,
   },
   userName: {
     fontSize: 20,
     fontWeight: '700',
     color: COLORS.textPrimary,
-    marginBottom: SPACING.xs,
-  },
-  userEmail: {
-    fontSize: 14,
-    color: COLORS.textSecondary,
-    marginBottom: SPACING.xs,
-  },
-  userPhone: {
-    fontSize: 14,
-    color: COLORS.textSecondary,
-    marginBottom: SPACING.md,
+    marginBottom: SPACING.sm,
   },
   roleContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: SPACING.md,
-  },
-  roleLabel: {
-    fontSize: 14,
-    color: COLORS.textSecondary,
-    marginRight: SPACING.xs,
   },
   roleBadge: {
     backgroundColor: COLORS.primary + '15',
@@ -229,29 +337,77 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: COLORS.primary,
   },
-  editButton: {
-    backgroundColor: COLORS.primary,
-    paddingVertical: SPACING.sm,
-    paddingHorizontal: SPACING.xl,
-    borderRadius: BORDER_RADIUS.md,
-  },
-  editButtonText: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: COLORS.white,
-  },
 
-  // Settings Section
+  // Section
   section: {
-    marginTop: SPACING.lg,
+    marginTop: SPACING.md,
+  },
+  sectionHeader: {
+    backgroundColor: COLORS.white,
+    marginHorizontal: SPACING.lg,
+    padding: SPACING.md,
+    borderRadius: BORDER_RADIUS.lg,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    ...SHADOWS.sm,
+  },
+  sectionHeaderLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+  },
+  sectionIcon: {
+    fontSize: 22,
+    marginRight: SPACING.sm,
   },
   sectionTitle: {
     fontSize: 16,
     fontWeight: '700',
     color: COLORS.textPrimary,
-    marginBottom: SPACING.sm,
-    marginHorizontal: SPACING.lg,
   },
+
+  // Info Card
+  infoCard: {
+    backgroundColor: COLORS.white,
+    marginHorizontal: SPACING.lg,
+    marginTop: SPACING.xs,
+    padding: SPACING.md,
+    borderRadius: BORDER_RADIUS.lg,
+    ...SHADOWS.sm,
+  },
+  infoRow: {
+    marginBottom: SPACING.md,
+  },
+  infoItem: {
+    flex: 1,
+  },
+  infoLabel: {
+    fontSize: 13,
+    color: COLORS.textSecondary,
+    marginBottom: SPACING.xs,
+    fontWeight: '500',
+  },
+  infoValue: {
+    fontSize: 15,
+    color: COLORS.textPrimary,
+    fontWeight: '500',
+  },
+  editSectionButton: {
+    backgroundColor: COLORS.primary,
+    paddingVertical: SPACING.sm,
+    paddingHorizontal: SPACING.md,
+    borderRadius: BORDER_RADIUS.md,
+    alignItems: 'center',
+    marginTop: SPACING.xs,
+  },
+  editSectionButtonText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: COLORS.white,
+  },
+
+  // Settings Card
   settingsCard: {
     backgroundColor: COLORS.white,
     marginHorizontal: SPACING.lg,
@@ -294,9 +450,9 @@ const styles = StyleSheet.create({
     color: COLORS.textPrimary,
   },
   chevronIcon: {
-    fontSize: 28,
+    fontSize: 20,
     color: COLORS.gray400,
-    fontWeight: '300',
+    fontWeight: '600',
   },
 
   // Logout Button

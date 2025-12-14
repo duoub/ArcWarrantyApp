@@ -8,6 +8,7 @@ import MenuScreen from '../screens/main/MenuScreen/MenuScreen';
 import WarrantyActivationScreen from '../screens/main/WarrantyActivationScreen/WarrantyActivationScreen';
 import InOutScreen from '../screens/main/InOutScreen/InOutScreen';
 import ProfileScreen from '../screens/main/ProfileScreen/ProfileScreen';
+import EditProfileScreen from '../screens/main/ProfileScreen/EditProfileScreen';
 import SalesProgramScreen from '../screens/main/SalesProgramScreen/SalesProgramScreen';
 import DealerListScreen from '../screens/main/DealerListScreen/DealerListScreen';
 import WarrantyStationListScreen from '../screens/main/WarrantyStationListScreen/WarrantyStationListScreen';
@@ -20,7 +21,7 @@ export type MainTabParamList = {
   MenuStack: undefined;
   InOutStack: undefined;
   WarrantyActivation: undefined;
-  Profile: undefined;
+  ProfileStack: undefined;
 };
 
 export type HomeStackParamList = {
@@ -41,9 +42,15 @@ export type InOutStackParamList = {
   DealerList: undefined;
 };
 
+export type ProfileStackParamList = {
+  Profile: undefined;
+  EditProfile: { section: 'personal' | 'bank' };
+};
+
 const HomeStack = createStackNavigator<HomeStackParamList>();
 const MenuStack = createStackNavigator<MenuStackParamList>();
 const InOutStack = createStackNavigator<InOutStackParamList>();
+const ProfileStack = createStackNavigator<ProfileStackParamList>();
 const Tab = createBottomTabNavigator<MainTabParamList>();
 
 // Custom Tab Button Component for Center Button
@@ -89,6 +96,16 @@ const InOutStackNavigator = () => {
       <InOutStack.Screen name="InOut" component={InOutScreen} />
       <InOutStack.Screen name="DealerList" component={DealerListScreen} />
     </InOutStack.Navigator>
+  );
+};
+
+// Profile Stack Navigator
+const ProfileStackNavigator = () => {
+  return (
+    <ProfileStack.Navigator screenOptions={{ headerShown: false }}>
+      <ProfileStack.Screen name="Profile" component={ProfileScreen} />
+      <ProfileStack.Screen name="EditProfile" component={EditProfileScreen} />
+    </ProfileStack.Navigator>
   );
 };
 
@@ -162,8 +179,8 @@ const MainNavigator = () => {
         }}
       />
       <Tab.Screen
-        name="Profile"
-        component={ProfileScreen}
+        name="ProfileStack"
+        component={ProfileStackNavigator}
         options={{
           title: 'Tài khoản',
           headerShown: false,

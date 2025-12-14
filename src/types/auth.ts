@@ -9,6 +9,16 @@ export interface User {
   phone?: string;
   role: 'admin' | 'technician' | 'dealer' | 'customer';
   avatar?: string;
+  // Personal Information
+  cccd?: string; // CCCD/CMND
+  address?: string;
+  city?: string; // Tỉnh/Thành phố
+  // Business Information
+  taxCode?: string; // Mã số thuế
+  // Bank Information
+  bankName?: string;
+  bankAccountNumber?: string;
+  bankAccountName?: string;
 }
 
 export interface LoginRequest {

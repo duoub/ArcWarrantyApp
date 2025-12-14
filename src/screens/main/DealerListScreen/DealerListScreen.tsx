@@ -6,12 +6,12 @@ import {
   FlatList,
   TouchableOpacity,
   StatusBar,
-  Image,
   TextInput,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { COLORS, SPACING, BORDER_RADIUS, SHADOWS } from '../../../config/theme';
 import CustomHeader from '../../../components/CustomHeader';
+import Avatar from '../../../components/Avatar';
 
 interface Dealer {
   id: string;
@@ -92,10 +92,7 @@ const DealerListScreen = () => {
       onPress={() => handleSelectDealer(item)}
       activeOpacity={0.7}
     >
-      <Image
-        source={require('../../../assets/images/user.jpg')}
-        style={styles.dealerAvatar}
-      />
+      <Avatar size={60} style={styles.dealerAvatar} />
       <View style={styles.dealerInfo}>
         <Text style={styles.dealerName}>Tên đại lý {item.name}</Text>
         <Text style={styles.dealerDetail}>
@@ -218,9 +215,6 @@ const styles = StyleSheet.create({
     ...SHADOWS.md,
   },
   dealerAvatar: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
     marginRight: SPACING.md,
   },
   dealerInfo: {
