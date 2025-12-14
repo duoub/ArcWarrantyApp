@@ -13,6 +13,7 @@ import {
 import { useNavigation } from '@react-navigation/native';
 import { COLORS, SPACING, BORDER_RADIUS, SHADOWS } from '../../../config/theme';
 import CustomHeader from '../../../components/CustomHeader';
+import BarcodeScanner from '../../../components/BarcodeScanner';
 
 interface ProductInfo {
   serial: string;
@@ -29,13 +30,19 @@ const ProductLookupScreen = () => {
   const [serial, setSerial] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [result, setResult] = useState<ProductInfo | null>(null);
+  const [showScanner, setShowScanner] = useState(false);
 
   const handleScanQR = () => {
-    Alert.alert(
-      'Quét mã QR',
-      'Tính năng quét mã QR đang được phát triển.',
-      [{ text: 'OK' }]
-    );
+    setShowScanner(true);
+  };
+
+  const handleScanComplete = (data: string) => {
+    setSerial(data);
+    setShowScanner(false);
+    // Auto search after scan
+    setTimeout(() => {
+      handleSearch();
+    }, 100);
   };
 
   const handleSearch = async () => {
@@ -144,7 +151,7 @@ const ProductLookupScreen = () => {
               style={styles.scanButton}
               disabled={isLoading}
             >
-              <Text style={styles.scanIcon}>📷</Text>
+              <Text style={styles.scanIcon}>⚡</Text>
             </TouchableOpacity>
           </View>
 
@@ -262,6 +269,14 @@ const ProductLookupScreen = () => {
 
         <View style={styles.bottomSpacing} />
       </ScrollView>
+
+      {/* Barcode Scanner Modal */}
+      <BarcodeScanner
+        visible={showScanner}
+        onClose={() => setShowScanner(false)}
+        onScan={handleScanComplete}
+        title="Quét mã sản phẩm"
+      />
     </View>
   );
 };

@@ -19,6 +19,7 @@ import { z } from 'zod';
 import { COLORS, SPACING, BORDER_RADIUS, SHADOWS } from '../../../config/theme';
 import { warrantyService } from '../../../api/warrantyService';
 import CustomHeader from '../../../components/CustomHeader';
+import BarcodeScanner from '../../../components/BarcodeScanner';
 
 // Validation Schema
 const warrantyActivationSchema = z.object({
@@ -40,6 +41,7 @@ type WarrantyActivationFormData = z.infer<typeof warrantyActivationSchema>;
 
 const WarrantyActivationScreen = () => {
   const [isLoading, setIsLoading] = useState(false);
+  const [showScanner, setShowScanner] = useState(false);
 
   const {
     control,
@@ -58,12 +60,12 @@ const WarrantyActivationScreen = () => {
   });
 
   const handleScanQR = () => {
-    // TODO: Implement QR scanner
-    Alert.alert(
-      'Quét mã QR',
-      'Tính năng quét mã QR đang được phát triển. Vui lòng nhập serial thủ công.',
-      [{ text: 'OK' }]
-    );
+    setShowScanner(true);
+  };
+
+  const handleScanComplete = (data: string) => {
+    setValue('serial', data);
+    setShowScanner(false);
   };
 
   const handleActivate = async (data: WarrantyActivationFormData) => {
@@ -171,7 +173,7 @@ const WarrantyActivationScreen = () => {
                     onPress={handleScanQR}
                     disabled={isLoading}
                   >
-                    <Text>Quét</Text>
+                    <Text style={styles.scanIcon}>⚡</Text>
                   </TouchableOpacity>
                 </View>
                 {errors.serial && (
@@ -349,6 +351,14 @@ const WarrantyActivationScreen = () => {
           <View style={styles.bottomSpacing} />
         </ScrollView>
       </KeyboardAvoidingView>
+
+      {/* Barcode Scanner Modal */}
+      <BarcodeScanner
+        visible={showScanner}
+        onClose={() => setShowScanner(false)}
+        onScan={handleScanComplete}
+        title="Quét mã sản phẩm"
+      />
     </View>
   );
 };

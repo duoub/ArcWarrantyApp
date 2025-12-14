@@ -18,6 +18,7 @@ import {
 import { useNavigation } from '@react-navigation/native';
 import { COLORS, SPACING, BORDER_RADIUS, SHADOWS } from '../../../config/theme';
 import CustomHeader from '../../../components/CustomHeader';
+import BarcodeScanner from '../../../components/BarcodeScanner';
 
 interface Province {
   id: string;
@@ -56,6 +57,7 @@ const WarrantyReportScreen = () => {
   const [showDistrictModal, setShowDistrictModal] = useState(false);
   const [showWardModal, setShowWardModal] = useState(false);
   const [searchKeyword, setSearchKeyword] = useState('');
+  const [showScanner, setShowScanner] = useState(false);
 
   // Mock data - replace with API
   const provinces: Province[] = [
@@ -86,11 +88,12 @@ const WarrantyReportScreen = () => {
     : [];
 
   const handleScanQR = () => {
-    Alert.alert(
-      'Quét mã QR',
-      'Tính năng quét mã QR đang được phát triển.',
-      [{ text: 'OK' }]
-    );
+    setShowScanner(true);
+  };
+
+  const handleScanComplete = (data: string) => {
+    setSerial(data);
+    setShowScanner(false);
   };
 
   const handleSearchByPhone = () => {
@@ -292,7 +295,7 @@ const WarrantyReportScreen = () => {
                   editable={!isLoading}
                 />
                 <TouchableOpacity onPress={handleScanQR} style={styles.scanButton}>
-                  <Text style={styles.scanIcon}>📷</Text>
+                  <Text style={styles.scanIcon}>⚡</Text>
                 </TouchableOpacity>
               </View>
             </View>
@@ -529,6 +532,14 @@ const WarrantyReportScreen = () => {
         setWard,
         ward
       )}
+
+      {/* Barcode Scanner Modal */}
+      <BarcodeScanner
+        visible={showScanner}
+        onClose={() => setShowScanner(false)}
+        onScan={handleScanComplete}
+        title="Quét mã sản phẩm"
+      />
     </View>
   );
 };
