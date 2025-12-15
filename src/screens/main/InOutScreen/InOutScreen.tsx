@@ -21,6 +21,7 @@ import Avatar from '../../../components/Avatar';
 import BarcodeScanner from '../../../components/BarcodeScanner';
 import { useAuthStore } from '../../../store/authStore';
 import { InOutStackParamList } from '../../../navigation/MainNavigator';
+import { commonStyles } from '../../../styles/commonStyles';
 
 type InOutScreenNavigationProp = StackNavigationProp<InOutStackParamList, 'InOut'>;
 
@@ -197,11 +198,13 @@ const InOutScreen = () => {
           />
 
           {/* Info hint */}
-          <View style={styles.infoBox}>
-            <Text style={styles.infoIcon}>ℹ️</Text>
-            <Text style={styles.infoText}>
-              Vui lòng quét mã QR hoặc nhập số serial để lưu thông tin
-            </Text>
+          <View style={commonStyles.infoBox}>
+            <Text style={commonStyles.infoBoxIcon}>ℹ️</Text>
+            <View style={commonStyles.infoBoxContent}>
+              <Text style={commonStyles.infoBoxText}>
+                Vui lòng quét mã QR hoặc nhập số serial để lưu thông tin
+              </Text>
+            </View>
           </View>
 
           {/* Save Button - Inside card for seamless look */}
@@ -349,30 +352,6 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: COLORS.error,
     marginTop: SPACING.xs,
-  },
-
-  // Info Box (similar to WarrantyActivationScreen)
-  infoBox: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    backgroundColor: COLORS.accent + '15',
-    borderRadius: BORDER_RADIUS.md,
-    padding: SPACING.md,
-    borderWidth: 1,
-    borderColor: COLORS.accent + '30',
-    marginTop: SPACING.md,
-    marginBottom: SPACING.md,
-  },
-  infoIcon: {
-    fontSize: 18,
-    marginRight: SPACING.sm,
-    marginTop: 2,
-  },
-  infoText: {
-    flex: 1,
-    fontSize: 13,
-    color: COLORS.textSecondary,
-    lineHeight: 18,
   },
 
   // Save Button (matching WarrantyActivationScreen style)

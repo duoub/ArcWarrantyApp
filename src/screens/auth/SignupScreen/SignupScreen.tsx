@@ -13,6 +13,7 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { COLORS, SPACING, BORDER_RADIUS, SHADOWS } from '../../../config/theme';
 import { AuthStackParamList } from '../../../navigation/AuthNavigator';
 import CustomHeader from '../../../components/CustomHeader';
+import { commonStyles } from '../../../styles/commonStyles';
 
 type SignupScreenNavigationProp = StackNavigationProp<AuthStackParamList, 'Signup'>;
 
@@ -103,14 +104,14 @@ const SignupScreen: React.FC = () => {
         </View>
 
         {/* Info Box */}
-        <View style={styles.infoBox}>
-          <Text style={styles.infoBoxIcon}>ℹ️</Text>
-          <View style={styles.infoBoxContent}>
-            <Text style={styles.infoBoxText}>
+        <View style={[commonStyles.infoBox, styles.infoBoxMargin]}>
+          <Text style={commonStyles.infoBoxIcon}>ℹ️</Text>
+          <View style={commonStyles.infoBoxContent}>
+            <Text style={commonStyles.infoBoxText}>
               Trở thành hội viên Akito để nhận nhiều ưu đãi và quyền lợi đặc biệt
             </Text>
             <TouchableOpacity activeOpacity={0.7}>
-              <Text style={styles.infoBoxLink}>Tìm hiểu thêm →</Text>
+              <Text style={commonStyles.infoBoxLink}>Tìm hiểu thêm →</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -202,35 +203,9 @@ const styles = StyleSheet.create({
   },
 
   // Info Box
-  infoBox: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    backgroundColor: COLORS.accent + '15',
-    borderRadius: BORDER_RADIUS.md,
-    padding: SPACING.md,
-    borderWidth: 1,
-    borderColor: COLORS.accent + '30',
+  infoBoxMargin: {
     marginHorizontal: SPACING.lg,
     marginTop: SPACING.md,
-  },
-  infoBoxIcon: {
-    fontSize: 20,
-    marginRight: SPACING.sm,
-    marginTop: 2,
-  },
-  infoBoxContent: {
-    flex: 1,
-  },
-  infoBoxText: {
-    fontSize: 13,
-    color: COLORS.textPrimary,
-    lineHeight: 20,
-    marginBottom: SPACING.xs,
-  },
-  infoBoxLink: {
-    fontSize: 14,
-    color: COLORS.primary,
-    fontWeight: '600',
   },
 
   // Bottom Spacing

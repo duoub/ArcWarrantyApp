@@ -18,6 +18,7 @@ import { COLORS, SPACING, BORDER_RADIUS } from '../../../config/theme';
 import { AuthStackParamList } from '../../../navigation/AuthNavigator';
 import { forgotPasswordSchema, ForgotPasswordFormData } from '../../../utils/validation';
 import { authService } from '../../../api/authService';
+import { commonStyles } from '../../../styles/commonStyles';
 
 type ForgotPasswordScreenNavigationProp = StackNavigationProp<AuthStackParamList, 'ForgotPassword'>;
 
@@ -159,11 +160,13 @@ const ForgotPasswordScreen = () => {
           />
 
           {/* Info Box */}
-          <View style={styles.infoBox}>
-            <Text style={styles.infoIcon}>ℹ️</Text>
-            <Text style={styles.infoText}>
-              Mã OTP sẽ hết hạn sau 5 phút
-            </Text>
+          <View style={commonStyles.infoBox}>
+            <Text style={commonStyles.infoBoxIcon}>ℹ️</Text>
+            <View style={commonStyles.infoBoxContent}>
+              <Text style={commonStyles.infoBoxText}>
+                Mã OTP sẽ hết hạn sau 5 phút
+              </Text>
+            </View>
           </View>
         </View>
 
@@ -320,26 +323,6 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: COLORS.error,
     marginTop: SPACING.xs,
-  },
-
-  // Info Box
-  infoBox: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: COLORS.accent + '15',
-    borderRadius: BORDER_RADIUS.md,
-    padding: SPACING.md,
-    borderWidth: 1,
-    borderColor: COLORS.accent + '30',
-  },
-  infoIcon: {
-    fontSize: 18,
-    marginRight: SPACING.sm,
-  },
-  infoText: {
-    flex: 1,
-    fontSize: 13,
-    color: COLORS.textSecondary,
   },
 
   // Send Button

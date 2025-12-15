@@ -21,6 +21,7 @@ import { COLORS, SPACING, BORDER_RADIUS, SHADOWS } from '../../../config/theme';
 import { warrantyService } from '../../../api/warrantyService';
 import CustomHeader from '../../../components/CustomHeader';
 import BarcodeScanner from '../../../components/BarcodeScanner';
+import { commonStyles } from '../../../styles/commonStyles';
 
 // Validation Schema
 const warrantyActivationSchema = z.object({
@@ -326,12 +327,14 @@ const WarrantyActivationScreen = () => {
           />
 
           {/* Info Box */}
-          <View style={styles.infoBox}>
-            <Text style={styles.infoBoxIcon}>ℹ️</Text>
-            <Text style={styles.infoText}>
-              Vui lòng điền đầy đủ thông tin để kích hoạt bảo hành. Thông tin
-              này sẽ được sử dụng cho việc hỗ trợ và bảo hành sản phẩm.
-            </Text>
+          <View style={commonStyles.infoBox}>
+            <Text style={commonStyles.infoBoxIcon}>ℹ️</Text>
+            <View style={commonStyles.infoBoxContent}>
+              <Text style={commonStyles.infoBoxText}>
+                Vui lòng điền đầy đủ thông tin để kích hoạt bảo hành. Thông tin
+                này sẽ được sử dụng cho việc hỗ trợ và bảo hành sản phẩm.
+              </Text>
+            </View>
           </View>
 
           {/* Activate Button */}
@@ -458,29 +461,6 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: COLORS.error,
     marginTop: SPACING.xs,
-  },
-
-  // Info Box
-  infoBox: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    backgroundColor: COLORS.accent + '15',
-    borderRadius: BORDER_RADIUS.md,
-    padding: SPACING.md,
-    borderWidth: 1,
-    borderColor: COLORS.accent + '30',
-    marginBottom: SPACING.lg,
-  },
-  infoBoxIcon: {
-    fontSize: 18,
-    marginRight: SPACING.sm,
-    marginTop: 2,
-  },
-  infoText: {
-    flex: 1,
-    fontSize: 13,
-    color: COLORS.textSecondary,
-    lineHeight: 18,
   },
 
   // Activate Button

@@ -231,24 +231,37 @@ export const commonStyles = StyleSheet.create({
     marginTop: SPACING.xs,
   },
 
-  // Info Box
+  // Info Box (from WarrantyActivationScreen)
   infoBox: {
     flexDirection: 'row',
-    backgroundColor: `${COLORS.info}08`,
+    alignItems: 'flex-start',
+    backgroundColor: COLORS.accent + '15',
     borderRadius: BORDER_RADIUS.md,
     padding: SPACING.md,
-    borderLeftWidth: 3,
-    borderLeftColor: COLORS.info,
+    borderWidth: 1,
+    borderColor: COLORS.accent + '30',
+    marginBottom: SPACING.lg,
+    marginTop: SPACING.md,
   },
-  infoIcon: {
-    fontSize: 16,
+  infoBoxIcon: {
+    fontSize: 18,
     marginRight: SPACING.sm,
+    marginTop: 2,
   },
-  infoText: {
-    ...TYPOGRAPHY.caption,
-    color: COLORS.info,
+  infoBoxContent: {
     flex: 1,
-    lineHeight: 18,
+    marginTop: 2,
+  },
+  infoBoxText: {
+    fontSize: 13,
+    color: COLORS.textPrimary,
+    lineHeight: 20,
+    marginBottom: SPACING.xs,
+  },
+  infoBoxLink: {
+    fontSize: 14,
+    color: COLORS.primary,
+    fontWeight: '600',
   },
 
   // Divider

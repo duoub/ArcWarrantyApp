@@ -15,6 +15,7 @@ import { useNavigation } from '@react-navigation/native';
 import { COLORS, SPACING, BORDER_RADIUS, SHADOWS } from '../../../config/theme';
 import CustomHeader from '../../../components/CustomHeader';
 import BarcodeScanner from '../../../components/BarcodeScanner';
+import { commonStyles } from '../../../styles/commonStyles';
 
 interface ProductInfo {
   serial: string;
@@ -264,12 +265,14 @@ const ProductLookupScreen = () => {
         )}
 
         {/* Info Box */}
-        <View style={styles.infoBox}>
-          <Text style={styles.infoBoxIcon}>ℹ️</Text>
-          <Text style={styles.infoText}>
-            Nhập số serial trên tem sản phẩm hoặc quét mã QR để kiểm tra
-            tính xác thực của sản phẩm AKITO.
-          </Text>
+        <View style={[commonStyles.infoBox, styles.infoBoxMargin]}>
+          <Text style={commonStyles.infoBoxIcon}>ℹ️</Text>
+          <View style={commonStyles.infoBoxContent}>
+            <Text style={commonStyles.infoBoxText}>
+              Nhập số serial trên tem sản phẩm hoặc quét mã QR để kiểm tra
+              tính xác thực của sản phẩm AKITO.
+            </Text>
+          </View>
         </View>
 
         <View style={styles.bottomSpacing} />
@@ -491,27 +494,9 @@ const styles = StyleSheet.create({
   },
 
   // Info Box
-  infoBox: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    backgroundColor: COLORS.accent + '15',
-    borderRadius: BORDER_RADIUS.md,
-    padding: SPACING.md,
-    borderWidth: 1,
-    borderColor: COLORS.accent + '30',
+  infoBoxMargin: {
     marginHorizontal: SPACING.lg,
     marginTop: SPACING.md,
-  },
-  infoBoxIcon: {
-    fontSize: 18,
-    marginRight: SPACING.sm,
-    marginTop: 2,
-  },
-  infoText: {
-    flex: 1,
-    fontSize: 13,
-    color: COLORS.textSecondary,
-    lineHeight: 18,
   },
 
   bottomSpacing: {
