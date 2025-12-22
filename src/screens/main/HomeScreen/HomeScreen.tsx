@@ -27,9 +27,10 @@ const BANNER_HEIGHT = BANNER_WIDTH * 0.5;
 
 // Mock data for banners - replace with API call later
 const MOCK_BANNERS = [
-  'https://via.placeholder.com/800x400/E31E24/FFFFFF?text=AKITO+Banner+1',
-  'https://via.placeholder.com/800x400/2D2D2D/FFFFFF?text=AKITO+Banner+2',
-  'https://via.placeholder.com/800x400/4FC3F7/FFFFFF?text=AKITO+Banner+3',
+  require('../../../assets/images/banner.jpg'),
+  require('../../../assets/images/banner.jpg'),
+  require('../../../assets/images/banner.jpg'),
+  require('../../../assets/images/banner.jpg'),
 ];
 
 // Mock reward data - replace with API call later
@@ -80,17 +81,17 @@ const HomeScreen = () => {
   };
 
   const handleInventoryPress = () => {
-    Alert.alert('Kho hàng', 'Chức năng đang phát triển');
+    navigation.navigate('Inventory');
   };
 
-  const renderBanner = ({ item, index }: { item: string; index: number }) => (
+  const renderBanner = ({ item, index }: { item: any; index: number }) => (
     <TouchableOpacity
       activeOpacity={0.9}
       onPress={() => handleBannerPress(index)}
       style={styles.bannerItem}
     >
       <Image
-        source={{ uri: item }}
+        source={item}
         style={styles.bannerImage}
         resizeMode="cover"
       />
@@ -107,7 +108,7 @@ const HomeScreen = () => {
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
       {/* Banner Slider */}
       <View style={styles.bannerContainer}>
-        {/* <FlatList
+        <FlatList
           ref={bannerListRef}
           data={MOCK_BANNERS}
           renderItem={renderBanner}
@@ -121,10 +122,10 @@ const HomeScreen = () => {
             );
             setCurrentBannerIndex(index);
           }}
-        /> */}
+        />
 
         {/* Pagination Dots */}
-        {/* <View style={styles.paginationContainer}>
+        <View style={styles.paginationContainer}>
           {MOCK_BANNERS.map((_, index) => (
             <View
               key={`dot-${index}`}
@@ -134,7 +135,7 @@ const HomeScreen = () => {
               ]}
             />
           ))}
-        </View> */}
+        </View>
       </View>
 
       {/* User Profile Section */}

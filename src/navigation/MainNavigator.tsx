@@ -9,12 +9,19 @@ import WarrantyActivationScreen from '../screens/main/WarrantyActivationScreen/W
 import InOutScreen from '../screens/main/InOutScreen/InOutScreen';
 import ProfileScreen from '../screens/main/ProfileScreen/ProfileScreen';
 import EditProfileScreen from '../screens/main/ProfileScreen/EditProfileScreen';
+import ChangePasswordScreen from '../screens/main/ChangePasswordScreen/ChangePasswordScreen';
 import SalesProgramScreen from '../screens/main/SalesProgramScreen/SalesProgramScreen';
+import InventoryScreen from '../screens/main/InventoryScreen/InventoryScreen';
 import DealerListScreen from '../screens/main/DealerListScreen/DealerListScreen';
 import WarrantyStationListScreen from '../screens/main/WarrantyStationListScreen/WarrantyStationListScreen';
 import WarrantyReportScreen from '../screens/main/WarrantyReportScreen/WarrantyReportScreen';
 import WarrantyLookupScreen from '../screens/main/WarrantyLookupScreen/WarrantyLookupScreen';
 import ProductLookupScreen from '../screens/main/ProductLookupScreen/ProductLookupScreen';
+import ProductScreen from '../screens/main/ProductScreen/ProductScreen';
+import DistributionSystemScreen from '../screens/main/DistributionSystemScreen/DistributionSystemScreen';
+import NotificationScreen from '../screens/main/NotificationScreen/NotificationScreen';
+import NewsScreen from '../screens/main/NewsScreen/NewsScreen';
+import ContactScreen from '../screens/main/ContactScreen/ContactScreen';
 
 export type MainTabParamList = {
   HomeStack: undefined;
@@ -27,6 +34,7 @@ export type MainTabParamList = {
 export type HomeStackParamList = {
   Home: undefined;
   SalesProgram: undefined;
+  Inventory: undefined;
 };
 
 export type MenuStackParamList = {
@@ -35,6 +43,11 @@ export type MenuStackParamList = {
   WarrantyReport: undefined;
   WarrantyLookup: undefined;
   ProductLookup: undefined;
+  Product: undefined;
+  DistributionSystem: undefined;
+  Notification: undefined;
+  News: undefined;
+  Contact: undefined;
 };
 
 export type InOutStackParamList = {
@@ -45,6 +58,7 @@ export type InOutStackParamList = {
 export type ProfileStackParamList = {
   Profile: undefined;
   EditProfile: { section: 'personal' | 'bank' };
+  ChangePassword: undefined;
 };
 
 const HomeStack = createStackNavigator<HomeStackParamList>();
@@ -72,6 +86,7 @@ const HomeStackNavigator = () => {
     <HomeStack.Navigator screenOptions={{ headerShown: false }}>
       <HomeStack.Screen name="Home" component={HomeScreen} />
       <HomeStack.Screen name="SalesProgram" component={SalesProgramScreen} />
+      <HomeStack.Screen name="Inventory" component={InventoryScreen} />
     </HomeStack.Navigator>
   );
 };
@@ -85,6 +100,11 @@ const MenuStackNavigator = () => {
       <MenuStack.Screen name="WarrantyReport" component={WarrantyReportScreen} />
       <MenuStack.Screen name="WarrantyLookup" component={WarrantyLookupScreen} />
       <MenuStack.Screen name="ProductLookup" component={ProductLookupScreen} />
+      <MenuStack.Screen name="Product" component={ProductScreen} />
+      <MenuStack.Screen name="DistributionSystem" component={DistributionSystemScreen} />
+      <MenuStack.Screen name="Notification" component={NotificationScreen} />
+      <MenuStack.Screen name="News" component={NewsScreen} />
+      <MenuStack.Screen name="Contact" component={ContactScreen} />
     </MenuStack.Navigator>
   );
 };
@@ -105,6 +125,7 @@ const ProfileStackNavigator = () => {
     <ProfileStack.Navigator screenOptions={{ headerShown: false }}>
       <ProfileStack.Screen name="Profile" component={ProfileScreen} />
       <ProfileStack.Screen name="EditProfile" component={EditProfileScreen} />
+      <ProfileStack.Screen name="ChangePassword" component={ChangePasswordScreen} />
     </ProfileStack.Navigator>
   );
 };

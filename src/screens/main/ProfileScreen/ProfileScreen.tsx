@@ -124,7 +124,7 @@ const ProfileScreen = () => {
   };
 
   const handleChangePassword = () => {
-    Alert.alert('Đổi mật khẩu', 'Chức năng đang phát triển');
+    navigation.navigate('ChangePassword');
   };
 
   const handleLogout = () => {
@@ -305,8 +305,6 @@ const ProfileScreen = () => {
 
         {/* Settings Section */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Cài đặt</Text>
-
           <View style={styles.settingsCard}>
             {/* Change Password */}
             <TouchableOpacity
@@ -490,6 +488,12 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '600',
     color: COLORS.white,
+  },
+
+  // Settings Section Title
+  settingsTitleContainer: {
+    marginHorizontal: SPACING.lg,
+    marginBottom: SPACING.sm,
   },
 
   // Settings Card

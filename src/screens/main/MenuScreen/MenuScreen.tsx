@@ -43,7 +43,7 @@ const MenuScreen = () => {
         {
           icon: '📦',
           label: 'Thông tin sản phẩm',
-          onPress: () => Alert.alert('Thông tin sản phẩm', 'Chức năng đang phát triển'),
+          onPress: () => navigation.navigate('Product'),
         },
         {
           icon: '💼',
@@ -53,7 +53,7 @@ const MenuScreen = () => {
         {
           icon: '🏪',
           label: 'Hệ thống phân phối',
-          onPress: () => Alert.alert('Hệ thống phân phối', 'Chức năng đang phát triển'),
+          onPress: () => navigation.navigate('DistributionSystem'),
         },
       ],
     },
@@ -98,17 +98,17 @@ const MenuScreen = () => {
         {
           icon: '🔔',
           label: 'Thông báo',
-          onPress: () => Alert.alert('Thông báo', 'Chức năng đang phát triển'),
+          onPress: () => navigation.navigate('Notification'),
         },
         {
           icon: '📰',
           label: 'Tin tức',
-          onPress: () => Alert.alert('Tin tức', 'Chức năng đang phát triển'),
+          onPress: () => navigation.navigate('News'),
         },
         {
           icon: '📞',
           label: 'Liên hệ',
-          onPress: () => Alert.alert('Liên hệ', 'Chức năng đang phát triển'),
+          onPress: () => navigation.navigate('Contact'),
         },
       ],
     },
