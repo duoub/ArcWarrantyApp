@@ -18,7 +18,7 @@ export const warrantyService = {
     data: WarrantyActivationRequest
   ): Promise<WarrantyActivationResponse> => {
     const apiUrl = 'https://scell1.qbis.vn/api/forza';
-    const storeId = '022665066528';
+    const storeId = '022665047387'; //'022665066528';
 
     try {
       // Get user info from storage

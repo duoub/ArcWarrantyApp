@@ -11,6 +11,7 @@ export const API_CONFIG = {
   BASE_URL: __DEV__
     ? 'https://scell1.qbis.vn/api/forza'
     : 'https://scell1.qbis.vn/api/forza',
+  STORE_ID: '022665047387', // Store ID for API calls
   TIMEOUT: 30000,
   RETRY_ATTEMPTS: 3,
 };
@@ -27,7 +28,6 @@ export const STORAGE_KEYS = {
 
 // Default Values
 export const DEFAULTS = {
-  STORE_ID: '022665066528', // From AsiaticVn-main configuration
   LANGUAGE: 'vi',
   ITEMS_PER_PAGE: 20,
 };

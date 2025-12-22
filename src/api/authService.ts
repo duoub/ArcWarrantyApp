@@ -4,6 +4,7 @@
  */
 
 import { apiRequest } from './client';
+import { API_CONFIG } from '../config/constants';
 import {
   LoginRequest,
   LoginResponse,
@@ -20,15 +21,11 @@ import {
 export const authService = {
   /**
    * Login user using AsiaticVn API
-   * API: https://scell1.qbis.vn/api/forza/login?storeid=022665066528
+   * API: /login?storeid=xxx
    */
   login: async (data: LoginRequest): Promise<LoginResponse> => {
-    // Using the AsiaticVn API configuration
-    const apiUrl = 'https://scell1.qbis.vn/api/forza';
-    const storeId = '022665066528';
-
     try {
-      const response = await fetch(`${apiUrl}/login?storeid=${storeId}`, {
+      const response = await fetch(`${API_CONFIG.BASE_URL}/login?storeid=${API_CONFIG.STORE_ID}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -50,6 +47,7 @@ export const authService = {
         token: result.token || '', // Add token if available
         user: {
           id: result.id || result.user?.id || '',
+          username: result.username,
           email: result.email || result.user?.email || data.username,
           name: result.name || result.user?.name || data.username,
           phone: result.phone || result.user?.phone,

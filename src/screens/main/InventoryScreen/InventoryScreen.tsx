@@ -18,118 +18,95 @@ import { COLORS, SPACING, BORDER_RADIUS, SHADOWS } from '../../../config/theme';
 import CustomHeader from '../../../components/CustomHeader';
 import BarcodeScanner from '../../../components/BarcodeScanner';
 import { HomeStackParamList } from '../../../navigation/MainNavigator';
+import { inventoryService } from '../../../api/inventoryService';
+import { InventoryItem } from '../../../types/inventory';
 
 type InventoryScreenNavigationProp = StackNavigationProp<HomeStackParamList, 'Inventory'>;
-
-// Mock data type
-interface InventoryItem {
-  serial: string;
-  tenhangsanxuat: string;
-  tenmodel: string;
-  thoigianbaohanh: string;
-  ngaynhapkho: string;
-  ngaymua: string;
-  kichhoatbaohanh: number;
-  kichhoatbaohanhname: string;
-  ngaykichhoat: string;
-  hanbaohanh: string;
-  statuscolor: string;
-}
 
 const InventoryScreen = () => {
   const navigation = useNavigation<InventoryScreenNavigationProp>();
 
   const [activeTab, setActiveTab] = useState<'1' | '2'>('1'); // 1: Còn trong kho, 2: Đã bán
   const [keyword, setKeyword] = useState('');
+  const [searchKeyword, setSearchKeyword] = useState(''); // Debounced keyword
   const [showScanner, setShowScanner] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [inventoryList, setInventoryList] = useState<InventoryItem[]>([]);
   const [totalCount, setTotalCount] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [hasNextPage, setHasNextPage] = useState(true);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
 
-  // Mock data - replace with API call later
-  const MOCK_INVENTORY: InventoryItem[] = [
-    {
-      serial: 'AKT-2024-001-0001',
-      tenhangsanxuat: 'AKITO',
-      tenmodel: 'AKITO-12000BTU-INV',
-      thoigianbaohanh: '24 tháng',
-      ngaynhapkho: '15/12/2024',
-      ngaymua: '',
-      kichhoatbaohanh: 1,
-      kichhoatbaohanhname: 'Chưa kích hoạt',
-      ngaykichhoat: '',
-      hanbaohanh: '',
-      statuscolor: COLORS.warning,
-    },
-    {
-      serial: 'AKT-2024-001-0002',
-      tenhangsanxuat: 'AKITO',
-      tenmodel: 'AKITO-18000BTU-INV',
-      thoigianbaohanh: '24 tháng',
-      ngaynhapkho: '14/12/2024',
-      ngaymua: '',
-      kichhoatbaohanh: 1,
-      kichhoatbaohanhname: 'Chưa kích hoạt',
-      ngaykichhoat: '',
-      hanbaohanh: '',
-      statuscolor: COLORS.warning,
-    },
-    {
-      serial: 'AKT-2024-001-0003',
-      tenhangsanxuat: 'AKITO',
-      tenmodel: 'AKITO-9000BTU',
-      thoigianbaohanh: '24 tháng',
-      ngaynhapkho: '10/12/2024',
-      ngaymua: '12/12/2024',
-      kichhoatbaohanh: 2,
-      kichhoatbaohanhname: 'Đã kích hoạt',
-      ngaykichhoat: '12/12/2024',
-      hanbaohanh: '12/12/2026',
-      statuscolor: COLORS.success,
-    },
-  ];
-
+  // Debounce search keyword
   useEffect(() => {
-    loadInventory();
-  }, [activeTab, keyword]);
+    const timer = setTimeout(() => {
+      setSearchKeyword(keyword);
+      setCurrentPage(1); // Reset to page 1 when searching
+    }, 800);
 
-  const loadInventory = async () => {
+    return () => clearTimeout(timer);
+  }, [keyword]);
+
+  // Load inventory when tab or search keyword changes
+  useEffect(() => {
+    loadInventory(1, true);
+  }, [activeTab, searchKeyword]);
+
+  const loadInventory = async (page: number = 1, reset: boolean = false) => {
     try {
-      setIsLoading(true);
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 500));
-
-      // Filter by tab and keyword
-      let filtered = MOCK_INVENTORY.filter(item => {
-        if (activeTab === '1') {
-          return !item.ngaymua; // Còn trong kho (chưa bán)
-        } else {
-          return !!item.ngaymua; // Đã bán
-        }
-      });
-
-      if (keyword) {
-        filtered = filtered.filter(item =>
-          item.serial.toLowerCase().includes(keyword.toLowerCase()) ||
-          item.tenhangsanxuat.toLowerCase().includes(keyword.toLowerCase()) ||
-          item.tenmodel.toLowerCase().includes(keyword.toLowerCase())
-        );
+      if (reset) {
+        setIsLoading(true);
+        setInventoryList([]);
+      } else {
+        setIsLoadingMore(true);
       }
 
-      setInventoryList(filtered);
-      setTotalCount(filtered.length);
+      console.log('📦 Loading inventory - Page:', page, 'Type:', activeTab, 'Keyword:', searchKeyword);
+
+      const response = await inventoryService.getInventoryList({
+        page,
+        type: activeTab,
+        keyword: searchKeyword,
+      });
+
+      console.log('✅ Inventory loaded:', {
+        count: response.count,
+        items: response.list.length,
+        hasNext: response.nextpage,
+      });
+
+      if (reset) {
+        setInventoryList(response.list);
+      } else {
+        setInventoryList(prev => [...prev, ...response.list]);
+      }
+
+      setTotalCount(response.count);
+      setHasNextPage(response.nextpage);
+      setCurrentPage(page);
     } catch (error) {
-      Alert.alert('Lỗi', 'Không thể tải danh sách kho hàng');
+      console.error('❌ Load inventory error:', error);
+      Alert.alert(
+        'Lỗi',
+        error instanceof Error ? error.message : 'Không thể tải danh sách kho hàng'
+      );
     } finally {
       setIsLoading(false);
+      setIsLoadingMore(false);
     }
   };
 
   const handleRefresh = async () => {
     setIsRefreshing(true);
-    await loadInventory();
+    await loadInventory(1, true);
     setIsRefreshing(false);
+  };
+
+  const handleLoadMore = () => {
+    if (!isLoadingMore && hasNextPage && !isLoading) {
+      loadInventory(currentPage + 1, false);
+    }
   };
 
   const handleScanBarcode = () => {
@@ -290,6 +267,14 @@ const InventoryScreen = () => {
             tintColor={COLORS.primary}
           />
         }
+        onScroll={({ nativeEvent }) => {
+          const { layoutMeasurement, contentOffset, contentSize } = nativeEvent;
+          const isCloseToBottom = layoutMeasurement.height + contentOffset.y >= contentSize.height - 100;
+          if (isCloseToBottom) {
+            handleLoadMore();
+          }
+        }}
+        scrollEventThrottle={400}
       >
         {/* Total Count */}
         <View style={styles.totalCountCard}>
@@ -319,6 +304,14 @@ const InventoryScreen = () => {
 
         {/* Inventory List */}
         {!isLoading && inventoryList.map((item, index) => renderInventoryItem(item, index))}
+
+        {/* Load More Indicator */}
+        {isLoadingMore && (
+          <View style={styles.loadMoreContainer}>
+            <ActivityIndicator size="small" color={COLORS.primary} />
+            <Text style={styles.loadMoreText}>Đang tải thêm...</Text>
+          </View>
+        )}
 
         {/* Bottom Spacing */}
         <View style={styles.bottomSpacing} />
@@ -499,6 +492,18 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: COLORS.textSecondary,
     marginTop: SPACING.md,
+  },
+
+  // Load More State
+  loadMoreContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: SPACING.lg,
+  },
+  loadMoreText: {
+    fontSize: 13,
+    color: COLORS.textSecondary,
+    marginTop: SPACING.sm,
   },
 
   // Empty State
