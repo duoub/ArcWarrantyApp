@@ -1,20 +1,24 @@
 /**
- * Province API Service
- * API calls for province/city list with caching
+ * Province/District/Ward API Service
+ * API calls for location data with caching
  */
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { buildApiUrl, getUserCredentials } from '../utils/apiHelper';
 import {
   GetProvincesResponse,
+  GetLocationsResponse,
   ProvinceRaw,
   Province,
+  Location,
 } from '../types/province';
 
 const PROVINCE_CACHE_KEY = '@provinces_cache';
+const LOCATION_CACHE_PREFIX = '@location_cache_';
 
 // In-memory cache for faster access
 let memoryCache: Province[] | null = null;
+const locationMemoryCache: Map<string, Location[]> = new Map();
 
 /**
  * Parse and transform raw API data to clean app format
@@ -30,30 +34,27 @@ const parseProvince = (raw: ProvinceRaw): Province => {
 export const provinceService = {
   /**
    * Get list of provinces/cities with caching
+   * Uses /gettinhthanh API (has "Tất cả" option with empty MaDiaBan)
    * API: /gettinhthanh?storeid=xxx
-   * - First checks memory cache
-   * - Then checks AsyncStorage cache
-   * - Finally fetches from API if no cache available
    */
   getProvinces: async (forceRefresh: boolean = false): Promise<GetProvincesResponse> => {
     try {
-      // Return memory cache if available and not forcing refresh
-      if (!forceRefresh && memoryCache && memoryCache.length > 0) {
-        console.log('🌍 Using memory cached provinces:', memoryCache.length);
+      const cacheKey = PROVINCE_CACHE_KEY;
+
+      // Check memory cache
+      if (!forceRefresh && memoryCache) {
         return {
           status: true,
           list: memoryCache,
         };
       }
 
-      // Check AsyncStorage cache if not forcing refresh
+      // Check AsyncStorage cache
       if (!forceRefresh) {
-        const cachedData = await AsyncStorage.getItem(PROVINCE_CACHE_KEY);
+        const cachedData = await AsyncStorage.getItem(cacheKey);
         if (cachedData) {
           const parsedCache: Province[] = JSON.parse(cachedData);
           if (parsedCache && parsedCache.length > 0) {
-            console.log('🌍 Using AsyncStorage cached provinces:', parsedCache.length);
-            // Update memory cache
             memoryCache = parsedCache;
             return {
               status: true,
@@ -69,8 +70,6 @@ export const provinceService = {
         storeid: credentials.storeid,
       });
 
-      console.log('🌍 Fetching provinces from API:', url);
-
       const response = await fetch(url, {
         method: 'GET',
         headers: {
@@ -80,25 +79,16 @@ export const provinceService = {
 
       const result = await response.json();
 
-      console.log('🌍 Provinces API response:', {
-        isArray: Array.isArray(result),
-        length: result?.length,
-        firstItem: result?.[0],
-      });
-
-      // API returns array directly, not wrapped in object
+      // API returns array directly
       const rawList: ProvinceRaw[] = Array.isArray(result) ? result : [];
 
-      // Parse raw data to clean format
+      // Parse raw data
       const parsedList: Province[] = rawList.map(parseProvince);
 
-      console.log('✅ Parsed provinces count:', parsedList.length);
-
-      // Save to both memory and AsyncStorage cache
+      // Save to both caches
       if (parsedList.length > 0) {
         memoryCache = parsedList;
-        await AsyncStorage.setItem(PROVINCE_CACHE_KEY, JSON.stringify(parsedList));
-        console.log('💾 Provinces cached successfully');
+        await AsyncStorage.setItem(cacheKey, JSON.stringify(parsedList));
       }
 
       return {
@@ -106,7 +96,6 @@ export const provinceService = {
         list: parsedList,
       };
     } catch (error) {
-      console.error('❌ Provinces fetch error:', error);
       if (error instanceof Error) {
         throw error;
       }
@@ -124,7 +113,7 @@ export const provinceService = {
       await AsyncStorage.removeItem(PROVINCE_CACHE_KEY);
       console.log('🗑️ Province cache cleared');
     } catch (error) {
-      console.error('❌ Failed to clear province cache:', error);
+      // Silently fail on clear
     }
   },
 
@@ -133,7 +122,103 @@ export const provinceService = {
    * Call this after login
    */
   refreshProvinces: async (): Promise<GetProvincesResponse> => {
-    console.log('🔄 Refreshing provinces...');
     return provinceService.getProvinces(true);
+  },
+
+  /**
+   * Get locations (District/Ward) by parent code
+   * API: /getdiaban?storeid=xxx&macha=yyy
+   * - parentCode: MaDiaBan of parent (empty string for provinces)
+   * - Uses memory cache for faster access
+   * - Uses AsyncStorage for persistent cache
+   */
+  getLocations: async (
+    parentCode: string = '',
+    forceRefresh: boolean = false
+  ): Promise<GetLocationsResponse> => {
+    try {
+      const cacheKey = `${LOCATION_CACHE_PREFIX}${parentCode}`;
+      // Check memory cache
+      if (!forceRefresh && locationMemoryCache.has(cacheKey)) {
+        const cached = locationMemoryCache.get(cacheKey)!;
+        return {
+          status: true,
+          list: cached,
+        };
+      }
+
+      // Check AsyncStorage cache
+      if (!forceRefresh) {
+        const cachedData = await AsyncStorage.getItem(cacheKey);
+        if (cachedData) {
+          const parsedCache: Location[] = JSON.parse(cachedData);
+          if (parsedCache && parsedCache.length > 0) {
+            locationMemoryCache.set(cacheKey, parsedCache);
+            return {
+              status: true,
+              list: parsedCache,
+            };
+          }
+        }
+      }
+
+      // Fetch from API
+      const credentials = getUserCredentials();
+      const url = buildApiUrl('/getdiaban', {
+        storeid: credentials.storeid,
+        macha: parentCode,
+      });
+
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      const result = await response.json();
+
+      // API returns array directly
+      const rawList: ProvinceRaw[] = Array.isArray(result) ? result : [];
+
+      // Parse raw data
+      const parsedList: Location[] = rawList.map(parseProvince);
+
+      // Save to both caches
+      if (parsedList.length > 0) {
+        locationMemoryCache.set(cacheKey, parsedList);
+        await AsyncStorage.setItem(cacheKey, JSON.stringify(parsedList));
+      }
+
+      return {
+        status: true,
+        list: parsedList,
+      };
+    } catch (error) {
+      if (error instanceof Error) {
+        throw error;
+      }
+      throw new Error('Không thể tải danh sách địa điểm. Vui lòng thử lại.');
+    }
+  },
+
+  /**
+   * Clear all location caches (including provinces, districts, wards)
+   */
+  clearAllCaches: async (): Promise<void> => {
+    try {
+      // Clear memory caches
+      memoryCache = null;
+      locationMemoryCache.clear();
+
+      // Clear AsyncStorage - get all keys and remove location caches
+      const allKeys = await AsyncStorage.getAllKeys();
+      const locationKeys = allKeys.filter(
+        (key) => key.startsWith(LOCATION_CACHE_PREFIX) || key === PROVINCE_CACHE_KEY
+      );
+      await AsyncStorage.multiRemove(locationKeys);
+    } catch (error) {
+      // Silently fail on clear
+    }
   },
 };

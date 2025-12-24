@@ -11,31 +11,14 @@ import {
   ActivityIndicator,
   Alert,
   StatusBar,
-  Modal,
-  Pressable,
   Image,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { COLORS, SPACING, BORDER_RADIUS, SHADOWS } from '../../../config/theme';
 import CustomHeader from '../../../components/CustomHeader';
 import BarcodeScanner from '../../../components/BarcodeScanner';
-
-interface Province {
-  id: string;
-  TenDiaBan: string;
-}
-
-interface District {
-  id: string;
-  TenDiaBan: string;
-  provinceId: string;
-}
-
-interface Ward {
-  id: string;
-  TenDiaBan: string;
-  districtId: string;
-}
+import LocationSelector from '../../../components/LocationSelector';
+import { Location } from '../../../types/province';
 
 const WarrantyReportScreen = () => {
   const navigation = useNavigation();
@@ -44,48 +27,14 @@ const WarrantyReportScreen = () => {
   const [serial, setSerial] = useState('');
   const [customerName, setCustomerName] = useState('');
   const [phone, setPhone] = useState('');
-  const [province, setProvince] = useState<Province | null>(null);
-  const [district, setDistrict] = useState<District | null>(null);
-  const [ward, setWard] = useState<Ward | null>(null);
+  const [province, setProvince] = useState<Location | null>(null);
+  const [district, setDistrict] = useState<Location | null>(null);
+  const [ward, setWard] = useState<Location | null>(null);
   const [address, setAddress] = useState('');
   const [issueDescription, setIssueDescription] = useState('');
   const [images, setImages] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-
-  // Modal states
-  const [showProvinceModal, setShowProvinceModal] = useState(false);
-  const [showDistrictModal, setShowDistrictModal] = useState(false);
-  const [showWardModal, setShowWardModal] = useState(false);
-  const [searchKeyword, setSearchKeyword] = useState('');
   const [showScanner, setShowScanner] = useState(false);
-
-  // Mock data - replace with API
-  const provinces: Province[] = [
-    { id: '1', TenDiaBan: 'Hà Nội' },
-    { id: '2', TenDiaBan: 'TP. Hồ Chí Minh' },
-    { id: '3', TenDiaBan: 'Đà Nẵng' },
-  ];
-
-  const districts: District[] = [
-    { id: '1', TenDiaBan: 'Quận Hoàn Kiếm', provinceId: '1' },
-    { id: '2', TenDiaBan: 'Quận Hai Bà Trưng', provinceId: '1' },
-    { id: '3', TenDiaBan: 'Quận 1', provinceId: '2' },
-    { id: '4', TenDiaBan: 'Quận Tân Bình', provinceId: '2' },
-  ];
-
-  const wards: Ward[] = [
-    { id: '1', TenDiaBan: 'Phường Hàng Bạc', districtId: '1' },
-    { id: '2', TenDiaBan: 'Phường Hàng Bồ', districtId: '1' },
-    { id: '3', TenDiaBan: 'Phường Bạch Đằng', districtId: '2' },
-  ];
-
-  const filteredDistricts = province
-    ? districts.filter((d) => d.provinceId === province.id)
-    : [];
-
-  const filteredWards = district
-    ? wards.filter((w) => w.districtId === district.id)
-    : [];
 
   const handleScanQR = () => {
     setShowScanner(true);
@@ -167,90 +116,6 @@ const WarrantyReportScreen = () => {
       ]
     );
   };
-
-  const renderLocationModal = (
-    visible: boolean,
-    onClose: () => void,
-    title: string,
-    data: any[],
-    onSelect: (item: any) => void,
-    selectedItem: any
-  ) => (
-    <Modal
-      visible={visible}
-      animationType="slide"
-      transparent={true}
-      onRequestClose={onClose}
-    >
-      <View style={styles.modalOverlay}>
-        <Pressable style={styles.modalBackdrop} onPress={onClose} />
-        <View style={styles.modalContent}>
-          <View style={styles.modalHeader}>
-            <Text style={styles.modalTitle}>{title}</Text>
-            <TouchableOpacity onPress={onClose} style={styles.modalCloseButton}>
-              <Text style={styles.modalCloseIcon}>✕</Text>
-            </TouchableOpacity>
-          </View>
-
-          <View style={styles.modalSearchContainer}>
-            <Text style={styles.searchIcon}>🔍</Text>
-            <TextInput
-              style={styles.modalSearchInput}
-              placeholder="Tìm kiếm..."
-              placeholderTextColor={COLORS.gray400}
-              value={searchKeyword}
-              onChangeText={setSearchKeyword}
-              autoFocus
-            />
-            {searchKeyword !== '' && (
-              <TouchableOpacity
-                onPress={() => setSearchKeyword('')}
-                style={styles.clearSearchButton}
-              >
-                <Text style={styles.clearSearchIcon}>✕</Text>
-              </TouchableOpacity>
-            )}
-          </View>
-
-          <View style={styles.modalListWrapper}>
-            <ScrollView style={styles.modalList} showsVerticalScrollIndicator={true}>
-              {data
-                .filter((item) =>
-                  item.TenDiaBan.toLowerCase().includes(searchKeyword.toLowerCase())
-                )
-                .map((item, index, filteredArray) => (
-                  <TouchableOpacity
-                    key={item.id}
-                    style={[
-                      styles.modalOption,
-                      index === filteredArray.length - 1 && styles.modalOptionLast,
-                    ]}
-                    onPress={() => {
-                      onSelect(item);
-                      onClose();
-                      setSearchKeyword('');
-                    }}
-                    activeOpacity={0.7}
-                  >
-                    <Text
-                      style={[
-                        styles.modalOptionText,
-                        selectedItem?.id === item.id && styles.modalOptionTextActive,
-                      ]}
-                    >
-                      {item.TenDiaBan}
-                    </Text>
-                    {selectedItem?.id === item.id && (
-                      <Text style={styles.checkIcon}>✓</Text>
-                    )}
-                  </TouchableOpacity>
-                ))}
-            </ScrollView>
-          </View>
-        </View>
-      </View>
-    </Modal>
-  );
 
   return (
     <View style={styles.container}>
@@ -346,21 +211,16 @@ const WarrantyReportScreen = () => {
               <Text style={styles.inputLabel}>
                 Tỉnh thành <Text style={styles.required}>*</Text>
               </Text>
-              <TouchableOpacity
-                style={styles.selectWrapper}
-                onPress={() => setShowProvinceModal(true)}
-                activeOpacity={0.7}
-              >
-                <Text
-                  style={[
-                    styles.selectText,
-                    !province && styles.selectTextPlaceholder,
-                  ]}
-                >
-                  {province ? province.TenDiaBan : 'Chọn tỉnh thành'}
-                </Text>
-                <Text style={styles.selectIcon}>›</Text>
-              </TouchableOpacity>
+              <LocationSelector
+                parentCode=""
+                selectedLocation={province?.TenDiaBan || ''}
+                onLocationChange={(location) => {
+                  setProvince(location);
+                  setDistrict(null);
+                  setWard(null);
+                }}
+                placeholder="Chọn tỉnh thành"
+              />
             </View>
 
             {/* District */}
@@ -368,25 +228,16 @@ const WarrantyReportScreen = () => {
               <Text style={styles.inputLabel}>
                 Quận huyện <Text style={styles.required}>*</Text>
               </Text>
-              <TouchableOpacity
-                style={[
-                  styles.selectWrapper,
-                  !province && styles.selectWrapperDisabled,
-                ]}
-                onPress={() => province && setShowDistrictModal(true)}
-                activeOpacity={0.7}
+              <LocationSelector
+                parentCode={province?.MaDiaBan || ''}
+                selectedLocation={district?.TenDiaBan || ''}
+                onLocationChange={(location) => {
+                  setDistrict(location);
+                  setWard(null);
+                }}
+                placeholder="Chọn quận huyện"
                 disabled={!province}
-              >
-                <Text
-                  style={[
-                    styles.selectText,
-                    !district && styles.selectTextPlaceholder,
-                  ]}
-                >
-                  {district ? district.TenDiaBan : 'Chọn quận huyện'}
-                </Text>
-                <Text style={styles.selectIcon}>›</Text>
-              </TouchableOpacity>
+              />
             </View>
 
             {/* Ward */}
@@ -394,25 +245,13 @@ const WarrantyReportScreen = () => {
               <Text style={styles.inputLabel}>
                 Xã phường <Text style={styles.required}>*</Text>
               </Text>
-              <TouchableOpacity
-                style={[
-                  styles.selectWrapper,
-                  !district && styles.selectWrapperDisabled,
-                ]}
-                onPress={() => district && setShowWardModal(true)}
-                activeOpacity={0.7}
+              <LocationSelector
+                parentCode={district?.MaDiaBan || ''}
+                selectedLocation={ward?.TenDiaBan || ''}
+                onLocationChange={setWard}
+                placeholder="Chọn xã phường"
                 disabled={!district}
-              >
-                <Text
-                  style={[
-                    styles.selectText,
-                    !ward && styles.selectTextPlaceholder,
-                  ]}
-                >
-                  {ward ? ward.TenDiaBan : 'Chọn xã phường'}
-                </Text>
-                <Text style={styles.selectIcon}>›</Text>
-              </TouchableOpacity>
+              />
             </View>
 
             {/* Address */}
@@ -501,41 +340,6 @@ const WarrantyReportScreen = () => {
           <View style={styles.bottomSpacing} />
         </ScrollView>
       </KeyboardAvoidingView>
-
-      {/* Location Modals */}
-      {renderLocationModal(
-        showProvinceModal,
-        () => setShowProvinceModal(false),
-        'Chọn tỉnh thành',
-        provinces,
-        (item) => {
-          setProvince(item);
-          setDistrict(null);
-          setWard(null);
-        },
-        province
-      )}
-
-      {renderLocationModal(
-        showDistrictModal,
-        () => setShowDistrictModal(false),
-        'Chọn quận huyện',
-        filteredDistricts,
-        (item) => {
-          setDistrict(item);
-          setWard(null);
-        },
-        district
-      )}
-
-      {renderLocationModal(
-        showWardModal,
-        () => setShowWardModal(false),
-        'Chọn xã phường',
-        filteredWards,
-        setWard,
-        ward
-      )}
 
       {/* Barcode Scanner Modal */}
       <BarcodeScanner
@@ -641,35 +445,6 @@ const styles = StyleSheet.create({
     height: 32,
   },
 
-  // Select Fields
-  selectWrapper: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    backgroundColor: COLORS.gray50,
-    borderRadius: BORDER_RADIUS.md,
-    borderWidth: 1,
-    borderColor: COLORS.gray200,
-    paddingHorizontal: SPACING.md,
-    paddingVertical: SPACING.md,
-  },
-  selectWrapperDisabled: {
-    opacity: 0.5,
-  },
-  selectText: {
-    fontSize: 15,
-    color: COLORS.textPrimary,
-    flex: 1,
-  },
-  selectTextPlaceholder: {
-    color: COLORS.gray400,
-  },
-  selectIcon: {
-    fontSize: 24,
-    color: COLORS.gray400,
-    fontWeight: '300',
-  },
-
   // Image Upload
   addImageButton: {
     backgroundColor: COLORS.gray100,
@@ -739,116 +514,6 @@ const styles = StyleSheet.create({
   },
   submitButtonDisabled: {
     opacity: 0.6,
-  },
-
-  // Modal Styles
-  modalOverlay: {
-    flex: 1,
-    justifyContent: 'flex-end',
-  },
-  modalBackdrop: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: COLORS.overlay,
-  },
-  modalContent: {
-    backgroundColor: COLORS.white,
-    borderTopLeftRadius: BORDER_RADIUS.xl,
-    borderTopRightRadius: BORDER_RADIUS.xl,
-    height: '70%',
-    ...SHADOWS.xl,
-  },
-  modalHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: SPACING.lg,
-    paddingVertical: SPACING.md,
-    borderBottomWidth: 1,
-    borderBottomColor: COLORS.gray200,
-  },
-  modalTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: COLORS.textPrimary,
-  },
-  modalCloseButton: {
-    width: 32,
-    height: 32,
-    borderRadius: BORDER_RADIUS.full,
-    backgroundColor: COLORS.gray100,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  modalCloseIcon: {
-    fontSize: 18,
-    color: COLORS.gray600,
-    fontWeight: '600',
-  },
-  modalSearchContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: COLORS.gray50,
-    borderRadius: BORDER_RADIUS.md,
-    paddingHorizontal: SPACING.md,
-    marginHorizontal: SPACING.lg,
-    marginTop: SPACING.md,
-    marginBottom: SPACING.sm,
-    borderWidth: 1,
-    borderColor: COLORS.gray200,
-  },
-  searchIcon: {
-    fontSize: 20,
-    marginRight: SPACING.sm,
-  },
-  modalSearchInput: {
-    flex: 1,
-    height: 44,
-    fontSize: 15,
-    color: COLORS.textPrimary,
-  },
-  clearSearchButton: {
-    padding: SPACING.xs,
-  },
-  clearSearchIcon: {
-    fontSize: 16,
-    color: COLORS.gray500,
-  },
-  modalListWrapper: {
-    flex: 1,
-    overflow: 'hidden',
-  },
-  modalList: {
-    flex: 1,
-  },
-  modalOption: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingVertical: SPACING.md,
-    paddingHorizontal: SPACING.lg,
-    borderBottomWidth: 1,
-    borderBottomColor: COLORS.gray200,
-  },
-  modalOptionLast: {
-    borderBottomWidth: 0,
-  },
-  modalOptionText: {
-    fontSize: 15,
-    color: COLORS.textPrimary,
-    flex: 1,
-  },
-  modalOptionTextActive: {
-    color: COLORS.primary,
-    fontWeight: '700',
-  },
-  checkIcon: {
-    fontSize: 20,
-    color: COLORS.primary,
-    fontWeight: '700',
   },
 
   bottomSpacing: {
