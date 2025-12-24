@@ -36,8 +36,8 @@ apiClient.interceptors.response.use(
   async (error: AxiosError) => {
     if (error.response?.status === 401) {
       // Token expired or invalid - clear storage and redirect to login
-      storage.delete('auth_token');
-      storage.delete('user_data');
+      storage.remove('auth_token');
+      storage.remove('user_data');
     }
     return Promise.reject(error);
   }
@@ -51,8 +51,8 @@ export const handleApiError = (error: unknown): string => {
     if (axiosError.response) {
       // Server responded with error
       return axiosError.response.data?.message ||
-             axiosError.response.data?.error ||
-             'Đã có lỗi xảy ra';
+        axiosError.response.data?.error ||
+        'Đã có lỗi xảy ra';
     } else if (axiosError.request) {
       // No response received
       return 'Không thể kết nối đến server. Vui lòng kiểm tra kết nối mạng.';

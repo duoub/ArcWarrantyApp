@@ -106,7 +106,7 @@ const result = await apiFetch<ResponseType>(url, {
   }
   ```
 
-#### Activate Warranty
+#### Activate Warranty (Gửi kích hoạt bảo hành)
 - **Endpoint**: `/guikichhoatbaohanh`
 - **Method**: POST
 - **Body**:
@@ -122,6 +122,62 @@ const result = await apiFetch<ResponseType>(url, {
   {
     "status": true,
     "message": "Kích hoạt bảo hành thành công"
+  }
+  ```
+
+### 3. Warranty API (`warrantyService.ts`)
+
+#### Activate Serial (Kích hoạt serial)
+- **Endpoint**: `/activeserial`
+- **Method**: POST
+- **Body**:
+  ```json
+  {
+    "storeid": "022665047387",
+    "keyword": "0904601040",
+    "cusname": "Nguyen Van A",
+    "cusmobile": "0901234567",
+    "cusaddress": "123 Street, District, City",
+    "cusemail": "customer@example.com",
+    "userid": "username"
+  }
+  ```
+- **Response**:
+  ```json
+  {
+    "status": true,
+    "message": "Kích hoạt bảo hành thành công",
+    "data": {
+      "serial": "0904601040",
+      "activatedAt": "2024-12-22"
+    }
+  }
+  ```
+
+### 4. Warranty Station API (`warrantyStationService.ts`)
+
+#### Get Warranty Stations List
+- **Endpoint**: `/getlisttram`
+- **Method**: GET
+- **Query Params**:
+  - `storeid`: Store ID (from config) - '022665047387'
+  - `page`: Page number (1, 2, 3, ...)
+  - `tentinhthanh`: Province name ('Tỉnh thành' for all, 'Hà Nội', 'TP. Hồ Chí Minh', etc.)
+  - `keyword`: Search keyword (optional, tên trạm)
+- **Response**:
+  ```json
+  {
+    "nextpage": false,
+    "count": 10,
+    "list": [
+      {
+        "id": "1",
+        "TenTram": "Trung tâm bảo hành AKITO Hà Nội",
+        "SoDienThoai": "024 3333 4444",
+        "DiaChi": "123 Phố Huế, Quận Hai Bà Trưng, Hà Nội",
+        "TinhThanh": "Hà Nội"
+      }
+    ]
   }
   ```
 

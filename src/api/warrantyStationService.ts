@@ -1,0 +1,93 @@
+/**
+ * Warranty Station API Service
+ * API calls for warranty station list and management
+ */
+
+import { buildApiUrl } from '../utils/apiHelper';
+import {
+  GetWarrantyStationsRequest,
+  GetWarrantyStationsResponse,
+  WarrantyStationRaw,
+  WarrantyStation,
+} from '../types/warrantyStation';
+
+/**
+ * Parse and transform raw API data to clean app format
+ */
+const parseWarrantyStation = (raw: WarrantyStationRaw): WarrantyStation => {
+  return {
+    id: raw.id,
+    TenTram: raw.TenTram || '',
+    SoDienThoai: raw.SoDienThoai || '',
+    DiaChi: raw.DiaChi || '',
+    TinhThanh: raw.TinhThanh || '',
+  };
+};
+
+export const warrantyStationService = {
+  /**
+   * Get list of warranty stations
+   * API: /getlisttram?storeid=xxx&page=1&tentinhthanh=xxx&keyword=
+   */
+  getWarrantyStations: async (
+    params: GetWarrantyStationsRequest
+  ): Promise<GetWarrantyStationsResponse> => {
+    try {
+      const { page, tentinhthanh, keyword = '' } = params;
+
+      // Build API URL with query params
+      const url = buildApiUrl('/getlisttram', {
+        storeid: '022665047387',
+        page: page,
+        tentinhthanh: tentinhthanh,
+        keyword: keyword,
+      });
+
+      console.log('🏢 Fetching warranty stations:', url);
+
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      const result = await response.json();
+
+      console.log('🏢 Warranty stations response:', {
+        count: result.count,
+        nextpage: result.nextpage,
+        listLength: result.list?.length,
+        firstItem: result.list?.[0],
+      });
+
+      // API doesn't return status field, check if we have data
+      const hasData = result.list !== undefined;
+
+      if (!hasData && result.message) {
+        throw new Error(result.message);
+      }
+
+      // Parse raw data to clean format
+      const parsedList: WarrantyStation[] = (result.list || []).map(
+        parseWarrantyStation
+      );
+
+      console.log('✅ Parsed first station:', parsedList[0]);
+
+      return {
+        status: true,
+        list: parsedList,
+        count: result.count || 0,
+        nextpage: result.nextpage || false,
+        message: result.message,
+      };
+    } catch (error) {
+      console.error('❌ Warranty stations fetch error:', error);
+      if (error instanceof Error) {
+        throw error;
+      }
+      throw new Error('Đã có lỗi xảy ra. Vui lòng thử lại.');
+    }
+  },
+};

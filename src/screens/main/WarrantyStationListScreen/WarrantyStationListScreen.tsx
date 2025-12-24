@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import {
   View,
   Text,
@@ -12,37 +12,37 @@ import {
   ActivityIndicator,
   Modal,
   Pressable,
+  RefreshControl,
+  NativeSyntheticEvent,
+  NativeScrollEvent,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { COLORS, SPACING, BORDER_RADIUS, SHADOWS } from '../../../config/theme';
 import CustomHeader from '../../../components/CustomHeader';
-
-interface WarrantyStation {
-  id: string;
-  TenTram: string;
-  SoDienThoai: string;
-  DiaChi: string;
-  TinhThanh: string;
-}
-
-interface Province {
-  id: string;
-  TenDiaBan: string;
-}
+import { warrantyStationService } from '../../../api/warrantyStationService';
+import { WarrantyStation, Province } from '../../../types/warrantyStation';
 
 const WarrantyStationListScreen = () => {
   const navigation = useNavigation();
   const [stations, setStations] = useState<WarrantyStation[]>([]);
-  const [filteredStations, setFilteredStations] = useState<WarrantyStation[]>([]);
   const [keyword, setKeyword] = useState('');
-  const [selectedProvince, setSelectedProvince] = useState<string>('Tất cả');
+  const [searchKeyword, setSearchKeyword] = useState('');
+  const [selectedProvince, setSelectedProvince] = useState<string>('Tỉnh thành');
   const [isLoading, setIsLoading] = useState(false);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const [isRefreshing, setIsRefreshing] = useState(false);
   const [showProvinceModal, setShowProvinceModal] = useState(false);
   const [provinceSearchKeyword, setProvinceSearchKeyword] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [hasNextPage, setHasNextPage] = useState(false);
+  const [totalCount, setTotalCount] = useState(0);
 
-  // Mock data for provinces - replace with API call
+  // Debounce timer
+  const searchTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+
+  // Mock data for provinces - replace with API call later
   const provinces: Province[] = [
-    { id: '0', TenDiaBan: 'Tất cả' },
+    { id: '0', TenDiaBan: 'Tỉnh thành' },
     { id: '1', TenDiaBan: 'Hà Nội' },
     { id: '2', TenDiaBan: 'TP. Hồ Chí Minh' },
     { id: '3', TenDiaBan: 'Đà Nẵng' },
@@ -113,69 +113,89 @@ const WarrantyStationListScreen = () => {
     province.TenDiaBan.toLowerCase().includes(provinceSearchKeyword.toLowerCase())
   );
 
-  // Mock data for warranty stations - replace with API call
+  // Load warranty stations from API
+  const loadWarrantyStations = async (page: number = 1, reset: boolean = false) => {
+    try {
+      if (reset) {
+        setIsLoading(true);
+        setStations([]);
+      } else {
+        setIsLoadingMore(true);
+      }
+
+      const response = await warrantyStationService.getWarrantyStations({
+        page,
+        tentinhthanh: selectedProvince,
+        keyword: searchKeyword,
+      });
+
+      if (reset) {
+        setStations(response.list);
+      } else {
+        setStations((prev) => [...prev, ...response.list]);
+      }
+
+      setTotalCount(response.count);
+      setHasNextPage(response.nextpage);
+      setCurrentPage(page);
+    } catch (error) {
+      Alert.alert(
+        'Lỗi',
+        error instanceof Error ? error.message : 'Không thể tải danh sách trạm bảo hành'
+      );
+    } finally {
+      setIsLoading(false);
+      setIsLoadingMore(false);
+      setIsRefreshing(false);
+    }
+  };
+
+  // Initial load and when province or search keyword changes
   useEffect(() => {
-    const mockStations: WarrantyStation[] = [
-      {
-        id: '1',
-        TenTram: 'Trung tâm bảo hành AKITO Hà Nội',
-        SoDienThoai: '024 3333 4444',
-        DiaChi: '123 Phố Huế, Quận Hai Bà Trưng, Hà Nội',
-        TinhThanh: 'Hà Nội',
-      },
-      {
-        id: '2',
-        TenTram: 'Trung tâm bảo hành AKITO TP.HCM',
-        SoDienThoai: '028 3888 9999',
-        DiaChi: '456 Nguyễn Trãi, Quận 1, TP. Hồ Chí Minh',
-        TinhThanh: 'TP. Hồ Chí Minh',
-      },
-      {
-        id: '3',
-        TenTram: 'Trung tâm bảo hành AKITO Đà Nẵng',
-        SoDienThoai: '0236 3777 8888',
-        DiaChi: '789 Lê Duẩn, Quận Hải Châu, Đà Nẵng',
-        TinhThanh: 'Đà Nẵng',
-      },
-      {
-        id: '4',
-        TenTram: 'Trạm bảo hành AKITO Cầu Giấy',
-        SoDienThoai: '024 3555 6666',
-        DiaChi: '321 Cầu Giấy, Quận Cầu Giấy, Hà Nội',
-        TinhThanh: 'Hà Nội',
-      },
-      {
-        id: '5',
-        TenTram: 'Trạm bảo hành AKITO Tân Bình',
-        SoDienThoai: '028 3999 7777',
-        DiaChi: '654 Cộng Hòa, Quận Tân Bình, TP. Hồ Chí Minh',
-        TinhThanh: 'TP. Hồ Chí Minh',
-      },
-    ];
-    setStations(mockStations);
-    setFilteredStations(mockStations);
+    loadWarrantyStations(1, true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedProvince, searchKeyword]);
+
+  // Debounce search input
+  useEffect(() => {
+    if (searchTimeoutRef.current) {
+      clearTimeout(searchTimeoutRef.current);
+    }
+
+    searchTimeoutRef.current = setTimeout(() => {
+      setSearchKeyword(keyword);
+    }, 800);
+
+    return () => {
+      if (searchTimeoutRef.current) {
+        clearTimeout(searchTimeoutRef.current);
+      }
+    };
+  }, [keyword]);
+
+  // Pull to refresh handler
+  const handleRefresh = useCallback(() => {
+    setIsRefreshing(true);
+    loadWarrantyStations(1, true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Filter stations based on keyword and province
-  useEffect(() => {
-    let filtered = stations;
+  // Load more when scrolling near bottom
+  const handleScroll = useCallback(
+    (event: NativeSyntheticEvent<NativeScrollEvent>) => {
+      const { layoutMeasurement, contentOffset, contentSize } = event.nativeEvent;
+      const paddingToBottom = 20;
+      const isCloseToBottom =
+        layoutMeasurement.height + contentOffset.y >=
+        contentSize.height - paddingToBottom;
 
-    // Filter by province
-    if (selectedProvince !== 'Tất cả') {
-      filtered = filtered.filter(
-        (station) => station.TinhThanh === selectedProvince
-      );
-    }
-
-    // Filter by keyword
-    if (keyword.trim()) {
-      filtered = filtered.filter((station) =>
-        station.TenTram.toLowerCase().includes(keyword.toLowerCase())
-      );
-    }
-
-    setFilteredStations(filtered);
-  }, [keyword, selectedProvince, stations]);
+      if (isCloseToBottom && hasNextPage && !isLoadingMore && !isLoading) {
+        loadWarrantyStations(currentPage + 1, false);
+      }
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [hasNextPage, isLoadingMore, isLoading, currentPage]
+  );
 
   const handleCallPhone = (phoneNumber: string) => {
     const url = `tel:${phoneNumber}`;
@@ -196,7 +216,7 @@ const WarrantyStationListScreen = () => {
   };
 
   const renderStation = (item: WarrantyStation) => (
-    <View key={item.id} style={styles.stationCard}>
+    <View style={styles.stationCard}>
       {/* Header */}
       <View style={styles.stationHeader}>
         <Text style={styles.stationName}>{item.TenTram}</Text>
@@ -403,13 +423,23 @@ const WarrantyStationListScreen = () => {
         {/* Stations List */}
         <ScrollView
           style={styles.scrollView}
-          showsVerticalScrollIndicator={false}
+          showsVerticalScrollIndicator={true}
+          refreshControl={
+            <RefreshControl
+              refreshing={isRefreshing}
+              onRefresh={handleRefresh}
+              colors={[COLORS.primary]}
+              tintColor={COLORS.primary}
+            />
+          }
+          onScroll={handleScroll}
+          scrollEventThrottle={400}
         >
           {isLoading ? (
             <View style={styles.loadingContainer}>
               <ActivityIndicator size="large" color={COLORS.primary} />
             </View>
-          ) : filteredStations.length === 0 ? (
+          ) : stations.length === 0 ? (
             <View style={styles.emptyContainer}>
               <Text style={styles.emptyIcon}>🔍</Text>
               <Text style={styles.emptyText}>
@@ -417,9 +447,23 @@ const WarrantyStationListScreen = () => {
               </Text>
             </View>
           ) : (
-            <View style={styles.stationsList}>
-              {filteredStations.map((station) => renderStation(station))}
-            </View>
+            <>
+              <View style={styles.stationsList}>
+                {stations.map((station) => (
+                  <React.Fragment key={station.id}>
+                    {renderStation(station)}
+                  </React.Fragment>
+                ))}
+              </View>
+
+              {/* Loading more indicator */}
+              {isLoadingMore && (
+                <View style={styles.loadingMoreContainer}>
+                  <ActivityIndicator size="small" color={COLORS.primary} />
+                  <Text style={styles.loadingMoreText}>Đang tải thêm...</Text>
+                </View>
+              )}
+            </>
           )}
 
           {/* Bottom Spacing */}
@@ -740,6 +784,17 @@ const styles = StyleSheet.create({
   loadingContainer: {
     padding: SPACING.xl,
     alignItems: 'center',
+  },
+  loadingMoreContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: SPACING.lg,
+    gap: SPACING.sm,
+  },
+  loadingMoreText: {
+    fontSize: 14,
+    color: COLORS.textSecondary,
   },
   emptyContainer: {
     padding: SPACING.xl,
