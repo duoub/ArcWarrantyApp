@@ -77,6 +77,10 @@ export const provinceService = {
         },
       });
 
+      if (!response.ok) {
+        throw new Error(`HTTP error: ${response.status}`);
+      }
+
       const result = await response.json();
 
       // API returns array directly

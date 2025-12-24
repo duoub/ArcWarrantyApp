@@ -4,7 +4,7 @@
  * Uses cascading API: /getdiaban?macha={parentCode}
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   View,
   Text,
@@ -69,19 +69,12 @@ const LocationSelector: React.FC<LocationSelectorProps> = ({
   const [searchKeyword, setSearchKeyword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
-  // Load locations when modal opens or parentCode changes
-  useEffect(() => {
-    if (showModal) {
-      loadLocations();
-    }
-  }, [showModal, parentCode]);
-
-  const loadLocations = async () => {
+  // Wrap loadLocations in useCallback to maintain stable reference and avoid stale closures
+  const loadLocations = useCallback(async () => {
     try {
       setIsLoading(true);
 
-      // If parentCode is empty string, load provinces using getProvinces
-      // Otherwise, load districts/wards using getLocations
+      // Load locations using getLocations API (handles provinces, districts, and wards based on parentCode)
       const response = await provinceService.getLocations(parentCode);
 
       setLocations(response.list);
@@ -94,7 +87,14 @@ const LocationSelector: React.FC<LocationSelectorProps> = ({
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [parentCode]);
+
+  // Load locations when modal opens or parentCode changes
+  useEffect(() => {
+    if (showModal) {
+      loadLocations();
+    }
+  }, [showModal, loadLocations]);
 
   // Filter locations by search keyword
   const filteredLocations = locations.filter((location) =>
@@ -203,7 +203,7 @@ const LocationSelector: React.FC<LocationSelectorProps> = ({
                 </View>
               ) : filteredLocations.length === 0 ? (
                 <View style={styles.emptyContainer}>
-                  <Text style={styles.emptyText}>Không tìm thấy kết quả (locations: {locations.length}, filtered: {filteredLocations.length})</Text>
+                  <Text style={styles.emptyText}>Không tìm thấy kết quả</Text>
                 </View>
               ) : (
                 filteredLocations.map((location, index) => (
