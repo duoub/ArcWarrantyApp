@@ -8,8 +8,6 @@ import {
   ActivityIndicator,
   Alert,
   ScrollView,
-  Modal,
-  Pressable,
   StatusBar,
   Image,
 } from 'react-native';
@@ -22,13 +20,9 @@ import ImagePicker from 'react-native-image-crop-picker';
 import { COLORS, SPACING, BORDER_RADIUS } from '../../../config/theme';
 import { AuthStackParamList } from '../../../navigation/AuthNavigator';
 import CustomHeader from '../../../components/CustomHeader';
+import ProvinceSelector from '../../../components/ProvinceSelector';
 
 type DealerSignupScreenNavigationProp = StackNavigationProp<AuthStackParamList, 'DealerSignup'>;
-
-interface Province {
-  id: string;
-  TenDiaBan: string;
-}
 
 interface ImageItem {
   src: string;
@@ -55,81 +49,11 @@ const dealerSignupSchema = z.object({
 
 type DealerSignupFormData = z.infer<typeof dealerSignupSchema>;
 
-// List of 63 provinces in Vietnam
-const PROVINCES: Province[] = [
-  { id: '1', TenDiaBan: 'An Giang' },
-  { id: '2', TenDiaBan: 'Bà Rịa - Vũng Tàu' },
-  { id: '3', TenDiaBan: 'Bắc Giang' },
-  { id: '4', TenDiaBan: 'Bắc Kạn' },
-  { id: '5', TenDiaBan: 'Bạc Liêu' },
-  { id: '6', TenDiaBan: 'Bắc Ninh' },
-  { id: '7', TenDiaBan: 'Bến Tre' },
-  { id: '8', TenDiaBan: 'Bình Định' },
-  { id: '9', TenDiaBan: 'Bình Dương' },
-  { id: '10', TenDiaBan: 'Bình Phước' },
-  { id: '11', TenDiaBan: 'Bình Thuận' },
-  { id: '12', TenDiaBan: 'Cà Mau' },
-  { id: '13', TenDiaBan: 'Cần Thơ' },
-  { id: '14', TenDiaBan: 'Cao Bằng' },
-  { id: '15', TenDiaBan: 'Đà Nẵng' },
-  { id: '16', TenDiaBan: 'Đắk Lắk' },
-  { id: '17', TenDiaBan: 'Đắk Nông' },
-  { id: '18', TenDiaBan: 'Điện Biên' },
-  { id: '19', TenDiaBan: 'Đồng Nai' },
-  { id: '20', TenDiaBan: 'Đồng Tháp' },
-  { id: '21', TenDiaBan: 'Gia Lai' },
-  { id: '22', TenDiaBan: 'Hà Giang' },
-  { id: '23', TenDiaBan: 'Hà Nam' },
-  { id: '24', TenDiaBan: 'Hà Nội' },
-  { id: '25', TenDiaBan: 'Hà Tĩnh' },
-  { id: '26', TenDiaBan: 'Hải Dương' },
-  { id: '27', TenDiaBan: 'Hải Phòng' },
-  { id: '28', TenDiaBan: 'Hậu Giang' },
-  { id: '29', TenDiaBan: 'Hòa Bình' },
-  { id: '30', TenDiaBan: 'Hưng Yên' },
-  { id: '31', TenDiaBan: 'Khánh Hòa' },
-  { id: '32', TenDiaBan: 'Kiên Giang' },
-  { id: '33', TenDiaBan: 'Kon Tum' },
-  { id: '34', TenDiaBan: 'Lai Châu' },
-  { id: '35', TenDiaBan: 'Lâm Đồng' },
-  { id: '36', TenDiaBan: 'Lạng Sơn' },
-  { id: '37', TenDiaBan: 'Lào Cai' },
-  { id: '38', TenDiaBan: 'Long An' },
-  { id: '39', TenDiaBan: 'Nam Định' },
-  { id: '40', TenDiaBan: 'Nghệ An' },
-  { id: '41', TenDiaBan: 'Ninh Bình' },
-  { id: '42', TenDiaBan: 'Ninh Thuận' },
-  { id: '43', TenDiaBan: 'Phú Thọ' },
-  { id: '44', TenDiaBan: 'Phú Yên' },
-  { id: '45', TenDiaBan: 'Quảng Bình' },
-  { id: '46', TenDiaBan: 'Quảng Nam' },
-  { id: '47', TenDiaBan: 'Quảng Ngãi' },
-  { id: '48', TenDiaBan: 'Quảng Ninh' },
-  { id: '49', TenDiaBan: 'Quảng Trị' },
-  { id: '50', TenDiaBan: 'Sóc Trăng' },
-  { id: '51', TenDiaBan: 'Sơn La' },
-  { id: '52', TenDiaBan: 'Tây Ninh' },
-  { id: '53', TenDiaBan: 'Thái Bình' },
-  { id: '54', TenDiaBan: 'Thái Nguyên' },
-  { id: '55', TenDiaBan: 'Thanh Hóa' },
-  { id: '56', TenDiaBan: 'Thừa Thiên Huế' },
-  { id: '57', TenDiaBan: 'Tiền Giang' },
-  { id: '58', TenDiaBan: 'TP Hồ Chí Minh' },
-  { id: '59', TenDiaBan: 'Trà Vinh' },
-  { id: '60', TenDiaBan: 'Tuyên Quang' },
-  { id: '61', TenDiaBan: 'Vĩnh Long' },
-  { id: '62', TenDiaBan: 'Vĩnh Phúc' },
-  { id: '63', TenDiaBan: 'Yên Bái' },
-];
-
 const DealerSignupScreen: React.FC = () => {
   const navigation = useNavigation<DealerSignupScreenNavigationProp>();
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showRePassword, setShowRePassword] = useState(false);
-  const [selectedProvince, setSelectedProvince] = useState<string>('');
-  const [showProvinceModal, setShowProvinceModal] = useState(false);
-  const [provinceSearchKeyword, setProvinceSearchKeyword] = useState('');
   const [images, setImages] = useState<ImageItem[]>([]);
   const [termsAccepted, setTermsAccepted] = useState(false);
 
@@ -154,15 +78,6 @@ const DealerSignupScreen: React.FC = () => {
       repassword: '',
     },
   });
-
-  const filteredProvinces = PROVINCES.filter(province =>
-    province.TenDiaBan.toLowerCase().includes(provinceSearchKeyword.toLowerCase())
-  );
-
-  const handleProvinceSelect = (province: string) => {
-    setSelectedProvince(province);
-    setValue('city', province);
-  };
 
   const handleAddImage = async () => {
     try {
@@ -354,26 +269,16 @@ const DealerSignupScreen: React.FC = () => {
           <Controller
             control={control}
             name="city"
-            render={({ field: { value } }) => (
+            render={({ field: { onChange, value } }) => (
               <View style={styles.inputContainer}>
                 <Text style={styles.inputLabel}>
                   Tỉnh thành <Text style={styles.required}>*</Text>
                 </Text>
-                <TouchableOpacity
-                  style={[styles.input, styles.selectInput, errors.city && styles.inputError]}
-                  onPress={() => setShowProvinceModal(true)}
-                  activeOpacity={0.7}
-                >
-                  <Text
-                    style={[
-                      styles.selectInputText,
-                      !selectedProvince && styles.selectPlaceholder,
-                    ]}
-                  >
-                    {selectedProvince || 'Chọn tỉnh thành'}
-                  </Text>
-                  <Text style={styles.dropdownIcon}>▼</Text>
-                </TouchableOpacity>
+                <ProvinceSelector
+                  selectedProvince={value}
+                  onProvinceChange={onChange}
+                  placeholder="Chọn tỉnh thành"
+                />
                 {errors.city && (
                   <Text style={styles.errorText}>{errors.city.message}</Text>
                 )}
@@ -616,84 +521,6 @@ const DealerSignupScreen: React.FC = () => {
           </TouchableOpacity>
         </View>
       </ScrollView>
-
-      {/* Province Selection Modal */}
-      <Modal
-        visible={showProvinceModal}
-        animationType="slide"
-        transparent={true}
-        onRequestClose={() => {
-          setShowProvinceModal(false);
-          setProvinceSearchKeyword('');
-        }}
-      >
-        <View style={styles.modalOverlay}>
-          <Pressable
-            style={styles.modalBackdrop}
-            onPress={() => {
-              setShowProvinceModal(false);
-              setProvinceSearchKeyword('');
-            }}
-          />
-          <View style={styles.modalContent}>
-            <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>Chọn tỉnh thành</Text>
-              <TouchableOpacity
-                onPress={() => {
-                  setShowProvinceModal(false);
-                  setProvinceSearchKeyword('');
-                }}
-              >
-                <Text style={styles.modalCloseButton}>✕</Text>
-              </TouchableOpacity>
-            </View>
-
-            <TextInput
-              style={styles.searchInput}
-              placeholder="Tìm kiếm tỉnh thành..."
-              placeholderTextColor={COLORS.textSecondary}
-              value={provinceSearchKeyword}
-              onChangeText={setProvinceSearchKeyword}
-            />
-
-            <ScrollView style={styles.provinceList}>
-              {filteredProvinces.length === 0 ? (
-                <Text style={styles.noResultsText}>Không tìm thấy tỉnh thành</Text>
-              ) : (
-                filteredProvinces.map((province) => (
-                  <TouchableOpacity
-                    key={province.id}
-                    style={[
-                      styles.provinceOption,
-                      selectedProvince === province.TenDiaBan &&
-                      styles.provinceOptionActive,
-                    ]}
-                    onPress={() => {
-                      handleProvinceSelect(province.TenDiaBan);
-                      setShowProvinceModal(false);
-                      setProvinceSearchKeyword('');
-                    }}
-                    activeOpacity={0.7}
-                  >
-                    <Text
-                      style={[
-                        styles.provinceOptionText,
-                        selectedProvince === province.TenDiaBan &&
-                        styles.provinceOptionTextActive,
-                      ]}
-                    >
-                      {province.TenDiaBan}
-                    </Text>
-                    {selectedProvince === province.TenDiaBan && (
-                      <Text style={styles.checkIcon}>✓</Text>
-                    )}
-                  </TouchableOpacity>
-                ))
-              )}
-            </ScrollView>
-          </View>
-        </View>
-      </Modal>
     </View>
   );
 };
@@ -759,22 +586,6 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: COLORS.error,
     marginTop: SPACING.xs,
-  },
-  selectInput: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  selectInputText: {
-    fontSize: 15,
-    color: COLORS.textPrimary,
-  },
-  selectPlaceholder: {
-    color: COLORS.textSecondary,
-  },
-  dropdownIcon: {
-    fontSize: 12,
-    color: COLORS.textSecondary,
   },
   passwordContainer: {
     position: 'relative',
@@ -915,87 +726,6 @@ const styles = StyleSheet.create({
     color: COLORS.white,
     fontSize: 16,
     fontWeight: '700',
-  },
-
-  // Province Modal
-  modalOverlay: {
-    flex: 1,
-    justifyContent: 'flex-end',
-  },
-  modalBackdrop: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-  },
-  modalContent: {
-    backgroundColor: COLORS.white,
-    borderTopLeftRadius: BORDER_RADIUS.xl,
-    borderTopRightRadius: BORDER_RADIUS.xl,
-    maxHeight: '80%',
-    paddingBottom: SPACING.xl,
-  },
-  modalHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: SPACING.lg,
-    borderBottomWidth: 1,
-    borderBottomColor: COLORS.gray200,
-  },
-  modalTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: COLORS.textPrimary,
-  },
-  modalCloseButton: {
-    fontSize: 24,
-    color: COLORS.textSecondary,
-  },
-  searchInput: {
-    backgroundColor: COLORS.background,
-    borderWidth: 1,
-    borderColor: COLORS.gray300,
-    borderRadius: BORDER_RADIUS.md,
-    paddingHorizontal: SPACING.md,
-    paddingVertical: SPACING.sm,
-    fontSize: 15,
-    color: COLORS.textPrimary,
-    margin: SPACING.lg,
-  },
-  provinceList: {
-    paddingHorizontal: SPACING.lg,
-  },
-  provinceOption: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingVertical: SPACING.md,
-    borderBottomWidth: 1,
-    borderBottomColor: COLORS.gray200,
-  },
-  provinceOptionActive: {
-    backgroundColor: COLORS.primaryLight,
-  },
-  provinceOptionText: {
-    fontSize: 15,
-    color: COLORS.textPrimary,
-  },
-  provinceOptionTextActive: {
-    color: COLORS.primary,
-    fontWeight: '600',
-  },
-  checkIcon: {
-    fontSize: 18,
-    color: COLORS.primary,
-    fontWeight: 'bold',
-  },
-  noResultsText: {
-    textAlign: 'center',
-    color: COLORS.textSecondary,
-    paddingVertical: SPACING.xl,
   },
 });
 

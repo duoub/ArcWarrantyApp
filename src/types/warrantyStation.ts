@@ -21,11 +21,6 @@ export interface WarrantyStation {
   TinhThanh: string;
 }
 
-export interface Province {
-  id: string;
-  TenDiaBan: string;
-}
-
 // API Request/Response types
 export interface GetWarrantyStationsRequest {
   page: number;

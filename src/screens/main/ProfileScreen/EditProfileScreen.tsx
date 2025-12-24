@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -9,8 +9,6 @@ import {
   Alert,
   TextInput,
   ActivityIndicator,
-  Modal,
-  Pressable,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useForm, Controller } from 'react-hook-form';
@@ -18,12 +16,8 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { COLORS, SPACING, BORDER_RADIUS, SHADOWS } from '../../../config/theme';
 import CustomHeader from '../../../components/CustomHeader';
+import ProvinceSelector from '../../../components/ProvinceSelector';
 import { useAuthStore } from '../../../store/authStore';
-
-interface Province {
-  id: string;
-  TenDiaBan: string;
-}
 
 // Validation Schema for Personal Info
 const personalInfoSchema = z.object({
@@ -59,90 +53,8 @@ const EditProfileScreen: React.FC<EditProfileScreenProps> = ({ route }) => {
   const { user } = useAuthStore();
   const { section } = route.params;
   const [isLoading, setIsLoading] = useState(false);
-  const [showProvinceModal, setShowProvinceModal] = useState(false);
-  const [provinceSearchKeyword, setProvinceSearchKeyword] = useState('');
-  const [selectedProvince, setSelectedProvince] = useState('');
 
   const isPersonalSection = section === 'personal';
-
-  // Province list - same as WarrantyStationListScreen
-  const provinces: Province[] = [
-    { id: '1', TenDiaBan: 'Hà Nội' },
-    { id: '2', TenDiaBan: 'TP. Hồ Chí Minh' },
-    { id: '3', TenDiaBan: 'Đà Nẵng' },
-    { id: '4', TenDiaBan: 'Hải Phòng' },
-    { id: '5', TenDiaBan: 'Cần Thơ' },
-    { id: '6', TenDiaBan: 'An Giang' },
-    { id: '7', TenDiaBan: 'Bà Rịa - Vũng Tàu' },
-    { id: '8', TenDiaBan: 'Bắc Giang' },
-    { id: '9', TenDiaBan: 'Bắc Kạn' },
-    { id: '10', TenDiaBan: 'Bạc Liêu' },
-    { id: '11', TenDiaBan: 'Bắc Ninh' },
-    { id: '12', TenDiaBan: 'Bến Tre' },
-    { id: '13', TenDiaBan: 'Bình Định' },
-    { id: '14', TenDiaBan: 'Bình Dương' },
-    { id: '15', TenDiaBan: 'Bình Phước' },
-    { id: '16', TenDiaBan: 'Bình Thuận' },
-    { id: '17', TenDiaBan: 'Cà Mau' },
-    { id: '18', TenDiaBan: 'Cao Bằng' },
-    { id: '19', TenDiaBan: 'Đắk Lắk' },
-    { id: '20', TenDiaBan: 'Đắk Nông' },
-    { id: '21', TenDiaBan: 'Điện Biên' },
-    { id: '22', TenDiaBan: 'Đồng Nai' },
-    { id: '23', TenDiaBan: 'Đồng Tháp' },
-    { id: '24', TenDiaBan: 'Gia Lai' },
-    { id: '25', TenDiaBan: 'Hà Giang' },
-    { id: '26', TenDiaBan: 'Hà Nam' },
-    { id: '27', TenDiaBan: 'Hà Tĩnh' },
-    { id: '28', TenDiaBan: 'Hải Dương' },
-    { id: '29', TenDiaBan: 'Hậu Giang' },
-    { id: '30', TenDiaBan: 'Hòa Bình' },
-    { id: '31', TenDiaBan: 'Hưng Yên' },
-    { id: '32', TenDiaBan: 'Khánh Hòa' },
-    { id: '33', TenDiaBan: 'Kiên Giang' },
-    { id: '34', TenDiaBan: 'Kon Tum' },
-    { id: '35', TenDiaBan: 'Lai Châu' },
-    { id: '36', TenDiaBan: 'Lâm Đồng' },
-    { id: '37', TenDiaBan: 'Lạng Sơn' },
-    { id: '38', TenDiaBan: 'Lào Cai' },
-    { id: '39', TenDiaBan: 'Long An' },
-    { id: '40', TenDiaBan: 'Nam Định' },
-    { id: '41', TenDiaBan: 'Nghệ An' },
-    { id: '42', TenDiaBan: 'Ninh Bình' },
-    { id: '43', TenDiaBan: 'Ninh Thuận' },
-    { id: '44', TenDiaBan: 'Phú Thọ' },
-    { id: '45', TenDiaBan: 'Phú Yên' },
-    { id: '46', TenDiaBan: 'Quảng Bình' },
-    { id: '47', TenDiaBan: 'Quảng Nam' },
-    { id: '48', TenDiaBan: 'Quảng Ngãi' },
-    { id: '49', TenDiaBan: 'Quảng Ninh' },
-    { id: '50', TenDiaBan: 'Quảng Trị' },
-    { id: '51', TenDiaBan: 'Sóc Trăng' },
-    { id: '52', TenDiaBan: 'Sơn La' },
-    { id: '53', TenDiaBan: 'Tây Ninh' },
-    { id: '54', TenDiaBan: 'Thái Bình' },
-    { id: '55', TenDiaBan: 'Thái Nguyên' },
-    { id: '56', TenDiaBan: 'Thanh Hóa' },
-    { id: '57', TenDiaBan: 'Thừa Thiên Huế' },
-    { id: '58', TenDiaBan: 'Tiền Giang' },
-    { id: '59', TenDiaBan: 'Trà Vinh' },
-    { id: '60', TenDiaBan: 'Tuyên Quang' },
-    { id: '61', TenDiaBan: 'Vĩnh Long' },
-    { id: '62', TenDiaBan: 'Vĩnh Phúc' },
-    { id: '63', TenDiaBan: 'Yên Bái' },
-  ];
-
-  // Filter provinces based on search keyword
-  const filteredProvinces = provinces.filter((province) =>
-    province.TenDiaBan.toLowerCase().includes(provinceSearchKeyword.toLowerCase())
-  );
-
-  // Initialize selectedProvince from user data
-  useEffect(() => {
-    if (user?.city) {
-      setSelectedProvince(user.city);
-    }
-  }, [user]);
 
   // Personal Info Form
   const {
@@ -351,44 +263,21 @@ const EditProfileScreen: React.FC<EditProfileScreenProps> = ({ route }) => {
       <Controller
         control={personalControl}
         name="city"
-        render={({ field: { onChange, value } }) => {
-          // Sync value with selectedProvince
-          React.useEffect(() => {
-            if (selectedProvince && selectedProvince !== value) {
-              onChange(selectedProvince);
-            }
-          }, [selectedProvince]);
-
-          return (
-            <View style={styles.inputContainer}>
-              <Text style={styles.inputLabel}>
-                Tỉnh/Thành phố <Text style={styles.required}>*</Text>
-              </Text>
-              <TouchableOpacity
-                style={[
-                  styles.provinceSelector,
-                  personalErrors.city && styles.inputError,
-                ]}
-                onPress={() => setShowProvinceModal(true)}
-                activeOpacity={0.7}
-                disabled={isLoading}
-              >
-                <Text
-                  style={[
-                    styles.provinceSelectorText,
-                    !value && styles.placeholderText,
-                  ]}
-                >
-                  {value || 'Chọn tỉnh/thành phố'}
-                </Text>
-                <Text style={styles.dropdownIcon}>›</Text>
-              </TouchableOpacity>
-              {personalErrors.city && (
-                <Text style={styles.errorText}>{personalErrors.city.message}</Text>
-              )}
-            </View>
-          );
-        }}
+        render={({ field: { onChange, value } }) => (
+          <View style={styles.inputContainer}>
+            <Text style={styles.inputLabel}>
+              Tỉnh/Thành phố <Text style={styles.required}>*</Text>
+            </Text>
+            <ProvinceSelector
+              selectedProvince={value}
+              onProvinceChange={onChange}
+              placeholder="Chọn tỉnh/thành phố"
+            />
+            {personalErrors.city && (
+              <Text style={styles.errorText}>{personalErrors.city.message}</Text>
+            )}
+          </View>
+        )}
       />
 
       {/* CCCD */}
@@ -533,111 +422,6 @@ const EditProfileScreen: React.FC<EditProfileScreenProps> = ({ route }) => {
         onLeftPress={() => navigation.goBack()}
       />
 
-      {/* Province Selection Modal */}
-      <Modal
-        visible={showProvinceModal}
-        animationType="slide"
-        transparent={true}
-        onRequestClose={() => {
-          setShowProvinceModal(false);
-          setProvinceSearchKeyword('');
-        }}
-      >
-        <View style={styles.modalOverlay}>
-          <Pressable
-            style={styles.modalBackdrop}
-            onPress={() => {
-              setShowProvinceModal(false);
-              setProvinceSearchKeyword('');
-            }}
-          />
-          <View style={styles.modalContent}>
-            {/* Modal Header */}
-            <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>Chọn tỉnh/thành phố</Text>
-              <TouchableOpacity
-                onPress={() => {
-                  setShowProvinceModal(false);
-                  setProvinceSearchKeyword('');
-                }}
-                style={styles.modalCloseButton}
-              >
-                <Text style={styles.modalCloseIcon}>✕</Text>
-              </TouchableOpacity>
-            </View>
-
-            {/* Modal Search */}
-            <View style={styles.modalSearchContainer}>
-              <Text style={styles.searchIcon}>🔍</Text>
-              <TextInput
-                style={styles.modalSearchInput}
-                placeholder="Tìm kiếm tỉnh/thành phố..."
-                placeholderTextColor={COLORS.gray400}
-                value={provinceSearchKeyword}
-                onChangeText={setProvinceSearchKeyword}
-                autoFocus
-              />
-              {provinceSearchKeyword !== '' && (
-                <TouchableOpacity
-                  onPress={() => setProvinceSearchKeyword('')}
-                  style={styles.clearSearchButton}
-                >
-                  <Text style={styles.clearSearchIcon}>✕</Text>
-                </TouchableOpacity>
-              )}
-            </View>
-
-            {/* Province List */}
-            <View style={styles.modalListWrapper}>
-              <ScrollView
-                style={styles.modalList}
-                showsVerticalScrollIndicator={true}
-                nestedScrollEnabled={true}
-              >
-                {filteredProvinces.length === 0 ? (
-                  <View style={styles.emptyModal}>
-                    <Text style={styles.emptyModalText}>
-                      Không tìm thấy tỉnh/thành phố
-                    </Text>
-                  </View>
-                ) : (
-                  filteredProvinces.map((province, index) => (
-                    <TouchableOpacity
-                      key={province.id}
-                      style={[
-                        styles.provinceOption,
-                        index === filteredProvinces.length - 1 && styles.provinceOptionLast,
-                      ]}
-                      onPress={() => {
-                        // Update form value
-                        personalControl._formValues.city = province.TenDiaBan;
-                        setSelectedProvince(province.TenDiaBan);
-                        setShowProvinceModal(false);
-                        setProvinceSearchKeyword('');
-                      }}
-                      activeOpacity={0.7}
-                    >
-                      <Text
-                        style={[
-                          styles.provinceOptionText,
-                          selectedProvince === province.TenDiaBan &&
-                            styles.provinceOptionTextActive,
-                        ]}
-                      >
-                        {province.TenDiaBan}
-                      </Text>
-                      {selectedProvince === province.TenDiaBan && (
-                        <Text style={styles.checkIcon}>✓</Text>
-                      )}
-                    </TouchableOpacity>
-                  ))
-                )}
-              </ScrollView>
-            </View>
-          </View>
-        </View>
-      </Modal>
-
       <ScrollView
         style={styles.scrollView}
         showsVerticalScrollIndicator={false}
@@ -724,152 +508,6 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: COLORS.error,
     marginTop: SPACING.xs,
-  },
-
-  // Province Selector
-  provinceSelector: {
-    backgroundColor: COLORS.gray50,
-    borderRadius: BORDER_RADIUS.md,
-    borderWidth: 2,
-    borderColor: COLORS.gray200,
-    paddingHorizontal: SPACING.md,
-    paddingVertical: SPACING.sm,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    minHeight: 48,
-  },
-  provinceSelectorText: {
-    fontSize: 15,
-    color: COLORS.textPrimary,
-    flex: 1,
-  },
-  placeholderText: {
-    color: COLORS.gray400,
-  },
-  dropdownIcon: {
-    fontSize: 24,
-    color: COLORS.gray400,
-    fontWeight: '300',
-  },
-
-  // Modal Styles
-  modalOverlay: {
-    flex: 1,
-    justifyContent: 'flex-end',
-  },
-  modalBackdrop: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: COLORS.overlay,
-  },
-  modalContent: {
-    backgroundColor: COLORS.white,
-    borderTopLeftRadius: BORDER_RADIUS.xl,
-    borderTopRightRadius: BORDER_RADIUS.xl,
-    height: '80%',
-    ...SHADOWS.xl,
-  },
-  modalHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: SPACING.lg,
-    paddingVertical: SPACING.md,
-    borderBottomWidth: 1,
-    borderBottomColor: COLORS.gray200,
-  },
-  modalTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: COLORS.textPrimary,
-  },
-  modalCloseButton: {
-    width: 32,
-    height: 32,
-    borderRadius: BORDER_RADIUS.full,
-    backgroundColor: COLORS.gray100,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  modalCloseIcon: {
-    fontSize: 18,
-    color: COLORS.gray600,
-    fontWeight: '600',
-  },
-  modalSearchContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: COLORS.gray50,
-    borderRadius: BORDER_RADIUS.md,
-    paddingHorizontal: SPACING.md,
-    marginHorizontal: SPACING.lg,
-    marginTop: SPACING.md,
-    marginBottom: SPACING.sm,
-    borderWidth: 1,
-    borderColor: COLORS.gray200,
-  },
-  searchIcon: {
-    fontSize: 20,
-    marginRight: SPACING.sm,
-  },
-  modalSearchInput: {
-    flex: 1,
-    height: 44,
-    fontSize: 15,
-    color: COLORS.textPrimary,
-  },
-  clearSearchButton: {
-    padding: SPACING.xs,
-  },
-  clearSearchIcon: {
-    fontSize: 16,
-    color: COLORS.gray500,
-  },
-  modalListWrapper: {
-    flex: 1,
-    overflow: 'hidden',
-  },
-  modalList: {
-    flex: 1,
-  },
-  provinceOption: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingVertical: SPACING.md,
-    paddingHorizontal: SPACING.lg,
-    borderBottomWidth: 1,
-    borderBottomColor: COLORS.gray200,
-  },
-  provinceOptionLast: {
-    borderBottomWidth: 0,
-  },
-  provinceOptionText: {
-    fontSize: 15,
-    color: COLORS.textPrimary,
-    flex: 1,
-  },
-  provinceOptionTextActive: {
-    color: COLORS.primary,
-    fontWeight: '700',
-  },
-  checkIcon: {
-    fontSize: 20,
-    color: COLORS.primary,
-    fontWeight: '700',
-  },
-  emptyModal: {
-    padding: SPACING.xl,
-    alignItems: 'center',
-  },
-  emptyModalText: {
-    fontSize: 15,
-    color: COLORS.textSecondary,
-    textAlign: 'center',
   },
 
   // Update Button
