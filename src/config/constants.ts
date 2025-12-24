@@ -11,6 +11,10 @@ export const API_CONFIG = {
   BASE_URL: __DEV__
     ? 'https://scell1.qbis.vn/api/forza'
     : 'https://scell1.qbis.vn/api/forza',
+  TRACKING_BASE_URL: __DEV__
+    ? 'https://tracking.qbis.vn/api/tracking'
+    : 'https://tracking.qbis.vn/api/tracking',
+  TRACKING_TOKEN: '', // Token for tracking API
   STORE_ID: '022665047387', // Store ID for API calls
   TIMEOUT: 30000,
   RETRY_ATTEMPTS: 3,

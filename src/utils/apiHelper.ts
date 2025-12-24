@@ -29,12 +29,16 @@ export const getUserCredentials = () => {
 
 /**
  * Build API URL with query parameters
+ * @param endpoint - API endpoint path
+ * @param params - Query parameters
+ * @param baseUrl - Optional base URL (defaults to API_CONFIG.BASE_URL)
  */
 export const buildApiUrl = (
   endpoint: string,
-  params?: Record<string, string | number | boolean>
+  params?: Record<string, string | number | boolean>,
+  baseUrl?: string
 ): string => {
-  const url = `${API_CONFIG.BASE_URL}${endpoint}`;
+  const url = `${baseUrl || API_CONFIG.BASE_URL}${endpoint}`;
 
   if (!params || Object.keys(params).length === 0) {
     return url;
@@ -48,6 +52,16 @@ export const buildApiUrl = (
   ).toString();
 
   return `${url}?${queryString}`;
+};
+
+/**
+ * Build Tracking API URL with query parameters
+ */
+export const buildTrackingApiUrl = (
+  endpoint: string,
+  params?: Record<string, string | number | boolean>
+): string => {
+  return buildApiUrl(endpoint, params, API_CONFIG.TRACKING_BASE_URL);
 };
 
 /**

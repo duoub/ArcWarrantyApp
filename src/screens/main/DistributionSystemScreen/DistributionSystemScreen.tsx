@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import {
   View,
   Text,
@@ -10,91 +10,114 @@ import {
   Linking,
   Alert,
   ActivityIndicator,
+  RefreshControl,
+  NativeSyntheticEvent,
+  NativeScrollEvent,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { COLORS, SPACING, BORDER_RADIUS, SHADOWS } from '../../../config/theme';
 import CustomHeader from '../../../components/CustomHeader';
 import ProvinceSelector from '../../../components/ProvinceSelector';
-
-interface Distributor {
-  id: string;
-  TenTram: string;
-  SoDienThoai: string;
-  DiaChi: string;
-  TinhThanh: string;
-}
+import { distributionSystemService } from '../../../api/distributionSystemService';
+import { Distributor } from '../../../types/distributionSystem';
 
 const DistributionSystemScreen = () => {
   const navigation = useNavigation();
   const [distributors, setDistributors] = useState<Distributor[]>([]);
-  const [filteredDistributors, setFilteredDistributors] = useState<Distributor[]>([]);
   const [keyword, setKeyword] = useState('');
-  const [selectedProvince, setSelectedProvince] = useState<string>('Tất cả');
+  const [searchKeyword, setSearchKeyword] = useState('');
+  const [selectedProvince, setSelectedProvince] = useState<string>('Tỉnh thành');
   const [isLoading, setIsLoading] = useState(false);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [hasNextPage, setHasNextPage] = useState(false);
 
-  // Mock data for distributors
+  // Debounce timer
+  const searchTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+
+  // Load distributors from API
+  const loadDistributors = async (page: number = 1, reset: boolean = false) => {
+    try {
+      if (reset) {
+        setIsLoading(true);
+        setDistributors([]);
+      } else {
+        setIsLoadingMore(true);
+      }
+
+      const response = await distributionSystemService.getDistributors({
+        page,
+        tentinhthanh: selectedProvince,
+        keyword: searchKeyword,
+      });
+
+      if (reset) {
+        setDistributors(response.list);
+      } else {
+        setDistributors((prev) => [...prev, ...response.list]);
+      }
+
+      setHasNextPage(response.nextpage);
+      setCurrentPage(page);
+    } catch (error) {
+      Alert.alert(
+        'Lỗi',
+        error instanceof Error ? error.message : 'Không thể tải danh sách nhà phân phối'
+      );
+    } finally {
+      setIsLoading(false);
+      setIsLoadingMore(false);
+      setIsRefreshing(false);
+    }
+  };
+
+  // Initial load and when province or search keyword changes
   useEffect(() => {
-    const mockDistributors: Distributor[] = [
-      {
-        id: '1',
-        TenTram: 'Nhà phân phối AKITO Hà Nội',
-        SoDienThoai: '024 3666 7777',
-        DiaChi: '88 Đường Láng, Quận Đống Đa, Hà Nội',
-        TinhThanh: 'Hà Nội',
-      },
-      {
-        id: '2',
-        TenTram: 'Nhà phân phối AKITO TP.HCM',
-        SoDienThoai: '028 3999 8888',
-        DiaChi: '234 Điện Biên Phủ, Quận 3, TP. Hồ Chí Minh',
-        TinhThanh: 'TP. Hồ Chí Minh',
-      },
-      {
-        id: '3',
-        TenTram: 'Nhà phân phối AKITO Đà Nẵng',
-        SoDienThoai: '0236 3888 9999',
-        DiaChi: '99 Nguyễn Văn Linh, Quận Thanh Khê, Đà Nẵng',
-        TinhThanh: 'Đà Nẵng',
-      },
-      {
-        id: '4',
-        TenTram: 'Đại lý AKITO Long Biên',
-        SoDienThoai: '024 3777 8888',
-        DiaChi: '456 Nguyễn Văn Cừ, Quận Long Biên, Hà Nội',
-        TinhThanh: 'Hà Nội',
-      },
-      {
-        id: '5',
-        TenTram: 'Đại lý AKITO Bình Thạnh',
-        SoDienThoai: '028 3888 7777',
-        DiaChi: '789 Xô Viết Nghệ Tĩnh, Quận Bình Thạnh, TP. Hồ Chí Minh',
-        TinhThanh: 'TP. Hồ Chí Minh',
-      },
-    ];
-    setDistributors(mockDistributors);
-    setFilteredDistributors(mockDistributors);
+    loadDistributors(1, true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedProvince, searchKeyword]);
+
+  // Debounce search input
+  useEffect(() => {
+    if (searchTimeoutRef.current) {
+      clearTimeout(searchTimeoutRef.current);
+    }
+
+    searchTimeoutRef.current = setTimeout(() => {
+      setSearchKeyword(keyword);
+    }, 800);
+
+    return () => {
+      if (searchTimeoutRef.current) {
+        clearTimeout(searchTimeoutRef.current);
+      }
+    };
+  }, [keyword]);
+
+  // Pull to refresh handler
+  const handleRefresh = useCallback(() => {
+    setIsRefreshing(true);
+    loadDistributors(1, true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Filter distributors based on keyword and province
-  useEffect(() => {
-    let filtered = distributors;
+  // Load more when scrolling near bottom
+  const handleScroll = useCallback(
+    (event: NativeSyntheticEvent<NativeScrollEvent>) => {
+      const { layoutMeasurement, contentOffset, contentSize } = event.nativeEvent;
+      const paddingToBottom = 20;
+      const isCloseToBottom =
+        layoutMeasurement.height + contentOffset.y >=
+        contentSize.height - paddingToBottom;
 
-    // Filter by province
-    if (selectedProvince !== 'Tất cả') {
-      filtered = filtered.filter(
-        (distributor) => distributor.TinhThanh === selectedProvince
-      );
-    }
-
-    // Filter by keyword
-    if (keyword.trim()) {
-      filtered = filtered.filter((distributor) =>
-        distributor.TenTram.toLowerCase().includes(keyword.toLowerCase())
-      );
-    }
-
-    setFilteredDistributors(filtered);
-  }, [keyword, selectedProvince, distributors]);
+      if (isCloseToBottom && hasNextPage && !isLoadingMore && !isLoading) {
+        loadDistributors(currentPage + 1, false);
+      }
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [hasNextPage, isLoadingMore, isLoading, currentPage]
+  );
 
   const handleCallPhone = (phoneNumber: string) => {
     const url = `tel:${phoneNumber}`;
@@ -198,21 +221,29 @@ const DistributionSystemScreen = () => {
           <ProvinceSelector
             selectedProvince={selectedProvince}
             onProvinceChange={setSelectedProvince}
-            label="Tỉnh/Thành phố:"
-            placeholder="Tất cả"
           />
         </View>
 
         {/* Distributors List */}
         <ScrollView
           style={styles.scrollView}
-          showsVerticalScrollIndicator={false}
+          showsVerticalScrollIndicator={true}
+          refreshControl={
+            <RefreshControl
+              refreshing={isRefreshing}
+              onRefresh={handleRefresh}
+              colors={[COLORS.primary]}
+              tintColor={COLORS.primary}
+            />
+          }
+          onScroll={handleScroll}
+          scrollEventThrottle={400}
         >
           {isLoading ? (
             <View style={styles.loadingContainer}>
               <ActivityIndicator size="large" color={COLORS.primary} />
             </View>
-          ) : filteredDistributors.length === 0 ? (
+          ) : distributors.length === 0 ? (
             <View style={styles.emptyContainer}>
               <Text style={styles.emptyIcon}>🔍</Text>
               <Text style={styles.emptyText}>
@@ -220,9 +251,23 @@ const DistributionSystemScreen = () => {
               </Text>
             </View>
           ) : (
-            <View style={styles.distributorsList}>
-              {filteredDistributors.map((distributor) => renderDistributor(distributor))}
-            </View>
+            <>
+              <View style={styles.distributorsList}>
+                {distributors.map((distributor) => (
+                  <React.Fragment key={distributor.id}>
+                    {renderDistributor(distributor)}
+                  </React.Fragment>
+                ))}
+              </View>
+
+              {/* Loading more indicator */}
+              {isLoadingMore && (
+                <View style={styles.loadingMoreContainer}>
+                  <ActivityIndicator size="small" color={COLORS.primary} />
+                  <Text style={styles.loadingMoreText}>Đang tải thêm...</Text>
+                </View>
+              )}
+            </>
           )}
 
           {/* Bottom Spacing */}
@@ -382,6 +427,17 @@ const styles = StyleSheet.create({
   loadingContainer: {
     padding: SPACING.xl,
     alignItems: 'center',
+  },
+  loadingMoreContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: SPACING.lg,
+    gap: SPACING.sm,
+  },
+  loadingMoreText: {
+    fontSize: 14,
+    color: COLORS.textSecondary,
   },
   emptyContainer: {
     padding: SPACING.xl,

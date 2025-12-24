@@ -10,6 +10,7 @@ import {
   FlatList,
   Alert,
   StatusBar,
+  ActivityIndicator,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -18,6 +19,8 @@ import { useAuthStore } from '../../../store/authStore';
 import CustomHeader from '../../../components/CustomHeader';
 import Avatar from '../../../components/Avatar';
 import { HomeStackParamList } from '../../../navigation/MainNavigator';
+import { profileService } from '../../../api/profileService';
+import { ProfileData } from '../../../types/profile';
 
 type HomeScreenNavigationProp = StackNavigationProp<HomeStackParamList, 'Home'>;
 
@@ -25,21 +28,10 @@ const { width } = Dimensions.get('window');
 const BANNER_WIDTH = width - SPACING.lg * 2;
 const BANNER_HEIGHT = BANNER_WIDTH * 0.5;
 
-// Mock data for banners - replace with API call later
-const MOCK_BANNERS = [
-  require('../../../assets/images/banner.jpg'),
-  require('../../../assets/images/banner.jpg'),
-  require('../../../assets/images/banner.jpg'),
+// Default banners if API doesn't return any
+const DEFAULT_BANNERS = [
   require('../../../assets/images/banner.jpg'),
 ];
-
-// Mock reward data - replace with API call later
-const MOCK_REWARDS = {
-  salesProgram: 5000000,
-  warrantyCommission: 2500000,
-  total: 7500000,
-  paid: 3000000,
-};
 
 const HomeScreen = () => {
   const navigation = useNavigation<HomeScreenNavigationProp>();
@@ -47,12 +39,41 @@ const HomeScreen = () => {
 
   const [currentBannerIndex, setCurrentBannerIndex] = useState(0);
   const bannerListRef = useRef<FlatList>(null);
+  const [profileData, setProfileData] = useState<ProfileData | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const banners = DEFAULT_BANNERS;
+
+  // Load profile data from API
+  useEffect(() => {
+    if (isAuthenticated) {
+      loadProfileData();
+    }
+  }, [isAuthenticated]);
+
+  const loadProfileData = async () => {
+    try {
+      setIsLoading(true);
+
+      const response = await profileService.getProfile({
+        typeget: 5,
+      });
+
+      if (response.status && response.data) {
+        setProfileData(response.data);
+      }
+    } catch (error) {
+      console.error('Failed to load profile data:', error);
+      // Keep using default banners and zero rewards on error
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   // Auto-slide banners
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentBannerIndex((prevIndex) => {
-        const nextIndex = (prevIndex + 1) % MOCK_BANNERS.length;
+        const nextIndex = (prevIndex + 1) % banners.length;
         bannerListRef.current?.scrollToIndex({
           index: nextIndex,
           animated: true,
@@ -62,14 +83,7 @@ const HomeScreen = () => {
     }, 3500);
 
     return () => clearInterval(interval);
-  }, []);
-
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('vi-VN', {
-      style: 'currency',
-      currency: 'VND',
-    }).format(amount);
-  };
+  }, [banners.length]);
 
   const handleBannerPress = (index: number) => {
     Alert.alert('Banner', `Clicked banner ${index + 1}`);
@@ -110,7 +124,7 @@ const HomeScreen = () => {
       <View style={styles.bannerContainer}>
         <FlatList
           ref={bannerListRef}
-          data={MOCK_BANNERS}
+          data={banners}
           renderItem={renderBanner}
           keyExtractor={(_, index) => `banner-${index}`}
           horizontal
@@ -126,7 +140,7 @@ const HomeScreen = () => {
 
         {/* Pagination Dots */}
         <View style={styles.paginationContainer}>
-          {MOCK_BANNERS.map((_, index) => (
+          {banners.map((_, index) => (
             <View
               key={`dot-${index}`}
               style={[
@@ -198,14 +212,14 @@ const HomeScreen = () => {
             <View style={styles.tableRow}>
               <Text style={styles.tableLabel}>Chương trình sell in/out</Text>
               <Text style={styles.tableValue}>
-                {formatCurrency(MOCK_REWARDS.salesProgram)}
+                {profileData?.salesProgram || '0'}
               </Text>
             </View>
 
             <View style={styles.tableRow}>
               <Text style={styles.tableLabel}>Hoa hồng kích hoạt bảo hành</Text>
               <Text style={styles.tableValue}>
-                {formatCurrency(MOCK_REWARDS.warrantyCommission)}
+                {profileData?.warrantyCommission || '0'}
               </Text>
             </View>
 
@@ -213,7 +227,7 @@ const HomeScreen = () => {
             <View style={[styles.tableRow, styles.tableFooter]}>
               <Text style={styles.tableFooterLabel}>Tổng cộng</Text>
               <Text style={styles.tableFooterValue}>
-                {formatCurrency(MOCK_REWARDS.total)}
+                {profileData?.total || '0'}
               </Text>
             </View>
 
@@ -221,7 +235,7 @@ const HomeScreen = () => {
             <View style={[styles.tableRow, styles.tableFooter]}>
               <Text style={styles.tableFooterLabel}>Đã thanh toán</Text>
               <Text style={styles.tableFooterValue}>
-                {formatCurrency(MOCK_REWARDS.paid)}
+                {profileData?.paid || '0'}
               </Text>
             </View>
           </View>

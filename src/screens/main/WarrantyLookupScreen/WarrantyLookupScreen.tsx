@@ -16,17 +16,8 @@ import { COLORS, SPACING, BORDER_RADIUS, SHADOWS } from '../../../config/theme';
 import CustomHeader from '../../../components/CustomHeader';
 import BarcodeScanner from '../../../components/BarcodeScanner';
 import { commonStyles } from '../../../styles/commonStyles';
-
-interface WarrantyInfo {
-  serial: string;
-  productName: string;
-  customerName: string;
-  phone: string;
-  address: string;
-  purchaseDate: string;
-  warrantyExpiry: string;
-  status: 'active' | 'expired' | 'not_found';
-}
+import { warrantyLookupService } from '../../../api/warrantyLookupService';
+import { WarrantyInfo } from '../../../types/warrantyLookup';
 
 const WarrantyLookupScreen = () => {
   const navigation = useNavigation();
@@ -58,27 +49,23 @@ const WarrantyLookupScreen = () => {
       setIsLoading(true);
       setResult(null);
 
-      // TODO: Replace with actual API call
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      const response = await warrantyLookupService.lookupWarranty({
+        keyword: keyword.trim(),
+      });
 
-      // Mock data
-      const mockResult: WarrantyInfo = {
-        serial: keyword,
-        productName: 'Điều hòa AKITO 12000 BTU',
-        customerName: 'Nguyễn Văn A',
-        phone: '0912345678',
-        address: '123 Nguyễn Trãi, Q.1, TP.HCM',
-        purchaseDate: '15/01/2024',
-        warrantyExpiry: '15/01/2026',
-        status: 'active',
-      };
-
-      setResult(mockResult);
+      if (response.data && response.data.length > 0) {
+        // Take the first result
+        setResult(response.data[0]);
+      } else {
+        Alert.alert(
+          'Không tìm thấy',
+          'Không tìm thấy thông tin bảo hành cho từ khóa này.'
+        );
+      }
     } catch (error) {
       Alert.alert(
         'Lỗi',
-        'Không thể tra cứu thông tin bảo hành. Vui lòng thử lại.'
+        error instanceof Error ? error.message : 'Không thể tra cứu thông tin bảo hành. Vui lòng thử lại.'
       );
     } finally {
       setIsLoading(false);
@@ -203,46 +190,87 @@ const WarrantyLookupScreen = () => {
                 <Text style={styles.infoValue}>{result.serial}</Text>
               </View>
 
+              {/* Product Code */}
+              {result.code && (
+                <View style={styles.infoRow}>
+                  <Text style={styles.infoLabel}>Mã sản phẩm:</Text>
+                  <Text style={styles.infoValue}>{result.code}</Text>
+                </View>
+              )}
+
               {/* Product Name */}
               <View style={styles.infoRow}>
                 <Text style={styles.infoLabel}>Sản phẩm:</Text>
-                <Text style={styles.infoValue}>{result.productName}</Text>
+                <Text style={styles.infoValue}>{result.namesp.trim() || result.name.trim()}</Text>
               </View>
+
+              {/* Product Type */}
+              {result.type && (
+                <View style={styles.infoRow}>
+                  <Text style={styles.infoLabel}>Chủng loại:</Text>
+                  <Text style={styles.infoValue}>{result.type}</Text>
+                </View>
+              )}
 
               {/* Customer Name */}
-              <View style={styles.infoRow}>
-                <Text style={styles.infoLabel}>Khách hàng:</Text>
-                <Text style={styles.infoValue}>{result.customerName}</Text>
-              </View>
+              {result.customerName && (
+                <View style={styles.infoRow}>
+                  <Text style={styles.infoLabel}>Khách hàng:</Text>
+                  <Text style={styles.infoValue}>{result.customerName}</Text>
+                </View>
+              )}
 
               {/* Phone */}
-              <View style={styles.infoRow}>
-                <Text style={styles.infoLabel}>Số điện thoại:</Text>
-                <Text style={styles.infoValue}>{result.phone}</Text>
-              </View>
+              {result.customerMobile && (
+                <View style={styles.infoRow}>
+                  <Text style={styles.infoLabel}>Số điện thoại:</Text>
+                  <Text style={styles.infoValue}>{result.customerMobile}</Text>
+                </View>
+              )}
 
               {/* Address */}
-              <View style={styles.infoRow}>
-                <Text style={styles.infoLabel}>Địa chỉ:</Text>
-                <Text style={styles.infoValue}>{result.address}</Text>
-              </View>
+              {result.customerAddress && (
+                <View style={styles.infoRow}>
+                  <Text style={styles.infoLabel}>Địa chỉ:</Text>
+                  <Text style={styles.infoValue}>{result.customerAddress}</Text>
+                </View>
+              )}
 
               {/* Divider */}
               <View style={styles.divider} />
 
-              {/* Purchase Date */}
+              {/* Active Date */}
               <View style={styles.infoRow}>
-                <Text style={styles.infoLabel}>Ngày mua:</Text>
-                <Text style={styles.infoValue}>{result.purchaseDate}</Text>
+                <Text style={styles.infoLabel}>Ngày kích hoạt:</Text>
+                <Text style={styles.infoValue}>{result.activeDate}</Text>
               </View>
+
+              {/* Warranty Time */}
+              {result.warrantyTime && (
+                <View style={styles.infoRow}>
+                  <Text style={styles.infoLabel}>Thời gian BH:</Text>
+                  <Text style={styles.infoValue}>{result.warrantyTime}</Text>
+                </View>
+              )}
 
               {/* Warranty Expiry */}
               <View style={styles.infoRow}>
                 <Text style={styles.infoLabel}>Hết hạn BH:</Text>
                 <Text style={[styles.infoValue, styles.infoValueHighlight]}>
-                  {result.warrantyExpiry}
+                  {result.expiryDate}
                 </Text>
               </View>
+
+              {/* Note */}
+              {result.note && (
+                <>
+                  <View style={styles.divider} />
+                  <View style={styles.infoRow}>
+                    <Text style={styles.infoLabel}>Ghi chú:</Text>
+                    <Text style={styles.infoValue}>{result.note}</Text>
+                  </View>
+                </>
+              )}
             </View>
           </View>
         )}

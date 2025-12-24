@@ -7,74 +7,47 @@ import {
   TouchableOpacity,
   StatusBar,
   Alert,
+  ActivityIndicator,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { COLORS, SPACING, BORDER_RADIUS, SHADOWS } from '../../../config/theme';
 import CustomHeader from '../../../components/CustomHeader';
 import { useAuthStore } from '../../../store/authStore';
-
-interface SalesProgram {
-  id: string;
-  name: string;
-  tenchitieu: string;
-  doanhsochitieu: string;
-  doanhsodat: string;
-  doanhsoconlai: string;
-  limittime: string;
-  tyledat: number;
-  thamgia: 0 | 1;
-  quyendangky: 0 | 1;
-}
+import { salesProgramService } from '../../../api/salesProgramService';
+import { SalesProgramItem } from '../../../types/salesProgram';
 
 const SalesProgramScreen = () => {
   const navigation = useNavigation();
-  const { user } = useAuthStore();
-  const [programs, setPrograms] = useState<SalesProgram[]>([]);
+  const { isAuthenticated } = useAuthStore();
+  const [programs, setPrograms] = useState<SalesProgramItem[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [chophepdangkygoi, setChophepdangkygoi] = useState(1);
 
-  // Mock data - replace with API call
+  // Load sales programs from API
   useEffect(() => {
-    const mockData: SalesProgram[] = [
-      {
-        id: '1',
-        name: 'Gói chương trình KPI Q1 2025',
-        tenchitieu: 'DOANH SỐ CHỈ TIÊU Q1',
-        doanhsochitieu: '500.000.000',
-        doanhsodat: '320.000.000',
-        doanhsoconlai: '180.000.000',
-        limittime: '45 ngày',
-        tyledat: 64,
-        thamgia: 1,
-        quyendangky: 1,
-      },
-      {
-        id: '2',
-        name: 'Gói boost doanh số tháng 3',
-        tenchitieu: 'DOANH SỐ CHỈ TIÊU THÁNG 3',
-        doanhsochitieu: '150.000.000',
-        doanhsodat: '95.000.000',
-        doanhsoconlai: '55.000.000',
-        limittime: '12 ngày',
-        tyledat: 63,
-        thamgia: 1,
-        quyendangky: 1,
-      },
-      {
-        id: '3',
-        name: 'Gói ưu đãi đại lý mới',
-        tenchitieu: 'DOANH SỐ CHỈ TIÊU',
-        doanhsochitieu: '100.000.000',
-        doanhsodat: '0',
-        doanhsoconlai: '0',
-        limittime: '0 ngày',
-        tyledat: 0,
-        thamgia: 0,
-        quyendangky: 1,
-      },
-    ];
-    setPrograms(mockData);
-  }, []);
+    if (isAuthenticated) {
+      loadSalesPrograms();
+    }
+  }, [isAuthenticated]);
+
+  const loadSalesPrograms = async () => {
+    try {
+      setIsLoading(true);
+
+      const response = await salesProgramService.getSalesPrograms({
+        typeget: 1,
+      });
+
+      if (response.status && response.data) {
+        setPrograms(response.data);
+      }
+    } catch (error) {
+      console.error('Failed to load sales programs:', error);
+      Alert.alert('Lỗi', 'Không thể tải danh sách chương trình bán hàng');
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const formatCurrency = (amount: string) => {
     const num = parseFloat(amount.replace(/[,.]/g, ''));
@@ -96,9 +69,40 @@ const SalesProgramScreen = () => {
         { text: 'Hủy', style: 'cancel' },
         {
           text: 'Đăng ký',
-          onPress: () => {
-            Alert.alert('Thành công', 'Đăng ký gói chương trình thành công!');
-            // TODO: Call API to register program
+          onPress: async () => {
+            try {
+              setIsLoading(true);
+
+              const response = await salesProgramService.registerProgram({
+                idct: id,
+              });
+
+              if (response.status) {
+                Alert.alert(
+                  'Thành công',
+                  response.message || 'Đăng ký gói chương trình thành công!',
+                  [
+                    {
+                      text: 'OK',
+                      onPress: () => {
+                        // Reload programs to get updated status
+                        loadSalesPrograms();
+                      },
+                    },
+                  ]
+                );
+              }
+            } catch (error) {
+              console.error('Failed to register program:', error);
+              Alert.alert(
+                'Lỗi',
+                error instanceof Error
+                  ? error.message
+                  : 'Không thể đăng ký chương trình. Vui lòng thử lại.'
+              );
+            } finally {
+              setIsLoading(false);
+            }
           },
         },
       ]
@@ -110,7 +114,7 @@ const SalesProgramScreen = () => {
     // TODO: Navigate to detail screen or show modal
   };
 
-  const renderProgram = (item: SalesProgram) => (
+  const renderProgram = (item: SalesProgramItem) => (
     <View key={item.id} style={styles.programCard}>
       {/* Header */}
       <View style={styles.programHeader}>
@@ -228,10 +232,20 @@ const SalesProgramScreen = () => {
           </Text>
         </View>
 
+        {/* Loading State */}
+        {isLoading && (
+          <View style={styles.loadingContainer}>
+            <ActivityIndicator size="large" color={COLORS.primary} />
+            <Text style={styles.loadingText}>Đang tải...</Text>
+          </View>
+        )}
+
         {/* Programs List */}
-        <View style={styles.programsList}>
-          {programs.map((program) => renderProgram(program))}
-        </View>
+        {!isLoading && (
+          <View style={styles.programsList}>
+            {programs.map((program) => renderProgram(program))}
+          </View>
+        )}
 
         {/* Bottom Spacing */}
         <View style={styles.bottomSpacing} />
@@ -269,6 +283,18 @@ const styles = StyleSheet.create({
     color: COLORS.textPrimary,
     textAlign: 'center',
     lineHeight: 22,
+  },
+
+  // Loading State
+  loadingContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: SPACING.xl * 2,
+  },
+  loadingText: {
+    marginTop: SPACING.md,
+    fontSize: 14,
+    color: COLORS.textSecondary,
   },
 
   // Programs List

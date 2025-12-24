@@ -16,16 +16,8 @@ import { COLORS, SPACING, BORDER_RADIUS, SHADOWS } from '../../../config/theme';
 import CustomHeader from '../../../components/CustomHeader';
 import BarcodeScanner from '../../../components/BarcodeScanner';
 import { commonStyles } from '../../../styles/commonStyles';
-
-interface ProductInfo {
-  serial: string;
-  productName: string;
-  model: string;
-  manufacturer: string;
-  productionDate: string;
-  isAuthentic: boolean;
-  status: 'authentic' | 'fake' | 'not_found';
-}
+import { productLookupService } from '../../../api/productLookupService';
+import { ProductInfo } from '../../../types/productLookup';
 
 const ProductLookupScreen = () => {
   const navigation = useNavigation();
@@ -57,26 +49,22 @@ const ProductLookupScreen = () => {
       setIsLoading(true);
       setResult(null);
 
-      // TODO: Replace with actual API call
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      const response = await productLookupService.checkProduct({
+        imeiserial: serial.trim(),
+      });
 
-      // Mock data
-      const mockResult: ProductInfo = {
-        serial: serial,
-        productName: 'Điều hòa AKITO Inverter 12000 BTU',
-        model: 'AKT-12INV',
-        manufacturer: 'AKITO Vietnam',
-        productionDate: '15/01/2024',
-        isAuthentic: true,
-        status: 'authentic',
-      };
-
-      setResult(mockResult);
+      if (response.success && response.data) {
+        setResult(response.data);
+      } else {
+        Alert.alert(
+          'Không tìm thấy',
+          response.message || 'Không tìm thấy thông tin sản phẩm này trong hệ thống.'
+        );
+      }
     } catch (error) {
       Alert.alert(
         'Lỗi',
-        'Không thể tra cứu thông tin sản phẩm. Vui lòng thử lại.'
+        error instanceof Error ? error.message : 'Không thể tra cứu thông tin sản phẩm. Vui lòng thử lại.'
       );
     } finally {
       setIsLoading(false);
@@ -91,13 +79,6 @@ const ProductLookupScreen = () => {
           icon: '✓',
           color: COLORS.success,
           bgColor: '#E8F5E9',
-        };
-      case 'fake':
-        return {
-          text: 'Sản phẩm không chính hãng',
-          icon: '✕',
-          color: COLORS.error,
-          bgColor: '#FFEBEE',
         };
       default:
         return {
@@ -211,29 +192,43 @@ const ProductLookupScreen = () => {
                   <Text style={styles.infoValue}>{result.serial}</Text>
                 </View>
 
+                {/* Product Code */}
+                {result.code && (
+                  <View style={styles.infoRow}>
+                    <Text style={styles.infoLabel}>Mã sản phẩm:</Text>
+                    <Text style={styles.infoValue}>{result.code}</Text>
+                  </View>
+                )}
+
                 {/* Product Name */}
                 <View style={styles.infoRow}>
                   <Text style={styles.infoLabel}>Tên sản phẩm:</Text>
-                  <Text style={styles.infoValue}>{result.productName}</Text>
+                  <Text style={styles.infoValue}>{result.name}</Text>
                 </View>
 
-                {/* Model */}
-                <View style={styles.infoRow}>
-                  <Text style={styles.infoLabel}>Model:</Text>
-                  <Text style={styles.infoValue}>{result.model}</Text>
-                </View>
+                {/* Warranty Time */}
+                {result.warrantyTime && (
+                  <View style={styles.infoRow}>
+                    <Text style={styles.infoLabel}>Thời gian BH:</Text>
+                    <Text style={styles.infoValue}>{result.warrantyTime}</Text>
+                  </View>
+                )}
 
-                {/* Manufacturer */}
-                <View style={styles.infoRow}>
-                  <Text style={styles.infoLabel}>Nhà sản xuất:</Text>
-                  <Text style={styles.infoValue}>{result.manufacturer}</Text>
-                </View>
+                {/* Export Date */}
+                {result.exportDate && (
+                  <View style={styles.infoRow}>
+                    <Text style={styles.infoLabel}>Ngày xuất kho:</Text>
+                    <Text style={styles.infoValue}>{result.exportDate}</Text>
+                  </View>
+                )}
 
-                {/* Production Date */}
-                <View style={styles.infoRow}>
-                  <Text style={styles.infoLabel}>Ngày sản xuất:</Text>
-                  <Text style={styles.infoValue}>{result.productionDate}</Text>
-                </View>
+                {/* Seller */}
+                {result.seller && (
+                  <View style={styles.infoRow}>
+                    <Text style={styles.infoLabel}>Nơi bán:</Text>
+                    <Text style={styles.infoValue}>{result.seller}</Text>
+                  </View>
+                )}
 
                 {/* Divider */}
                 <View style={styles.divider} />
@@ -244,19 +239,6 @@ const ProductLookupScreen = () => {
                   <Text style={styles.authenticNoteText}>
                     Sản phẩm này đã được xác thực là hàng chính hãng của AKITO.
                     Quý khách được hưởng đầy đủ chính sách bảo hành theo quy định.
-                  </Text>
-                </View>
-              </View>
-            )}
-
-            {/* Fake Product Warning */}
-            {result.status === 'fake' && (
-              <View style={styles.resultBody}>
-                <View style={styles.warningBox}>
-                  <Text style={styles.warningIcon}>⚠️</Text>
-                  <Text style={styles.warningText}>
-                    Sản phẩm này không phải là hàng chính hãng của AKITO.
-                    Vui lòng liên hệ hotline để được hỗ trợ và tư vấn.
                   </Text>
                 </View>
               </View>

@@ -1,50 +1,49 @@
 /**
- * Warranty Station API Service
- * API calls for warranty station list and management
+ * Distribution System API Service
+ * API calls for distribution system list and management
  */
 
 import { buildApiUrl, getUserCredentials } from '../utils/apiHelper';
 import {
-  GetWarrantyStationsRequest,
-  GetWarrantyStationsResponse,
-  WarrantyStationRaw,
-  WarrantyStation,
-} from '../types/warrantyStation';
+  GetDistributorsRequest,
+  GetDistributorsResponse,
+  DistributorRaw,
+  Distributor,
+} from '../types/distributionSystem';
 
 /**
  * Parse and transform raw API data to clean app format
  */
-const parseWarrantyStation = (raw: WarrantyStationRaw): WarrantyStation => {
+const parseDistributor = (raw: DistributorRaw): Distributor => {
   return {
-    id: raw.id,
+    id: raw.MaTram,
     TenTram: raw.TenTram || '',
     SoDienThoai: raw.SoDienThoai || '',
     DiaChi: raw.DiaChi || '',
-    TinhThanh: raw.TinhThanh || '',
   };
 };
 
-export const warrantyStationService = {
+export const distributionSystemService = {
   /**
-   * Get list of warranty stations
-   * API: /getlisttram?storeid=xxx&page=1&tentinhthanh=xxx&keyword=
+   * Get list of distributors
+   * API: /getlistnhaphanphoi?storeid=xxx&page=1&tentinhthanh=xxx&keyword=
    */
-  getWarrantyStations: async (
-    params: GetWarrantyStationsRequest
-  ): Promise<GetWarrantyStationsResponse> => {
+  getDistributors: async (
+    params: GetDistributorsRequest
+  ): Promise<GetDistributorsResponse> => {
     try {
       const credentials = getUserCredentials();
       const { page, tentinhthanh, keyword = '' } = params;
 
       // Build API URL with query params
-      const url = buildApiUrl('/getlisttram', {
+      const url = buildApiUrl('/getlistnhaphanphoi', {
         storeid: credentials.storeid,
         page: page,
         tentinhthanh: tentinhthanh,
         keyword: keyword,
       });
 
-      console.log('🏢 Fetching warranty stations:', url);
+      console.log('🏢 Fetching distributors:', url);
 
       const response = await fetch(url, {
         method: 'GET',
@@ -55,8 +54,7 @@ export const warrantyStationService = {
 
       const result = await response.json();
 
-      console.log('🏢 Warranty stations response:', {
-        count: result.count,
+      console.log('🏢 Distributors response:', {
         nextpage: result.nextpage,
         listLength: result.list?.length,
         firstItem: result.list?.[0],
@@ -70,21 +68,20 @@ export const warrantyStationService = {
       }
 
       // Parse raw data to clean format
-      const parsedList: WarrantyStation[] = (result.list || []).map(
-        parseWarrantyStation
+      const parsedList: Distributor[] = (result.list || []).map(
+        parseDistributor
       );
 
-      console.log('✅ Parsed first station:', parsedList[0]);
+      console.log('✅ Parsed first distributor:', parsedList[0]);
 
       return {
         status: true,
         list: parsedList,
-        count: result.count || 0,
         nextpage: result.nextpage || false,
         message: result.message,
       };
     } catch (error) {
-      console.error('❌ Warranty stations fetch error:', error);
+      console.error('❌ Distributors fetch error:', error);
       if (error instanceof Error) {
         throw error;
       }
