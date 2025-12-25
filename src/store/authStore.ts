@@ -93,15 +93,22 @@ export const useAuthStore = create<AuthState>((set) => ({
 
   // Update Avatar - Update user avatar in state and storage
   updateAvatar: (avatarUri) => {
-    set((state) => {
-      if (!state.user) return state;
+    const currentState = useAuthStore.getState();
 
-      const updatedUser = { ...state.user, avatar: avatarUri };
-      storage.set(StorageKeys.USER_DATA, JSON.stringify(updatedUser));
+    if (!currentState.user) {
+      console.warn('⚠️ Cannot update avatar: no user logged in');
+      return;
+    }
 
-      return {
-        user: updatedUser,
-      };
+    const updatedUser = { ...currentState.user, avatar: avatarUri };
+    storage.set(StorageKeys.USER_DATA, JSON.stringify(updatedUser));
+
+    console.log('✅ Avatar updated in store:', {
+      old: currentState.user.avatar,
+      new: avatarUri,
     });
+
+    // Force state update with new user object reference
+    set({ user: updatedUser });
   },
 }));

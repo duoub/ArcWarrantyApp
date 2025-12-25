@@ -43,6 +43,7 @@ const InOutScreen = () => {
     phone: '',
     address: '',
   });
+  const [avatarKey, setAvatarKey] = useState(0);
 
   // Log user info khi component mount để debug
   useEffect(() => {
@@ -55,6 +56,13 @@ const InOutScreen = () => {
       console.log('  - Role:', user.role);
     }
   }, [user]);
+
+  // Log when user avatar changes to debug re-render
+  useEffect(() => {
+    console.log('🔄 InOutScreen - user.avatar changed:', user?.avatar);
+    // Force Avatar component to re-render by changing key
+    setAvatarKey(prev => prev + 1);
+  }, [user?.avatar]);
 
   const {
     control,
@@ -120,7 +128,7 @@ const InOutScreen = () => {
         {/* Customer Info Card - Hiển thị thông tin user đã login hoặc dealer được chọn */}
         <View style={styles.customerCard}>
           <View style={styles.customerHeader}>
-            <Avatar uri={user?.avatar} size={50} style={styles.avatarContainer} />
+            <Avatar key={avatarKey} uri={user?.avatar} size={50} style={styles.avatarContainer} />
             <View style={styles.customerInfo}>
               <Text style={styles.customerName}>
                 {customerInfo.name || (user ? user.name : 'Chưa chọn đại lý')}

@@ -50,6 +50,11 @@ const HomeScreen = () => {
     }
   }, [isAuthenticated]);
 
+  // Log when user avatar changes to debug re-render
+  useEffect(() => {
+    console.log('🔄 HomeScreen - user.avatar changed:', user?.avatar);
+  }, [user?.avatar]);
+
   const loadProfileData = async () => {
     try {
       setIsLoading(true);

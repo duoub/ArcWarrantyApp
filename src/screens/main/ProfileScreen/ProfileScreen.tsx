@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -31,6 +31,14 @@ const ProfileScreen = () => {
   const [showPersonalInfo, setShowPersonalInfo] = useState(true);
   const [showBankInfo, setShowBankInfo] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
+  const [avatarKey, setAvatarKey] = useState(0);
+
+  // Log when user avatar changes to debug re-render
+  useEffect(() => {
+    console.log('🔄 ProfileScreen - user.avatar changed:', user?.avatar);
+    // Force Avatar component to re-render by changing key
+    setAvatarKey(prev => prev + 1);
+  }, [user?.avatar]);
 
   const uploadImageToServer = async (imagePath: string) => {
     try {
@@ -206,7 +214,7 @@ const ProfileScreen = () => {
         {/* User Profile Card */}
         <View style={styles.profileCard}>
           <View style={styles.avatarWrapper}>
-            <Avatar uri={user?.avatar} size={100} />
+            <Avatar key={avatarKey} uri={user?.avatar} size={100} />
             <TouchableOpacity
               style={styles.changeAvatarButton}
               onPress={handleChangeAvatar}
