@@ -21,7 +21,9 @@ import { COLORS, SPACING, BORDER_RADIUS, SHADOWS } from '../../../config/theme';
 import { warrantyService } from '../../../api/warrantyService';
 import CustomHeader from '../../../components/CustomHeader';
 import BarcodeScanner from '../../../components/BarcodeScanner';
+import LocationSelector from '../../../components/LocationSelector';
 import { commonStyles } from '../../../styles/commonStyles';
+import { Location } from '../../../types/province';
 
 // Validation Schema
 const warrantyActivationSchema = z.object({
@@ -31,6 +33,9 @@ const warrantyActivationSchema = z.object({
     .string()
     .min(1, 'Số điện thoại là bắt buộc')
     .regex(/^[0-9]{9,11}$/, 'Số điện thoại không hợp lệ'),
+  tinhthanh: z.string().min(1, 'Tỉnh thành là bắt buộc'),
+  quanhuyen: z.string().min(1, 'Quận huyện là bắt buộc'),
+  xaphuong: z.string().min(1, 'Xã phường là bắt buộc'),
   address: z.string().min(1, 'Địa chỉ là bắt buộc'),
   email: z
     .string()
@@ -44,18 +49,25 @@ type WarrantyActivationFormData = z.infer<typeof warrantyActivationSchema>;
 const WarrantyActivationScreen = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [showScanner, setShowScanner] = useState(false);
+  const [province, setProvince] = useState<Location | null>(null);
+  const [district, setDistrict] = useState<Location | null>(null);
+  const [ward, setWard] = useState<Location | null>(null);
 
   const {
     control,
     handleSubmit,
     formState: { errors },
     setValue,
+    reset,
   } = useForm<WarrantyActivationFormData>({
     resolver: zodResolver(warrantyActivationSchema),
     defaultValues: {
       serial: '',
       customerName: '',
       phone: '',
+      tinhthanh: '',
+      quanhuyen: '',
+      xaphuong: '',
       address: '',
       email: '',
     },
@@ -78,6 +90,9 @@ const WarrantyActivationScreen = () => {
         serial: data.serial,
         customerName: data.customerName,
         phone: data.phone,
+        tinhthanh: data.tinhthanh,
+        quanhuyen: data.quanhuyen,
+        xaphuong: data.xaphuong,
         address: data.address,
         email: data.email,
       });
@@ -89,7 +104,11 @@ const WarrantyActivationScreen = () => {
           {
             text: 'OK',
             onPress: () => {
-              // TODO: Navigate to warranty details or clear form
+              // Reset form and location states
+              reset();
+              setProvince(null);
+              setDistrict(null);
+              setWard(null);
             },
           },
         ]
@@ -257,6 +276,71 @@ const WarrantyActivationScreen = () => {
               </View>
             )}
           />
+
+          {/* Province */}
+          <View style={styles.inputContainer}>
+            <Text style={styles.inputLabel}>
+              Tỉnh thành <Text style={styles.required}>*</Text>
+            </Text>
+            <LocationSelector
+              parentCode=""
+              selectedLocation={province?.TenDiaBan || ''}
+              onLocationChange={(location) => {
+                setProvince(location);
+                setValue('tinhthanh', location?.TenDiaBan || '');
+                setDistrict(null);
+                setWard(null);
+                setValue('quanhuyen', '');
+                setValue('xaphuong', '');
+              }}
+              placeholder="Chọn tỉnh thành"
+            />
+            {errors.tinhthanh && (
+              <Text style={styles.errorText}>{errors.tinhthanh.message}</Text>
+            )}
+          </View>
+
+          {/* District */}
+          <View style={styles.inputContainer}>
+            <Text style={styles.inputLabel}>
+              Quận huyện <Text style={styles.required}>*</Text>
+            </Text>
+            <LocationSelector
+              parentCode={province?.MaDiaBan || ''}
+              selectedLocation={district?.TenDiaBan || ''}
+              onLocationChange={(location) => {
+                setDistrict(location);
+                setValue('quanhuyen', location?.TenDiaBan || '');
+                setWard(null);
+                setValue('xaphuong', '');
+              }}
+              placeholder="Chọn quận huyện"
+              disabled={!province}
+            />
+            {errors.quanhuyen && (
+              <Text style={styles.errorText}>{errors.quanhuyen.message}</Text>
+            )}
+          </View>
+
+          {/* Ward */}
+          <View style={styles.inputContainer}>
+            <Text style={styles.inputLabel}>
+              Xã phường <Text style={styles.required}>*</Text>
+            </Text>
+            <LocationSelector
+              parentCode={district?.MaDiaBan || ''}
+              selectedLocation={ward?.TenDiaBan || ''}
+              onLocationChange={(location) => {
+                setWard(location);
+                setValue('xaphuong', location?.TenDiaBan || '');
+              }}
+              placeholder="Chọn xã phường"
+              disabled={!district}
+            />
+            {errors.xaphuong && (
+              <Text style={styles.errorText}>{errors.xaphuong.message}</Text>
+            )}
+          </View>
 
           {/* Address */}
           <Controller

@@ -6,6 +6,9 @@ export interface WarrantyActivationRequest {
   serial: string;
   customerName: string;
   phone: string;
+  tinhthanh: string;
+  quanhuyen: string;
+  xaphuong: string;
   address: string;
   email?: string;
 }
