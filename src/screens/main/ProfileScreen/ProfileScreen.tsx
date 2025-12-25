@@ -10,6 +10,7 @@ import {
   Switch,
   Platform,
   PermissionsAndroid,
+  ActivityIndicator,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -19,6 +20,7 @@ import CustomHeader from '../../../components/CustomHeader';
 import Avatar from '../../../components/Avatar';
 import { useAuthStore } from '../../../store/authStore';
 import { ProfileStackParamList } from '../../../navigation/MainNavigator';
+import { uploadService } from '../../../api/uploadService';
 
 type ProfileScreenNavigationProp = StackNavigationProp<ProfileStackParamList, 'Profile'>;
 
@@ -28,8 +30,34 @@ const ProfileScreen = () => {
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
   const [showPersonalInfo, setShowPersonalInfo] = useState(true);
   const [showBankInfo, setShowBankInfo] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
+
+  const uploadImageToServer = async (imagePath: string) => {
+    try {
+      setIsUploading(true);
+
+      // Upload image to server
+      const response = await uploadService.uploadAvatar(imagePath);
+
+      // Update local avatar with the server response URL
+      const avatarUrl = response.data || imagePath;
+      updateAvatar(avatarUrl);
+
+      Alert.alert('Thành công', 'Ảnh đại diện đã được cập nhật!');
+    } catch (error: any) {
+      Alert.alert('Lỗi', error.message || 'Không thể upload ảnh. Vui lòng thử lại.');
+      console.error('Upload error:', error);
+    } finally {
+      setIsUploading(false);
+    }
+  };
 
   const handleChangeAvatar = () => {
+    if (isUploading) {
+      Alert.alert('Thông báo', 'Đang upload ảnh, vui lòng đợi...');
+      return;
+    }
+
     Alert.alert(
       'Đổi ảnh đại diện',
       'Chọn nguồn ảnh',
@@ -82,8 +110,16 @@ const ProfileScreen = () => {
         compressImageQuality: 0.8,
       });
 
-      updateAvatar(image.path);
-      Alert.alert('Thành công', 'Ảnh đại diện đã được cập nhật!');
+      console.log('📸 Image selected:', {
+        path: image.path,
+        size: image.size,
+        width: image.width,
+        height: image.height,
+        mime: image.mime,
+      });
+
+      // Upload to server using react-native-blob-util
+      await uploadImageToServer(image.path);
     } catch (error: any) {
       if (error.code !== 'E_PICKER_CANCELLED') {
         Alert.alert('Lỗi', 'Không thể chụp ảnh. Vui lòng thử lại.');
@@ -105,8 +141,16 @@ const ProfileScreen = () => {
         compressImageQuality: 0.8,
       });
 
-      updateAvatar(image.path);
-      Alert.alert('Thành công', 'Ảnh đại diện đã được cập nhật!');
+      console.log('📸 Image selected:', {
+        path: image.path,
+        size: image.size,
+        width: image.width,
+        height: image.height,
+        mime: image.mime,
+      });
+
+      // Upload to server using react-native-blob-util
+      await uploadImageToServer(image.path);
     } catch (error: any) {
       if (error.code !== 'E_PICKER_CANCELLED') {
         Alert.alert('Lỗi', 'Không thể chọn ảnh. Vui lòng thử lại.');
