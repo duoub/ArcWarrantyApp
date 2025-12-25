@@ -10,6 +10,8 @@ import {
   ScrollView,
   StatusBar,
   Image,
+  Platform,
+  PermissionsAndroid,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -79,12 +81,49 @@ const DealerSignupScreen: React.FC = () => {
     },
   });
 
-  const handleAddImage = async () => {
+  const handleAddImage = () => {
+    Alert.alert(
+      'Thêm ảnh',
+      'Chọn nguồn ảnh',
+      [
+        {
+          text: 'Chụp ảnh',
+          onPress: () => handleTakePhoto(),
+        },
+        {
+          text: 'Thư viện',
+          onPress: () => handlePickFromLibrary(),
+        },
+        {
+          text: 'Hủy',
+          style: 'cancel',
+        },
+      ],
+      { cancelable: true }
+    );
+  };
+
+  const handleTakePhoto = async () => {
     try {
+      // Request camera permission for Android
+      if (Platform.OS === 'android') {
+        const granted = await PermissionsAndroid.request(
+          PermissionsAndroid.PERMISSIONS.CAMERA,
+          {
+            title: 'Quyền truy cập Camera',
+            message: 'Ứng dụng cần quyền truy cập camera để chụp ảnh.',
+            buttonNeutral: 'Hỏi sau',
+            buttonNegative: 'Từ chối',
+            buttonPositive: 'Đồng ý',
+          }
+        );
+        if (granted !== PermissionsAndroid.RESULTS.GRANTED) {
+          Alert.alert('Lỗi', 'Bạn cần cấp quyền truy cập camera để tiếp tục.');
+          return;
+        }
+      }
+
       const image = await ImagePicker.openCamera({
-        width: 800,
-        height: 600,
-        cropping: true,
         mediaType: 'photo',
         compressImageQuality: 0.8,
       });
@@ -98,6 +137,30 @@ const DealerSignupScreen: React.FC = () => {
     } catch (error: any) {
       if (error.code !== 'E_PICKER_CANCELLED') {
         Alert.alert('Lỗi', 'Không thể chụp ảnh. Vui lòng thử lại.');
+        console.error('Camera error:', error);
+      }
+    }
+  };
+
+  const handlePickFromLibrary = async () => {
+    try {
+      const selectedImages = await ImagePicker.openPicker({
+        multiple: true,
+        mediaType: 'photo',
+        compressImageQuality: 0.8,
+      });
+
+      // Add all selected images to the images array
+      const newImages: ImageItem[] = selectedImages.map((img) => ({
+        src: img.path,
+        uri: img.path,
+      }));
+
+      setImages([...images, ...newImages]);
+    } catch (error: any) {
+      if (error.code !== 'E_PICKER_CANCELLED') {
+        Alert.alert('Lỗi', 'Không thể chọn ảnh. Vui lòng thử lại.');
+        console.error('Image picker error:', error);
       }
     }
   };
@@ -293,7 +356,7 @@ const DealerSignupScreen: React.FC = () => {
             render={({ field: { onChange, onBlur, value } }) => (
               <View style={styles.inputContainer}>
                 <Text style={styles.inputLabel}>
-                  Số tài khoản <Text style={styles.required}>*</Text>
+                  Số tài khoản ngân hàng<Text style={styles.required}>*</Text>
                 </Text>
                 <TextInput
                   style={[styles.input, errors.sotaikhoan && styles.inputError]}
@@ -318,7 +381,7 @@ const DealerSignupScreen: React.FC = () => {
             render={({ field: { onChange, onBlur, value } }) => (
               <View style={styles.inputContainer}>
                 <Text style={styles.inputLabel}>
-                  Tên tài khoản <Text style={styles.required}>*</Text>
+                  Tên tài khoản ngân hàng<Text style={styles.required}>*</Text>
                 </Text>
                 <TextInput
                   style={[styles.input, errors.tentaikhoan && styles.inputError]}

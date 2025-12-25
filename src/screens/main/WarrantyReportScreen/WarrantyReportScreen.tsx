@@ -12,8 +12,10 @@ import {
   Alert,
   StatusBar,
   Image,
+  PermissionsAndroid,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import ImagePicker from 'react-native-image-crop-picker';
 import { COLORS, SPACING, BORDER_RADIUS, SHADOWS } from '../../../config/theme';
 import CustomHeader from '../../../components/CustomHeader';
 import BarcodeScanner from '../../../components/BarcodeScanner';
@@ -55,10 +57,78 @@ const WarrantyReportScreen = () => {
 
   const handleAddImage = () => {
     Alert.alert(
-      'Chụp ảnh',
-      'Tính năng chụp ảnh đang được phát triển.',
-      [{ text: 'OK' }]
+      'Thêm ảnh',
+      'Chọn nguồn ảnh',
+      [
+        {
+          text: 'Chụp ảnh',
+          onPress: () => handleTakePhoto(),
+        },
+        {
+          text: 'Thư viện',
+          onPress: () => handlePickFromLibrary(),
+        },
+        {
+          text: 'Hủy',
+          style: 'cancel',
+        },
+      ],
+      { cancelable: true }
     );
+  };
+
+  const handleTakePhoto = async () => {
+    try {
+      // Request camera permission for Android
+      if (Platform.OS === 'android') {
+        const granted = await PermissionsAndroid.request(
+          PermissionsAndroid.PERMISSIONS.CAMERA,
+          {
+            title: 'Quyền truy cập Camera',
+            message: 'Ứng dụng cần quyền truy cập camera để chụp ảnh.',
+            buttonNeutral: 'Hỏi sau',
+            buttonNegative: 'Từ chối',
+            buttonPositive: 'Đồng ý',
+          }
+        );
+        if (granted !== PermissionsAndroid.RESULTS.GRANTED) {
+          Alert.alert('Lỗi', 'Bạn cần cấp quyền truy cập camera để tiếp tục.');
+          return;
+        }
+      }
+
+      const image = await ImagePicker.openCamera({
+        mediaType: 'photo',
+        compressImageQuality: 0.8,
+      });
+
+      // Add the new image to the images array
+      setImages([...images, image.path]);
+    } catch (error: any) {
+      if (error.code !== 'E_PICKER_CANCELLED') {
+        Alert.alert('Lỗi', 'Không thể chụp ảnh. Vui lòng thử lại.');
+        console.error('Camera error:', error);
+      }
+    }
+  };
+
+  const handlePickFromLibrary = async () => {
+    try {
+      const selectedImages = await ImagePicker.openPicker({
+        multiple: true,
+        mediaType: 'photo',
+        compressImageQuality: 0.8,
+      });
+
+      // Add all selected images to the images array
+      const imagePaths = selectedImages.map((img) => img.path);
+      setImages([...images, ...imagePaths]);
+    } catch (error: any) {
+      if (error.code !== 'E_PICKER_CANCELLED') {
+        Alert.alert('Lỗi', 'Không thể chọn ảnh. Vui lòng thử lại.');
+        console.error('Image picker error:', error);
+      }
+    }
   };
 
   const handleRemoveImage = (index: number) => {
