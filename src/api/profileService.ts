@@ -124,4 +124,70 @@ export const profileService = {
       throw new Error('Đã có lỗi xảy ra. Vui lòng thử lại.');
     }
   },
+
+  /**
+   * Update personal information
+   * API: POST /forza/updateprofile
+   */
+  updateProfile: async (data: {
+    name: string;
+    phone: string;
+    email: string;
+    address: string;
+    tinhthanh: string;
+    taxcode: string;
+    sotaikhoan: string;
+    tentaikhoan: string;
+    nganhang: string;
+  }): Promise<{ status: boolean; message?: string }> => {
+    try {
+      const credentials = getUserCredentials();
+
+      const body = {
+        userid: credentials.userid,
+        token: credentials.userid,
+        storeid: credentials.storeid,
+        name: data.name,
+        phone: data.phone,
+        email: data.email,
+        address: data.address,
+        tinhthanh: data.tinhthanh,
+        taxcode: data.taxcode,
+        sotaikhoan: data.sotaikhoan,
+        tentaikhoan: data.tentaikhoan,
+        nganhang: data.nganhang,
+      };
+
+      const url = buildApiUrl('/updateprofile');
+
+      console.log('📝 Updating personal info:', body);
+
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(body),
+      });
+
+      const result = await response.json();
+
+      console.log('📝 Update personal info response:', result);
+
+      if (result.status || result.status === 'true') {
+        return {
+          status: true,
+          message: result.message || 'Cập nhật thông tin thành công',
+        };
+      } else {
+        throw new Error(result.message || 'Không thể cập nhật thông tin');
+      }
+    } catch (error) {
+      console.error('❌ Update personal info error:', error);
+      if (error instanceof Error) {
+        throw error;
+      }
+      throw new Error('Đã có lỗi xảy ra. Vui lòng thử lại.');
+    }
+  }
 };

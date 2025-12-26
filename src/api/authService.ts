@@ -16,12 +16,62 @@ import {
   ForgotPasswordResponse,
   ResendOTPRequest,
   ResendOTPResponse,
+  User,
+  UserProfileRaw,
 } from '../types/auth';
+import { buildApiUrl } from '../utils/apiHelper';
+import { SimultaneousGesture } from 'react-native-gesture-handler/lib/typescript/handlers/gestures/gestureComposition';
 
 export const authService = {
   /**
+   * Get user profile
+   * API: /forza/getprofile?userid=xxx&storeid=xxx&typeget=1
+   */
+  getProfile: async (userid: string, storeid: string): Promise<UserProfileRaw> => {
+    try {
+      const apiParams: Record<string, string> = {
+        userid,
+        storeid,
+        typeget: '1',
+      };
+
+      const url = buildApiUrl('/getprofile', apiParams);
+
+      console.log('👤 Fetching user profile:', { userid, storeid });
+
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      const result: UserProfileRaw = await response.json();
+
+      console.log('👤 Profile response:', result);
+
+      // Transform API response to User interface
+      return {
+        // name: result.name || '',
+        // email: result.email || '',
+        address: result.address || '',
+        tinhthanh: result.tinhthanh || '',
+        taxcode: result.taxcode || '',
+        nganhang: result.nganhang || '',
+        sotaikhoan: result.sotaikhoan || '',
+        tentaikhoan: result.tentaikhoan || '',
+        countThongBaoChuaDoc: result.countThongBaoChuaDoc || '0',
+      };
+    } catch (error) {
+      console.error('❌ Get profile error:', error);
+      throw new Error('Không thể lấy thông tin người dùng');
+    }
+  },
+
+  /**
    * Login user using AsiaticVn API
    * API: /login?storeid=xxx
+   * After successful login, fetch user profile from /forza/getprofile
    */
   login: async (data: LoginRequest): Promise<LoginResponse> => {
     try {
@@ -42,17 +92,24 @@ export const authService = {
         throw new Error(result.message || 'Đăng nhập thất bại');
       }
 
+      console.log('✅ Login successful, fetching profile...');
+
+      // Fetch user profile after successful login
+      const userProfile = await authService.getProfile(result.username, API_CONFIG.STORE_ID);
+
+
       // Transform API response to match our LoginResponse interface
       return {
         token: result.token || '', // Add token if available
         user: {
-          id: result.id || result.user?.id || '',
+          ...userProfile,
+          id: result.username,
           username: result.username,
-          email: result.email || result.user?.email || data.username,
-          name: result.name || result.user?.name || data.username,
-          phone: result.phone || result.user?.phone,
-          role: result.role || result.user?.role || 'customer',
-          avatar: result.avatar || result.user?.avatar,
+          name: result.name,
+          phone: result.phone,
+          email: result.email || '',
+          role: result.namemembertype || 'Đại lý',
+          avatar: result.avatar,
         },
         message: result.message || 'Đăng nhập thành công',
       };

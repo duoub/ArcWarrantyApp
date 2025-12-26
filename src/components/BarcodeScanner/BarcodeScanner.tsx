@@ -15,6 +15,7 @@ import {
   useCameraDevice,
   useCodeScanner,
 } from 'react-native-vision-camera';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { COLORS, SPACING, BORDER_RADIUS, SHADOWS } from '../../config/theme';
 
 interface BarcodeScannerProps {
@@ -112,18 +113,21 @@ const BarcodeScanner: React.FC<BarcodeScannerProps> = ({
     >
       <StatusBar barStyle="light-content" backgroundColor="#000000" />
       <View style={styles.container}>
-        {/* Header */}
-        <View style={styles.header}>
-          <TouchableOpacity
-            style={styles.closeButton}
-            onPress={handleClose}
-            activeOpacity={0.7}
-          >
-            <Text style={styles.closeIcon}>✕</Text>
-          </TouchableOpacity>
-          <Text style={styles.title}>{title}</Text>
-          <View style={styles.placeholder} />
-        </View>
+        {/* Header with SafeAreaView */}
+        <SafeAreaView edges={['top']} style={styles.safeAreaHeader}>
+          <View style={styles.header}>
+            <TouchableOpacity
+              style={styles.closeButton}
+              onPress={handleClose}
+              activeOpacity={0.7}
+              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+            >
+              <Text style={styles.closeIcon}>✕</Text>
+            </TouchableOpacity>
+            <Text style={styles.title}>{title}</Text>
+            <View style={styles.placeholder} />
+          </View>
+        </SafeAreaView>
 
         {/* Camera View */}
         {device && hasPermission ? (
@@ -178,26 +182,28 @@ const styles = StyleSheet.create({
     backgroundColor: '#000000',
   },
 
-  // Header
+  // Header with Safe Area
+  safeAreaHeader: {
+    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+    zIndex: 10,
+  },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: SPACING.md,
     paddingVertical: SPACING.md,
-    backgroundColor: 'rgba(0, 0, 0, 0.8)',
-    zIndex: 10,
   },
   closeButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
     backgroundColor: 'rgba(255, 255, 255, 0.2)',
     alignItems: 'center',
     justifyContent: 'center',
   },
   closeIcon: {
-    fontSize: 24,
+    fontSize: 26,
     color: COLORS.white,
     fontWeight: '300',
   },
@@ -207,7 +213,7 @@ const styles = StyleSheet.create({
     color: COLORS.white,
   },
   placeholder: {
-    width: 40,
+    width: 44,
   },
 
   // Loading

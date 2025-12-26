@@ -8,18 +8,39 @@ export interface User {
   email: string;
   name: string;
   phone?: string;
-  role: 'admin' | 'technician' | 'dealer' | 'customer';
+  role?: string;
   avatar?: string;
   // Personal Information
   cccd?: string; // CCCD/CMND
   address?: string;
-  city?: string; // Tỉnh/Thành phố
+  tinhthanh?: string; // Tỉnh/Thành phố (tinhthanh)
+  birthday?: string;
   // Business Information
-  taxCode?: string; // Mã số thuế
+  taxcode?: string; // Mã số thuế (taxcode)
   // Bank Information
-  bankName?: string;
-  bankAccountNumber?: string;
-  bankAccountName?: string;
+  nganhang?: string; // Ngân hàng (nganhang)
+  sotaikhoan?: string; // Số tài khoản (sotaikhoan)
+  tentaikhoan?: string; // Tên tài khoản (tentaikhoan)
+  // Notification
+  countThongBaoChuaDoc?: string;
+}
+
+export interface UserProfileRaw {
+  // name: string;
+  address: string;
+  taxcode: string;
+  // email: string;
+  tinhthanh: string;
+  sotaikhoan: string;
+  tentaikhoan: string;
+  nganhang: string;
+  countThongBaoChuaDoc: string;
+}
+
+export interface UserProfileResponse {
+  success: boolean;
+  data?: UserProfileRaw;
+  message?: string;
 }
 
 export interface LoginRequest {
