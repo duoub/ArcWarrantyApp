@@ -15,6 +15,9 @@ import {
   PermissionsAndroid,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import { useForm, Controller } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
 import ImagePicker from 'react-native-image-crop-picker';
 import { COLORS, SPACING, BORDER_RADIUS, SHADOWS } from '../../../config/theme';
 import CustomHeader from '../../../components/CustomHeader';
@@ -22,38 +25,255 @@ import BarcodeScanner from '../../../components/BarcodeScanner';
 import LocationSelector from '../../../components/LocationSelector';
 import { Location } from '../../../types/province';
 import { uploadService, UploadedFile } from '../../../api/uploadService';
+import { warrantyService } from '../../../api/warrantyService';
+import { warrantyLookupService } from '../../../api/warrantyLookupService';
+import { provinceService } from '../../../api/provinceService';
+import CustomerLookupModal from '../../../components/CustomerLookupModal';
+import { WarrantyInfo } from '../../../types/warrantyLookup';
+
+// Validation Schema
+const warrantyReportSchema = z.object({
+  serial: z.string().min(1, 'Số serial là bắt buộc'),
+  customerName: z.string().min(1, 'Tên khách hàng là bắt buộc'),
+  phone: z
+    .string()
+    .min(1, 'Số điện thoại là bắt buộc')
+    .regex(/^[0-9]{9,11}$/, 'Số điện thoại không hợp lệ'),
+  tinhthanh: z.string().min(1, 'Tỉnh thành là bắt buộc'),
+  quanhuyen: z.string().min(1, 'Quận huyện là bắt buộc'),
+  xaphuong: z.string().min(1, 'Xã phường là bắt buộc'),
+  address: z.string().min(1, 'Địa chỉ là bắt buộc'),
+  issueDescription: z.string().min(1, 'Thông tin lỗi là bắt buộc'),
+});
+
+type WarrantyReportFormData = z.infer<typeof warrantyReportSchema>;
 
 const WarrantyReportScreen = () => {
   const navigation = useNavigation();
 
-  // Form states
-  const [serial, setSerial] = useState('');
-  const [customerName, setCustomerName] = useState('');
-  const [phone, setPhone] = useState('');
+  // Location states
   const [province, setProvince] = useState<Location | null>(null);
   const [district, setDistrict] = useState<Location | null>(null);
   const [ward, setWard] = useState<Location | null>(null);
-  const [address, setAddress] = useState('');
-  const [issueDescription, setIssueDescription] = useState('');
+
+  // Other states
   const [images, setImages] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [isLookingUpSerial, setIsLookingUpSerial] = useState(false);
   const [showScanner, setShowScanner] = useState(false);
+  const [showCustomerLookup, setShowCustomerLookup] = useState(false);
+
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+    setValue,
+    reset,
+  } = useForm<WarrantyReportFormData>({
+    resolver: zodResolver(warrantyReportSchema),
+    defaultValues: {
+      serial: '',
+      customerName: '',
+      phone: '',
+      tinhthanh: '',
+      quanhuyen: '',
+      xaphuong: '',
+      address: '',
+      issueDescription: '',
+    },
+  });
 
   const handleScanQR = () => {
     setShowScanner(true);
   };
 
   const handleScanComplete = (data: string) => {
-    setSerial(data);
+    setValue('serial', data);
     setShowScanner(false);
   };
 
   const handleSearchByPhone = () => {
-    Alert.alert(
-      'Tìm theo SĐT',
-      'Tính năng tìm kiếm theo số điện thoại đang được phát triển.',
-      [{ text: 'OK' }]
-    );
+    setShowCustomerLookup(true);
+  };
+
+  /**
+   * Auto-fill location selectors from formatted address
+   * Parses the formattedAddress which contains province, district, ward info
+   */
+  const autoFillLocations = async (warrantyInfo: WarrantyInfo) => {
+    if (!warrantyInfo.formattedAddress) return;
+
+    try {
+      // Extract location names from formattedAddress
+      // Format: "xxx - Xã xxx - Huyện xxx - Tỉnh xxx"
+      const parts = warrantyInfo.formattedAddress.split(' - ');
+
+      let provinceName = '';
+      let districtName = '';
+      let wardName = '';
+
+      // Find province, district, ward by their prefixes
+      parts.forEach(part => {
+        if (part.startsWith('Tỉnh ') || part.startsWith('Thành phố ')) {
+          provinceName = part;
+        } else if (part.startsWith('Huyện ') || part.startsWith('Quận ') || part.startsWith('Thị xã ')) {
+          districtName = part;
+        } else if (part.startsWith('Xã ') || part.startsWith('Phường ') || part.startsWith('Thị trấn ')) {
+          wardName = part;
+        }
+      });
+
+      console.log('📍 Extracted location names:', { provinceName, districtName, wardName });
+
+      // Step 1: Find and set province
+      if (provinceName) {
+        const provincesResponse = await provinceService.getProvinces();
+        const foundProvince = provincesResponse.list.find(
+          p => p.TenDiaBan === provinceName
+        );
+
+        if (foundProvince) {
+          setProvince(foundProvince);
+          setValue('tinhthanh', foundProvince.TenDiaBan);
+          console.log('✅ Province set:', foundProvince.TenDiaBan);
+
+          // Step 2: Find and set district
+          if (districtName) {
+            const districtsResponse = await provinceService.getLocations(foundProvince.MaDiaBan);
+            const foundDistrict = districtsResponse.list.find(
+              d => d.TenDiaBan === districtName
+            );
+
+            if (foundDistrict) {
+              setDistrict(foundDistrict);
+              setValue('quanhuyen', foundDistrict.TenDiaBan);
+              console.log('✅ District set:', foundDistrict.TenDiaBan);
+
+              // Step 3: Find and set ward
+              if (wardName) {
+                const wardsResponse = await provinceService.getLocations(foundDistrict.MaDiaBan);
+                const foundWard = wardsResponse.list.find(
+                  w => w.TenDiaBan === wardName
+                );
+
+                if (foundWard) {
+                  setWard(foundWard);
+                  setValue('xaphuong', foundWard.TenDiaBan);
+                  console.log('✅ Ward set:', foundWard.TenDiaBan);
+                }
+              }
+            }
+          }
+        }
+      }
+    } catch (error) {
+      console.error('❌ Error auto-filling locations:', error);
+      // Silently fail - user can manually select if auto-fill fails
+    }
+  };
+
+  const handleSelectCustomer = (customer: WarrantyInfo) => {
+    // Auto-fill form fields with customer data
+    setValue('serial', customer.serial);
+    setValue('customerName', customer.customerName);
+    setValue('phone', customer.customerMobile || customer.customerPhone);
+    setValue('address', customer.customerAddress);
+
+    // Reset location selectors first
+    setProvince(null);
+    setDistrict(null);
+    setWard(null);
+    setValue('tinhthanh', '');
+    setValue('quanhuyen', '');
+    setValue('xaphuong', '');
+
+    // Auto-fill location selectors from formatted address if available
+    if (customer.formattedAddress) {
+      autoFillLocations(customer);
+    }
+
+    console.log('✅ Customer selected and auto-filled:', {
+      serial: customer.serial,
+      name: customer.customerName,
+      phone: customer.customerMobile || customer.customerPhone,
+      address: customer.customerAddress,
+      formattedAddress: customer.formattedAddress,
+    });
+  };
+
+  const handleSerialBlur = async (serial: string) => {
+    if (!serial.trim()) return;
+
+    try {
+      setIsLookingUpSerial(true);
+      console.log('🔍 Looking up warranty info for serial:', serial);
+
+      const response = await warrantyLookupService.lookupWarranty({
+        keyword: serial.trim(),
+      });
+
+      if (response.data && response.data.length > 0) {
+        const warrantyInfo = response.data[0]; // Take first result
+
+        console.log('✅ Found warranty info, auto-filling fields:', warrantyInfo);
+
+        // Auto-fill customer information if available
+        if (warrantyInfo.customerName) {
+          setValue('customerName', warrantyInfo.customerName);
+        }
+        if (warrantyInfo.customerMobile || warrantyInfo.customerPhone) {
+          setValue('phone', warrantyInfo.customerMobile || warrantyInfo.customerPhone);
+        }
+        if (warrantyInfo.customerAddress) {
+          setValue('address', warrantyInfo.customerAddress);
+        }
+
+        // Reset location selectors first
+        setProvince(null);
+        setDistrict(null);
+        setWard(null);
+        setValue('tinhthanh', '');
+        setValue('quanhuyen', '');
+        setValue('xaphuong', '');
+
+        // Auto-fill location selectors from formatted address if available
+        if (warrantyInfo.formattedAddress) {
+          autoFillLocations(warrantyInfo);
+        }
+      } else {
+        console.log('ℹ️ No warranty info found for serial:', serial);
+
+        // Reset customer fields if no data found
+        setValue('customerName', '');
+        setValue('phone', '');
+        setValue('address', '');
+
+        // Reset location selectors
+        setProvince(null);
+        setDistrict(null);
+        setWard(null);
+        setValue('tinhthanh', '');
+        setValue('quanhuyen', '');
+        setValue('xaphuong', '');
+      }
+    } catch (error) {
+      console.error('❌ Error looking up warranty info:', error);
+
+      // Reset customer fields on error
+      setValue('customerName', '');
+      setValue('phone', '');
+      setValue('address', '');
+
+      // Reset location selectors
+      setProvince(null);
+      setDistrict(null);
+      setWard(null);
+      setValue('tinhthanh', '');
+      setValue('quanhuyen', '');
+      setValue('xaphuong', '');
+    } finally {
+      setIsLookingUpSerial(false);
+    }
   };
 
   const handleAddImage = () => {
@@ -137,41 +357,7 @@ const WarrantyReportScreen = () => {
     setImages(newImages);
   };
 
-  const handleSubmit = async () => {
-    // Validation
-    // if (!serial.trim()) {
-    //   Alert.alert('Lỗi', 'Vui lòng nhập số serial');
-    //   return;
-    // }
-    // if (!customerName.trim()) {
-    //   Alert.alert('Lỗi', 'Vui lòng nhập tên khách hàng');
-    //   return;
-    // }
-    // if (!phone.trim()) {
-    //   Alert.alert('Lỗi', 'Vui lòng nhập số điện thoại');
-    //   return;
-    // }
-    // if (!province) {
-    //   Alert.alert('Lỗi', 'Vui lòng chọn tỉnh thành');
-    //   return;
-    // }
-    // if (!district) {
-    //   Alert.alert('Lỗi', 'Vui lòng chọn quận huyện');
-    //   return;
-    // }
-    // if (!ward) {
-    //   Alert.alert('Lỗi', 'Vui lòng chọn xã phường');
-    //   return;
-    // }
-    // if (!address.trim()) {
-    //   Alert.alert('Lỗi', 'Vui lòng nhập địa chỉ');
-    //   return;
-    // }
-    // if (!issueDescription.trim()) {
-    //   Alert.alert('Lỗi', 'Vui lòng nhập thông tin lỗi');
-    //   return;
-    // }
-
+  const onSubmit = async (data: WarrantyReportFormData) => {
     try {
       setIsLoading(true);
 
@@ -197,30 +383,43 @@ const WarrantyReportScreen = () => {
       }
 
       // Step 2: Submit warranty report with uploaded image files
-      // TODO: Call warranty report API here with uploadedFiles
       console.log('📋 Submitting warranty report with data:', {
-        serial,
-        customerName,
-        phone,
-        province: province?.TenDiaBan,
-        district: district?.TenDiaBan,
-        ward: ward?.TenDiaBan,
-        address,
-        issueDescription,
+        serial: data.serial,
+        customerName: data.customerName,
+        phone: data.phone,
+        tinhthanh: data.tinhthanh,
+        quanhuyen: data.quanhuyen,
+        xaphuong: data.xaphuong,
+        address: data.address,
+        issueDescription: data.issueDescription,
         files: uploadedFiles,
       });
 
-      // Simulate API call
-      await new Promise<void>((resolve) => setTimeout(resolve, 1000));
+      const response = await warrantyService.report({
+        serial: data.serial,
+        issueDescription: data.issueDescription,
+        customerName: data.customerName,
+        phone: data.phone,
+        tinhthanh: data.tinhthanh,
+        quanhuyen: data.quanhuyen,
+        xaphuong: data.xaphuong,
+        address: data.address,
+        images: uploadedFiles,
+      });
 
       Alert.alert(
         'Thành công',
-        'Báo ca bảo hành đã được gửi thành công!',
+        response.message || 'Báo cáo bảo hành đã được gửi thành công!',
         [
           {
             text: 'OK',
             onPress: () => {
-              // Clear form or navigate back
+              // Reset form and navigate back
+              reset();
+              setProvince(null);
+              setDistrict(null);
+              setWard(null);
+              setImages([]);
               navigation.goBack();
             },
           },
@@ -230,7 +429,7 @@ const WarrantyReportScreen = () => {
       console.error('❌ Submit error:', error);
       Alert.alert(
         'Lỗi',
-        error.message || 'Đã có lỗi xảy ra. Vui lòng thử lại.',
+        error instanceof Error ? error.message : 'Đã có lỗi xảy ra. Vui lòng thử lại.',
         [{ text: 'OK' }]
       );
     } finally {
@@ -259,73 +458,123 @@ const WarrantyReportScreen = () => {
         >
           <View style={styles.formCard}>
             {/* Serial Number */}
-            <View style={styles.inputContainer}>
-              <View style={styles.labelRow}>
-                <Text style={styles.inputLabel}>
-                  Số serial <Text style={styles.required}>*</Text>
-                </Text>
-                <TouchableOpacity onPress={handleSearchByPhone}>
-                  <Text style={styles.linkText}>
-                    📞 Tìm theo Tên/SĐT
-                  </Text>
-                </TouchableOpacity>
-              </View>
-              <View style={styles.inputWrapper}>
-                <Text style={styles.inputIcon}>🔍</Text>
-                <TextInput
-                  style={styles.input}
-                  placeholder="Serial"
-                  placeholderTextColor={COLORS.gray400}
-                  value={serial}
-                  onChangeText={setSerial}
-                  editable={!isLoading}
-                />
-                <TouchableOpacity onPress={handleScanQR} style={styles.scanButton}>
-                  <Image
-                    source={require('../../../assets/images/scan_me.png')}
-                    style={styles.scanImage}
-                    resizeMode="contain"
-                  />
-                </TouchableOpacity>
-              </View>
-            </View>
+            <Controller
+              control={control}
+              name="serial"
+              render={({ field: { onChange, onBlur, value } }) => (
+                <View style={styles.inputContainer}>
+                  <View style={styles.labelRow}>
+                    <Text style={styles.inputLabel}>
+                      Số serial <Text style={styles.required}>*</Text>
+                    </Text>
+                    <TouchableOpacity onPress={handleSearchByPhone}>
+                      <Text style={styles.linkText}>
+                        📞 Tìm theo Số điện thoại
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
+                  <View style={[
+                    styles.inputWrapper,
+                    errors.serial && styles.inputWrapperError,
+                  ]}>
+                    <Text style={styles.inputIcon}>🔍</Text>
+                    <TextInput
+                      style={styles.input}
+                      placeholder="Serial"
+                      placeholderTextColor={COLORS.gray400}
+                      value={value}
+                      onChangeText={onChange}
+                      onBlur={() => {
+                        onBlur();
+                        handleSerialBlur(value);
+                      }}
+                      editable={!isLoading && !isLookingUpSerial}
+                    />
+                    {isLookingUpSerial ? (
+                      <ActivityIndicator
+                        size="small"
+                        color={COLORS.primary}
+                        style={styles.serialLoadingIndicator}
+                      />
+                    ) : (
+                      <TouchableOpacity onPress={handleScanQR} style={styles.scanButton}>
+                        <Image
+                          source={require('../../../assets/images/scan_me.png')}
+                          style={styles.scanImage}
+                          resizeMode="contain"
+                        />
+                      </TouchableOpacity>
+                    )}
+                  </View>
+                  {errors.serial && (
+                    <Text style={styles.errorText}>{errors.serial.message}</Text>
+                  )}
+                </View>
+              )}
+            />
 
             {/* Customer Name */}
-            <View style={styles.inputContainer}>
-              <Text style={styles.inputLabel}>
-                Tên khách hàng <Text style={styles.required}>*</Text>
-              </Text>
-              <View style={styles.inputWrapper}>
-                <Text style={styles.inputIcon}>👤</Text>
-                <TextInput
-                  style={styles.input}
-                  placeholder="Họ tên"
-                  placeholderTextColor={COLORS.gray400}
-                  value={customerName}
-                  onChangeText={setCustomerName}
-                  editable={!isLoading}
-                />
-              </View>
-            </View>
+            <Controller
+              control={control}
+              name="customerName"
+              render={({ field: { onChange, onBlur, value } }) => (
+                <View style={styles.inputContainer}>
+                  <Text style={styles.inputLabel}>
+                    Tên khách hàng <Text style={styles.required}>*</Text>
+                  </Text>
+                  <View style={[
+                    styles.inputWrapper,
+                    errors.customerName && styles.inputWrapperError,
+                  ]}>
+                    <Text style={styles.inputIcon}>👤</Text>
+                    <TextInput
+                      style={styles.input}
+                      placeholder="Họ tên"
+                      placeholderTextColor={COLORS.gray400}
+                      value={value}
+                      onChangeText={onChange}
+                      onBlur={onBlur}
+                      editable={!isLoading}
+                    />
+                  </View>
+                  {errors.customerName && (
+                    <Text style={styles.errorText}>{errors.customerName.message}</Text>
+                  )}
+                </View>
+              )}
+            />
 
             {/* Phone */}
-            <View style={styles.inputContainer}>
-              <Text style={styles.inputLabel}>
-                Số điện thoại <Text style={styles.required}>*</Text>
-              </Text>
-              <View style={styles.inputWrapper}>
-                <Text style={styles.inputIcon}>📞</Text>
-                <TextInput
-                  style={styles.input}
-                  placeholder="Số điện thoại"
-                  placeholderTextColor={COLORS.gray400}
-                  value={phone}
-                  onChangeText={setPhone}
-                  keyboardType="phone-pad"
-                  editable={!isLoading}
-                />
-              </View>
-            </View>
+            <Controller
+              control={control}
+              name="phone"
+              render={({ field: { onChange, onBlur, value } }) => (
+                <View style={styles.inputContainer}>
+                  <Text style={styles.inputLabel}>
+                    Số điện thoại <Text style={styles.required}>*</Text>
+                  </Text>
+                  <View style={[
+                    styles.inputWrapper,
+                    errors.phone && styles.inputWrapperError,
+                  ]}>
+                    <Text style={styles.inputIcon}>📞</Text>
+                    <TextInput
+                      style={styles.input}
+                      placeholder="Số điện thoại"
+                      placeholderTextColor={COLORS.gray400}
+                      value={value}
+                      onChangeText={onChange}
+                      onBlur={onBlur}
+                      keyboardType="phone-pad"
+                      editable={!isLoading}
+                    />
+                  </View>
+                  {errors.phone && (
+                    <Text style={styles.errorText}>{errors.phone.message}</Text>
+                  )}
+                </View>
+              )}
+            />
 
             {/* Province */}
             <View style={styles.inputContainer}>
@@ -337,11 +586,17 @@ const WarrantyReportScreen = () => {
                 selectedLocation={province?.TenDiaBan || ''}
                 onLocationChange={(location) => {
                   setProvince(location);
+                  setValue('tinhthanh', location?.TenDiaBan || '');
                   setDistrict(null);
                   setWard(null);
+                  setValue('quanhuyen', '');
+                  setValue('xaphuong', '');
                 }}
                 placeholder="Chọn tỉnh thành"
               />
+              {errors.tinhthanh && (
+                <Text style={styles.errorText}>{errors.tinhthanh.message}</Text>
+              )}
             </View>
 
             {/* District */}
@@ -354,11 +609,16 @@ const WarrantyReportScreen = () => {
                 selectedLocation={district?.TenDiaBan || ''}
                 onLocationChange={(location) => {
                   setDistrict(location);
+                  setValue('quanhuyen', location?.TenDiaBan || '');
                   setWard(null);
+                  setValue('xaphuong', '');
                 }}
                 placeholder="Chọn quận huyện"
                 disabled={!province}
               />
+              {errors.quanhuyen && (
+                <Text style={styles.errorText}>{errors.quanhuyen.message}</Text>
+              )}
             </View>
 
             {/* Ward */}
@@ -369,52 +629,85 @@ const WarrantyReportScreen = () => {
               <LocationSelector
                 parentCode={district?.MaDiaBan || ''}
                 selectedLocation={ward?.TenDiaBan || ''}
-                onLocationChange={setWard}
+                onLocationChange={(location) => {
+                  setWard(location);
+                  setValue('xaphuong', location?.TenDiaBan || '');
+                }}
                 placeholder="Chọn xã phường"
                 disabled={!district}
               />
+              {errors.xaphuong && (
+                <Text style={styles.errorText}>{errors.xaphuong.message}</Text>
+              )}
             </View>
 
             {/* Address */}
-            <View style={styles.inputContainer}>
-              <Text style={styles.inputLabel}>
-                Địa chỉ <Text style={styles.required}>*</Text>
-              </Text>
-              <View style={styles.inputWrapper}>
-                <Text style={styles.inputIcon}>📍</Text>
-                <TextInput
-                  style={styles.input}
-                  placeholder="Địa chỉ"
-                  placeholderTextColor={COLORS.gray400}
-                  value={address}
-                  onChangeText={setAddress}
-                  editable={!isLoading}
-                  multiline
-                  numberOfLines={2}
-                />
-              </View>
-            </View>
+            <Controller
+              control={control}
+              name="address"
+              render={({ field: { onChange, onBlur, value } }) => (
+                <View style={styles.inputContainer}>
+                  <Text style={styles.inputLabel}>
+                    Địa chỉ <Text style={styles.required}>*</Text>
+                  </Text>
+                  <View style={[
+                    styles.inputWrapper,
+                    errors.address && styles.inputWrapperError,
+                  ]}>
+                    <Text style={styles.inputIcon}>📍</Text>
+                    <TextInput
+                      style={styles.input}
+                      placeholder="Địa chỉ"
+                      placeholderTextColor={COLORS.gray400}
+                      value={value}
+                      onChangeText={onChange}
+                      onBlur={onBlur}
+                      editable={!isLoading}
+                      multiline
+                      numberOfLines={2}
+                    />
+                  </View>
+                  {errors.address && (
+                    <Text style={styles.errorText}>{errors.address.message}</Text>
+                  )}
+                </View>
+              )}
+            />
 
             {/* Issue Description */}
-            <View style={styles.inputContainer}>
-              <Text style={styles.inputLabel}>
-                Thông tin lỗi / hiện tượng hư hỏng <Text style={styles.required}>*</Text>
-              </Text>
-              <View style={[styles.inputWrapper, styles.textareaWrapper]}>
-                <Text style={[styles.inputIcon, styles.textareaIcon]}>📝</Text>
-                <TextInput
-                  style={[styles.input, styles.textarea]}
-                  placeholder="Mô tả chi tiết hiện tượng hư hỏng..."
-                  placeholderTextColor={COLORS.gray400}
-                  value={issueDescription}
-                  onChangeText={setIssueDescription}
-                  editable={!isLoading}
-                  multiline
-                  numberOfLines={4}
-                  textAlignVertical="top"
-                />
-              </View>
-            </View>
+            <Controller
+              control={control}
+              name="issueDescription"
+              render={({ field: { onChange, onBlur, value } }) => (
+                <View style={styles.inputContainer}>
+                  <Text style={styles.inputLabel}>
+                    Thông tin lỗi / hiện tượng hư hỏng <Text style={styles.required}>*</Text>
+                  </Text>
+                  <View style={[
+                    styles.inputWrapper,
+                    styles.textareaWrapper,
+                    errors.issueDescription && styles.inputWrapperError,
+                  ]}>
+                    <Text style={[styles.inputIcon, styles.textareaIcon]}>📝</Text>
+                    <TextInput
+                      style={[styles.input, styles.textarea]}
+                      placeholder="Mô tả chi tiết hiện tượng hư hỏng..."
+                      placeholderTextColor={COLORS.gray400}
+                      value={value}
+                      onChangeText={onChange}
+                      onBlur={onBlur}
+                      editable={!isLoading}
+                      multiline
+                      numberOfLines={4}
+                      textAlignVertical="top"
+                    />
+                  </View>
+                  {errors.issueDescription && (
+                    <Text style={styles.errorText}>{errors.issueDescription.message}</Text>
+                  )}
+                </View>
+              )}
+            />
 
             {/* Add Image Button */}
             <TouchableOpacity
@@ -446,7 +739,7 @@ const WarrantyReportScreen = () => {
             {/* Submit Button */}
             <TouchableOpacity
               style={[styles.submitButton, isLoading && styles.submitButtonDisabled]}
-              onPress={handleSubmit}
+              onPress={handleSubmit(onSubmit)}
               activeOpacity={0.8}
               disabled={isLoading}
             >
@@ -468,6 +761,13 @@ const WarrantyReportScreen = () => {
         onClose={() => setShowScanner(false)}
         onScan={handleScanComplete}
         title="Quét mã sản phẩm"
+      />
+
+      {/* Customer Lookup Modal */}
+      <CustomerLookupModal
+        visible={showCustomerLookup}
+        onClose={() => setShowCustomerLookup(false)}
+        onSelectCustomer={handleSelectCustomer}
       />
     </View>
   );
@@ -533,6 +833,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: SPACING.md,
     minHeight: 48,
   },
+  inputWrapperError: {
+    borderColor: COLORS.error,
+  },
   textareaWrapper: {
     alignItems: 'flex-start',
     paddingVertical: SPACING.sm,
@@ -564,6 +867,14 @@ const styles = StyleSheet.create({
   scanImage: {
     width: 32,
     height: 32,
+  },
+  serialLoadingIndicator: {
+    marginLeft: SPACING.xs,
+  },
+  errorText: {
+    fontSize: 12,
+    color: COLORS.error,
+    marginTop: SPACING.xs,
   },
 
   // Image Upload
