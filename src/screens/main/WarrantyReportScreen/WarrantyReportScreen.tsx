@@ -21,6 +21,7 @@ import CustomHeader from '../../../components/CustomHeader';
 import BarcodeScanner from '../../../components/BarcodeScanner';
 import LocationSelector from '../../../components/LocationSelector';
 import { Location } from '../../../types/province';
+import { uploadService } from '../../../api/uploadService';
 
 const WarrantyReportScreen = () => {
   const navigation = useNavigation();
@@ -136,55 +137,105 @@ const WarrantyReportScreen = () => {
     setImages(newImages);
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     // Validation
-    if (!serial.trim()) {
-      Alert.alert('Lỗi', 'Vui lòng nhập số serial');
-      return;
-    }
-    if (!customerName.trim()) {
-      Alert.alert('Lỗi', 'Vui lòng nhập tên khách hàng');
-      return;
-    }
-    if (!phone.trim()) {
-      Alert.alert('Lỗi', 'Vui lòng nhập số điện thoại');
-      return;
-    }
-    if (!province) {
-      Alert.alert('Lỗi', 'Vui lòng chọn tỉnh thành');
-      return;
-    }
-    if (!district) {
-      Alert.alert('Lỗi', 'Vui lòng chọn quận huyện');
-      return;
-    }
-    if (!ward) {
-      Alert.alert('Lỗi', 'Vui lòng chọn xã phường');
-      return;
-    }
-    if (!address.trim()) {
-      Alert.alert('Lỗi', 'Vui lòng nhập địa chỉ');
-      return;
-    }
-    if (!issueDescription.trim()) {
-      Alert.alert('Lỗi', 'Vui lòng nhập thông tin lỗi');
-      return;
-    }
+    // if (!serial.trim()) {
+    //   Alert.alert('Lỗi', 'Vui lòng nhập số serial');
+    //   return;
+    // }
+    // if (!customerName.trim()) {
+    //   Alert.alert('Lỗi', 'Vui lòng nhập tên khách hàng');
+    //   return;
+    // }
+    // if (!phone.trim()) {
+    //   Alert.alert('Lỗi', 'Vui lòng nhập số điện thoại');
+    //   return;
+    // }
+    // if (!province) {
+    //   Alert.alert('Lỗi', 'Vui lòng chọn tỉnh thành');
+    //   return;
+    // }
+    // if (!district) {
+    //   Alert.alert('Lỗi', 'Vui lòng chọn quận huyện');
+    //   return;
+    // }
+    // if (!ward) {
+    //   Alert.alert('Lỗi', 'Vui lòng chọn xã phường');
+    //   return;
+    // }
+    // if (!address.trim()) {
+    //   Alert.alert('Lỗi', 'Vui lòng nhập địa chỉ');
+    //   return;
+    // }
+    // if (!issueDescription.trim()) {
+    //   Alert.alert('Lỗi', 'Vui lòng nhập thông tin lỗi');
+    //   return;
+    // }
 
-    // TODO: Submit to API
-    Alert.alert(
-      'Thành công',
-      'Báo ca bảo hành đã được gửi thành công!',
-      [
-        {
-          text: 'OK',
-          onPress: () => {
-            // Clear form or navigate back
-            navigation.goBack();
+    try {
+      setIsLoading(true);
+
+      let uploadedImageUrls: string[] = [];
+
+      // Step 1: Upload images if any
+      if (images.length > 0) {
+        console.log(`📤 Starting upload of ${images.length} images...`);
+
+        try {
+          uploadedImageUrls = await uploadService.uploadMultipleImages(images);
+          console.log(`✅ All images uploaded:`, uploadedImageUrls);
+        } catch (uploadError: any) {
+          console.error('❌ Image upload failed:', uploadError);
+          Alert.alert(
+            'Lỗi upload ảnh',
+            uploadError.message || 'Không thể upload ảnh. Vui lòng thử lại.',
+            [{ text: 'OK' }]
+          );
+          setIsLoading(false);
+          return;
+        }
+      }
+
+      // Step 2: Submit warranty report with uploaded image URLs
+      // TODO: Call warranty report API here with uploadedImageUrls
+      console.log('📋 Submitting warranty report with data:', {
+        serial,
+        customerName,
+        phone,
+        province: province?.TenDiaBan,
+        district: district?.TenDiaBan,
+        ward: ward?.TenDiaBan,
+        address,
+        issueDescription,
+        imageUrls: uploadedImageUrls,
+      });
+
+      // Simulate API call
+      await new Promise<void>((resolve) => setTimeout(resolve, 1000));
+
+      Alert.alert(
+        'Thành công',
+        'Báo ca bảo hành đã được gửi thành công!',
+        [
+          {
+            text: 'OK',
+            onPress: () => {
+              // Clear form or navigate back
+              navigation.goBack();
+            },
           },
-        },
-      ]
-    );
+        ]
+      );
+    } catch (error: any) {
+      console.error('❌ Submit error:', error);
+      Alert.alert(
+        'Lỗi',
+        error.message || 'Đã có lỗi xảy ra. Vui lòng thử lại.',
+        [{ text: 'OK' }]
+      );
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (

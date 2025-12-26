@@ -23,6 +23,7 @@ import { COLORS, SPACING, BORDER_RADIUS } from '../../../config/theme';
 import { AuthStackParamList } from '../../../navigation/AuthNavigator';
 import CustomHeader from '../../../components/CustomHeader';
 import ProvinceSelector from '../../../components/ProvinceSelector';
+import { uploadService } from '../../../api/uploadService';
 
 type DealerSignupScreenNavigationProp = StackNavigationProp<AuthStackParamList, 'DealerSignup'>;
 
@@ -186,12 +187,36 @@ const DealerSignupScreen: React.FC = () => {
     try {
       setIsLoading(true);
 
-      // TODO: Implement API call to signup
-      console.log('Dealer Signup Data:', data);
-      console.log('Images:', images);
+      let uploadedImageUrls: string[] = [];
+
+      // Step 1: Upload images
+      console.log(`📤 Starting upload of ${images.length} images...`);
+
+      try {
+        // Extract URIs from ImageItem array
+        const imagePaths = images.map((img) => img.uri);
+        uploadedImageUrls = await uploadService.uploadMultipleImages(imagePaths);
+        console.log(`✅ All images uploaded:`, uploadedImageUrls);
+      } catch (uploadError: any) {
+        console.error('❌ Image upload failed:', uploadError);
+        Alert.alert(
+          'Lỗi upload ảnh',
+          uploadError.message || 'Không thể upload ảnh. Vui lòng thử lại.',
+          [{ text: 'OK' }]
+        );
+        setIsLoading(false);
+        return;
+      }
+
+      // Step 2: Submit dealer signup with uploaded image URLs
+      // TODO: Call dealer signup API here with uploadedImageUrls
+      console.log('📋 Dealer Signup Data:', {
+        ...data,
+        imageUrls: uploadedImageUrls,
+      });
 
       // Simulate API call
-      await new Promise<void>((resolve) => setTimeout(() => resolve(), 2000));
+      await new Promise<void>((resolve) => setTimeout(() => resolve(), 1000));
 
       Alert.alert(
         'Đăng ký thành công',
@@ -203,10 +228,12 @@ const DealerSignupScreen: React.FC = () => {
           },
         ]
       );
-    } catch (error) {
+    } catch (error: any) {
+      console.error('❌ Signup error:', error);
       Alert.alert(
         'Đăng ký thất bại',
-        error instanceof Error ? error.message : 'Đã có lỗi xảy ra. Vui lòng thử lại.'
+        error.message || 'Đã có lỗi xảy ra. Vui lòng thử lại.',
+        [{ text: 'OK' }]
       );
     } finally {
       setIsLoading(false);

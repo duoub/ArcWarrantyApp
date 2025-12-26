@@ -11,6 +11,9 @@ export const API_CONFIG = {
   BASE_URL: __DEV__
     ? 'https://scell1.qbis.vn/api/forza'
     : 'https://scell1.qbis.vn/api/forza',
+  BASE_URL_MOBILE: __DEV__
+    ? 'https://scell.qbis.vn/Mobile'
+    : 'https://scell.qbis.vn/Mobile',
   TRACKING_BASE_URL: __DEV__
     ? 'https://tracking.qbis.vn/api/tracking'
     : 'https://tracking.qbis.vn/api/tracking',
