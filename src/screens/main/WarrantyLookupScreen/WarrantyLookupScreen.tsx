@@ -17,13 +17,14 @@ import CustomHeader from '../../../components/CustomHeader';
 import BarcodeScanner from '../../../components/BarcodeScanner';
 import { commonStyles } from '../../../styles/commonStyles';
 import { warrantyLookupService } from '../../../api/warrantyLookupService';
-import { WarrantyInfo } from '../../../types/warrantyLookup';
+import { WarrantyInfo, RepairInfo } from '../../../types/warrantyLookup';
 
 const WarrantyLookupScreen = () => {
   const navigation = useNavigation();
   const [keyword, setKeyword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [results, setResults] = useState<WarrantyInfo[]>([]);
+  const [repairResults, setRepairResults] = useState<RepairInfo[]>([]);
   const [showScanner, setShowScanner] = useState(false);
 
   const handleScanQR = () => {
@@ -48,24 +49,39 @@ const WarrantyLookupScreen = () => {
     try {
       setIsLoading(true);
       setResults([]);
+      setRepairResults([]);
 
-      const response = await warrantyLookupService.lookupWarranty({
-        keyword: keyword.trim(),
-      });
+      // Fetch both warranty and repair data in parallel
+      const [warrantyResponse, repairResponse] = await Promise.all([
+        warrantyLookupService.lookupWarranty({
+          keyword: keyword.trim(),
+        }),
+        warrantyLookupService.lookupRepair({
+          keyword: keyword.trim(),
+        }),
+      ]);
 
-      if (response.data && response.data.length > 0) {
+      const hasWarrantyData = warrantyResponse.data && warrantyResponse.data.length > 0;
+      const hasRepairData = repairResponse.data && repairResponse.data.length > 0;
+
+      if (hasWarrantyData || hasRepairData) {
         // Set all results
-        setResults(response.data);
+        if (hasWarrantyData) {
+          setResults(warrantyResponse.data);
+        }
+        if (hasRepairData) {
+          setRepairResults(repairResponse.data);
+        }
       } else {
         Alert.alert(
           'Không tìm thấy',
-          'Không tìm thấy thông tin bảo hành cho từ khóa này.'
+          'Không tìm thấy thông tin bảo hành hoặc sửa chữa cho từ khóa này.'
         );
       }
     } catch (error) {
       Alert.alert(
         'Lỗi',
-        error instanceof Error ? error.message : 'Không thể tra cứu thông tin bảo hành. Vui lòng thử lại.'
+        error instanceof Error ? error.message : 'Không thể tra cứu thông tin. Vui lòng thử lại.'
       );
     } finally {
       setIsLoading(false);
@@ -92,6 +108,29 @@ const WarrantyLookupScreen = () => {
           color: COLORS.gray500,
           bgColor: COLORS.gray100,
         };
+    }
+  };
+
+  const getRepairStatusInfo = (status: string) => {
+    const statusLower = status.toLowerCase();
+    if (statusLower.includes('hoàn thành') || statusLower.includes('hoàn tất')) {
+      return {
+        text: status,
+        color: COLORS.success,
+        bgColor: '#E8F5E9',
+      };
+    } else if (statusLower.includes('hủy') || statusLower.includes('huỷ')) {
+      return {
+        text: status,
+        color: COLORS.error,
+        bgColor: '#FFEBEE',
+      };
+    } else {
+      return {
+        text: status,
+        color: COLORS.warning,
+        bgColor: '#FFF3E0',
+      };
     }
   };
 
@@ -126,7 +165,7 @@ const WarrantyLookupScreen = () => {
             <Text style={styles.searchIcon}>🔍</Text>
             <TextInput
               style={styles.searchInput}
-              placeholder="Số Serial / Tên / SĐT"
+              placeholder="Số Serial / SĐT"
               placeholderTextColor={COLORS.gray400}
               value={keyword}
               onChangeText={setKeyword}
@@ -161,13 +200,13 @@ const WarrantyLookupScreen = () => {
           </TouchableOpacity>
         </View>
 
-        {/* Result Cards */}
+        {/* Warranty Result Cards */}
         {results.length > 0 && (
           <>
             {results.length > 1 && (
               <View style={styles.resultCountCard}>
                 <Text style={styles.resultCountText}>
-                  Tìm thấy {results.length} kết quả
+                  Tìm thấy {results.length} kết quả bảo hành
                 </Text>
               </View>
             )}
@@ -242,16 +281,16 @@ const WarrantyLookupScreen = () => {
                   {/* Phone - customerPhone */}
                   {result.customerPhone && result.customerPhone !== result.customerMobile && (
                     <View style={styles.infoRow}>
-                      <Text style={styles.infoLabel}>SĐT khác:</Text>
+                      <Text style={styles.infoLabel}>Số điện thoại:</Text>
                       <Text style={styles.infoValue}>{result.customerPhone}</Text>
                     </View>
                   )}
 
                   {/* Address */}
-                  {result.customerAddress && (
+                  {(result.formattedAddress || result.customerAddress) && (
                     <View style={styles.infoRow}>
                       <Text style={styles.infoLabel}>Địa chỉ:</Text>
-                      <Text style={styles.infoValue}>{result.customerAddress}</Text>
+                      <Text style={styles.infoValue}>{result.formattedAddress || result.customerAddress}</Text>
                     </View>
                   )}
 
@@ -296,13 +335,154 @@ const WarrantyLookupScreen = () => {
           </>
         )}
 
+        {/* Repair Result Cards */}
+        {repairResults.length > 0 && (
+          <>
+            {repairResults.length > 1 && (
+              <View style={styles.resultCountCard}>
+                <Text style={styles.resultCountText}>
+                  Tìm thấy {repairResults.length} kết quả sửa chữa
+                </Text>
+              </View>
+            )}
+            {repairResults.map((repair, index) => (
+              <View key={`repair-${repair.ticketCode}-${index}`} style={styles.repairCard}>
+                <View style={styles.repairHeader}>
+                  <Text style={styles.repairTitle}>
+                    Thông tin sửa chữa {repairResults.length > 1 ? `(${index + 1}/${repairResults.length})` : ''}
+                  </Text>
+                  <View
+                    style={[
+                      styles.statusBadge,
+                      { backgroundColor: getRepairStatusInfo(repair.status).bgColor },
+                    ]}
+                  >
+                    <Text
+                      style={[
+                        styles.statusText,
+                        { color: getRepairStatusInfo(repair.status).color },
+                      ]}
+                    >
+                      {getRepairStatusInfo(repair.status).text}
+                    </Text>
+                  </View>
+                </View>
+
+                <View style={styles.resultBody}>
+                  {/* Ticket Code */}
+                  <View style={styles.infoRow}>
+                    <Text style={styles.infoLabel}>Mã phiếu:</Text>
+                    <Text style={[styles.infoValue, styles.infoValueHighlight]}>{repair.ticketCode}</Text>
+                  </View>
+
+                  {/* Serial */}
+                  <View style={styles.infoRow}>
+                    <Text style={styles.infoLabel}>Số serial:</Text>
+                    <Text style={styles.infoValue}>{repair.serial}</Text>
+                  </View>
+
+                  {/* Product Name */}
+                  <View style={styles.infoRow}>
+                    <Text style={styles.infoLabel}>Sản phẩm:</Text>
+                    <Text style={styles.infoValue}>{repair.productName}</Text>
+                  </View>
+
+                  {/* Service Name */}
+                  <View style={styles.infoRow}>
+                    <Text style={styles.infoLabel}>Nhóm lỗi:</Text>
+                    <Text style={styles.infoValue}>{repair.serviceName}</Text>
+                  </View>
+
+                  {/* Customer Name */}
+                  {repair.customerName && (
+                    <View style={styles.infoRow}>
+                      <Text style={styles.infoLabel}>Khách hàng:</Text>
+                      <Text style={styles.infoValue}>{repair.customerName}</Text>
+                    </View>
+                  )}
+
+                  {/* Address */}
+                  {repair.customerAddress && (
+                    <View style={styles.infoRow}>
+                      <Text style={styles.infoLabel}>Địa chỉ:</Text>
+                      <Text style={styles.infoValue}>{repair.customerAddress}</Text>
+                    </View>
+                  )}
+
+                  {/* Warranty Place */}
+                  {repair.warrantyPlace && (
+                    <View style={styles.infoRow}>
+                      <Text style={styles.infoLabel}>Nơi bảo hành:</Text>
+                      <Text style={styles.infoValue}>{repair.warrantyPlace}</Text>
+                    </View>
+                  )}
+
+                  {/* Divider */}
+                  <View style={styles.divider} />
+
+                  {/* Create Date */}
+                  <View style={styles.infoRow}>
+                    <Text style={styles.infoLabel}>Ngày tạo:</Text>
+                    <Text style={styles.infoValue}>{repair.createDate}</Text>
+                  </View>
+
+                  {/* Due Date */}
+                  {repair.dueDate && (
+                    <View style={styles.infoRow}>
+                      <Text style={styles.infoLabel}>Ngày hẹn:</Text>
+                      <Text style={styles.infoValue}>{repair.dueDate}</Text>
+                    </View>
+                  )}
+
+                  {/* Update Date */}
+                  {repair.updateDate && (
+                    <View style={styles.infoRow}>
+                      <Text style={styles.infoLabel}>Ngày cập nhật:</Text>
+                      <Text style={styles.infoValue}>{repair.updateDate}</Text>
+                    </View>
+                  )}
+
+                  {/* Return Date */}
+                  {repair.returnDate && (
+                    <View style={styles.infoRow}>
+                      <Text style={styles.infoLabel}>Ngày trả:</Text>
+                      <Text style={styles.infoValue}>{repair.returnDate}</Text>
+                    </View>
+                  )}
+
+                  {/* Ticket Price */}
+                  {repair.ticketPrice && repair.ticketPrice !== '0' && (
+                    <>
+                      <View style={styles.divider} />
+                      <View style={styles.infoRow}>
+                        <Text style={styles.infoLabel}>Chi phí:</Text>
+                        <Text style={[styles.infoValue, styles.infoValueHighlight]}>
+                          {repair.ticketPrice} đ
+                        </Text>
+                      </View>
+                    </>
+                  )}
+
+                  {/* Assign Name */}
+                  {repair.assignName && (
+                    <View style={styles.infoRow}>
+                      <Text style={styles.infoLabel}>Người xử lý:</Text>
+                      <Text style={styles.infoValue}>{repair.assignName}</Text>
+                    </View>
+                  )}
+                </View>
+              </View>
+            ))}
+          </>
+        )}
+
         {/* Info Box */}
         <View style={[commonStyles.infoBox, styles.infoBoxMargin]}>
           <Text style={commonStyles.infoBoxIcon}>ℹ️</Text>
           <View style={commonStyles.infoBoxContent}>
             <Text style={commonStyles.infoBoxText}>
-              Bạn có thể tra cứu thông tin bảo hành bằng số serial sản phẩm,
-              tên khách hàng hoặc số điện thoại đã đăng ký.
+              Bạn có thể tra cứu thông tin bảo hành bằng số serial sản phẩm
+              hoặc số điện thoại đã đăng ký.
             </Text>
           </View>
         </View>
@@ -493,6 +673,30 @@ const styles = StyleSheet.create({
     height: 1,
     backgroundColor: COLORS.gray200,
     marginVertical: SPACING.sm,
+  },
+
+  // Repair Card
+  repairCard: {
+    backgroundColor: COLORS.white,
+    marginHorizontal: SPACING.lg,
+    marginTop: SPACING.md,
+    borderRadius: BORDER_RADIUS.xl,
+    overflow: 'hidden',
+    ...SHADOWS.md,
+  },
+  repairHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    padding: SPACING.md,
+    backgroundColor: COLORS.warning + '12',
+    borderBottomWidth: 1,
+    borderBottomColor: COLORS.gray200,
+  },
+  repairTitle: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: COLORS.textPrimary,
   },
 
   // Info Box
