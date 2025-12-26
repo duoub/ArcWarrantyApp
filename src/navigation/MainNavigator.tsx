@@ -64,7 +64,7 @@ export type InOutStackParamList = {
 
 export type ProfileStackParamList = {
   Profile: undefined;
-  EditProfile: { section: 'personal' | 'bank' };
+  EditProfile: undefined;
   ChangePassword: undefined;
 };
 

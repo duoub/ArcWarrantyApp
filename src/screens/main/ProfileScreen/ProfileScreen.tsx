@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   View,
   Text,
@@ -12,7 +12,7 @@ import {
   PermissionsAndroid,
   ActivityIndicator,
 } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import ImagePicker from 'react-native-image-crop-picker';
 import { COLORS, SPACING, BORDER_RADIUS, SHADOWS } from '../../../config/theme';
@@ -22,17 +22,44 @@ import { useAuthStore } from '../../../store/authStore';
 import { ProfileStackParamList } from '../../../navigation/MainNavigator';
 import { uploadService } from '../../../api/uploadService';
 import { profileService } from '../../../api/profileService';
+import { authService } from '../../../api/authService';
+import { API_CONFIG } from '../../../config/constants';
 
 type ProfileScreenNavigationProp = StackNavigationProp<ProfileStackParamList, 'Profile'>;
 
 const ProfileScreen = () => {
   const navigation = useNavigation<ProfileScreenNavigationProp>();
-  const { user, logout, updateAvatar } = useAuthStore();
+  const { user, logout, updateAvatar, setUser } = useAuthStore();
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
-  const [showPersonalInfo, setShowPersonalInfo] = useState(true);
-  const [showBankInfo, setShowBankInfo] = useState(false);
+  const [showProfileInfo, setShowProfileInfo] = useState(true);
   const [isUploading, setIsUploading] = useState(false);
   const [avatarKey, setAvatarKey] = useState(0);
+
+  // Refresh user profile when screen is focused
+  // useFocusEffect(
+  //   useCallback(() => {
+  //     const refreshUserProfile = async () => {
+  //       if (user?.id) {
+  //         try {
+  //           console.log('🔄 Refreshing user profile...');
+  //           const updatedProfile = await authService.getProfile(user.id, API_CONFIG.STORE_ID);
+
+  //           // Update user in store with fresh data
+  //           setUser({
+  //             ...user,
+  //             ...updatedProfile,
+  //           });
+
+  //           console.log('✅ Profile refreshed successfully');
+  //         } catch (error) {
+  //           console.error('❌ Failed to refresh profile:', error);
+  //         }
+  //       }
+  //     };
+
+  //     refreshUserProfile();
+  //   }, [user?.id])
+  // );
 
   // Log when user avatar changes to debug re-render
   useEffect(() => {
@@ -168,12 +195,8 @@ const ProfileScreen = () => {
     }
   };
 
-  const handleEditPersonalInfo = () => {
-    navigation.navigate('EditProfile', { section: 'personal' });
-  };
-
-  const handleEditBankInfo = () => {
-    navigation.navigate('EditProfile', { section: 'bank' });
+  const handleEditProfile = () => {
+    navigation.navigate('EditProfile');
   };
 
   const handleChangePassword = () => {
@@ -243,49 +266,40 @@ const ProfileScreen = () => {
           <View style={styles.roleContainer}>
             <View style={styles.roleBadge}>
               <Text style={styles.roleText}>
-                {user?.role === 'admin' && 'Quản trị viên'}
-                {user?.role === 'technician' && 'Kỹ thuật viên'}
-                {user?.role === 'dealer' && 'Đại lý'}
-                {user?.role === 'customer' && 'Khách hàng'}
+                {user?.role}
               </Text>
             </View>
           </View>
         </View>
 
-        {/* Personal Information Section */}
+        {/* Profile Information Section */}
         <View style={styles.section}>
           <TouchableOpacity
             style={styles.sectionHeader}
-            onPress={() => setShowPersonalInfo(!showPersonalInfo)}
+            onPress={() => setShowProfileInfo(!showProfileInfo)}
             activeOpacity={0.7}
           >
             <View style={styles.sectionHeaderLeft}>
               <Text style={styles.sectionIcon}>👤</Text>
-              <Text style={styles.sectionTitle}>Thông tin cá nhân</Text>
+              <Text style={styles.sectionTitle}>Thông tin hồ sơ</Text>
             </View>
-            <Text style={styles.chevronIcon}>{showPersonalInfo ? '▼' : '▶'}</Text>
+            <Text style={styles.chevronIcon}>{showProfileInfo ? '▼' : '▶'}</Text>
           </TouchableOpacity>
 
-          {showPersonalInfo && (
+          {showProfileInfo && (
             <View style={styles.infoCard}>
+              {/* Personal Information */}
               <View style={styles.infoRow}>
                 <View style={styles.infoItem}>
-                  <Text style={styles.infoLabel}>📧 Email</Text>
-                  <Text style={styles.infoValue}>{user?.email || 'Chưa cập nhật'}</Text>
-                </View>
-              </View>
-
-              <View style={styles.infoRow}>
-                <View style={styles.infoItem}>
-                  <Text style={styles.infoLabel}>📱 Điện thoại</Text>
+                  <Text style={styles.infoLabel}>📞 Điện thoại</Text>
                   <Text style={styles.infoValue}>{user?.phone || 'Chưa cập nhật'}</Text>
                 </View>
               </View>
 
               <View style={styles.infoRow}>
                 <View style={styles.infoItem}>
-                  <Text style={styles.infoLabel}>🆔 CCCD/CMND</Text>
-                  <Text style={styles.infoValue}>{user?.cccd || 'Chưa cập nhật'}</Text>
+                  <Text style={styles.infoLabel}>📧 Email</Text>
+                  <Text style={styles.infoValue}>{user?.email || 'Chưa cập nhật'}</Text>
                 </View>
               </View>
 
@@ -299,68 +313,44 @@ const ProfileScreen = () => {
               <View style={styles.infoRow}>
                 <View style={styles.infoItem}>
                   <Text style={styles.infoLabel}>🏙️ Tỉnh/Thành phố</Text>
-                  <Text style={styles.infoValue}>{user?.city || 'Chưa cập nhật'}</Text>
+                  <Text style={styles.infoValue}>{user?.tinhthanh || 'Chưa cập nhật'}</Text>
                 </View>
               </View>
 
               <View style={styles.infoRow}>
                 <View style={styles.infoItem}>
-                  <Text style={styles.infoLabel}>🏷️ Mã số thuế</Text>
-                  <Text style={styles.infoValue}>{user?.taxCode || 'Chưa cập nhật'}</Text>
+                  <Text style={styles.infoLabel}>🏷️ Mã số thuế/CCCD</Text>
+                  <Text style={styles.infoValue}>{user?.taxcode || 'Chưa cập nhật'}</Text>
                 </View>
               </View>
 
-              <TouchableOpacity
-                style={styles.editSectionButton}
-                onPress={handleEditPersonalInfo}
-                activeOpacity={0.7}
-              >
-                <Text style={styles.editSectionButtonText}>✏️ Chỉnh sửa</Text>
-              </TouchableOpacity>
-            </View>
-          )}
-        </View>
+              {/* Bank Information */}
+              <View style={styles.divider} />
 
-        {/* Bank Information Section */}
-        <View style={styles.section}>
-          <TouchableOpacity
-            style={styles.sectionHeader}
-            onPress={() => setShowBankInfo(!showBankInfo)}
-            activeOpacity={0.7}
-          >
-            <View style={styles.sectionHeaderLeft}>
-              <Text style={styles.sectionIcon}>🏦</Text>
-              <Text style={styles.sectionTitle}>Thông tin ngân hàng</Text>
-            </View>
-            <Text style={styles.chevronIcon}>{showBankInfo ? '▼' : '▶'}</Text>
-          </TouchableOpacity>
-
-          {showBankInfo && (
-            <View style={styles.infoCard}>
               <View style={styles.infoRow}>
                 <View style={styles.infoItem}>
                   <Text style={styles.infoLabel}>🏦 Ngân hàng</Text>
-                  <Text style={styles.infoValue}>{user?.bankName || 'Chưa cập nhật'}</Text>
+                  <Text style={styles.infoValue}>{user?.nganhang || 'Chưa cập nhật'}</Text>
                 </View>
               </View>
 
               <View style={styles.infoRow}>
                 <View style={styles.infoItem}>
                   <Text style={styles.infoLabel}>💳 Số tài khoản</Text>
-                  <Text style={styles.infoValue}>{user?.bankAccountNumber || 'Chưa cập nhật'}</Text>
+                  <Text style={styles.infoValue}>{user?.sotaikhoan || 'Chưa cập nhật'}</Text>
                 </View>
               </View>
 
               <View style={styles.infoRow}>
                 <View style={styles.infoItem}>
                   <Text style={styles.infoLabel}>👤 Tên tài khoản</Text>
-                  <Text style={styles.infoValue}>{user?.bankAccountName || 'Chưa cập nhật'}</Text>
+                  <Text style={styles.infoValue}>{user?.tentaikhoan || 'Chưa cập nhật'}</Text>
                 </View>
               </View>
 
               <TouchableOpacity
                 style={styles.editSectionButton}
-                onPress={handleEditBankInfo}
+                onPress={handleEditProfile}
                 activeOpacity={0.7}
               >
                 <Text style={styles.editSectionButtonText}>✏️ Chỉnh sửa</Text>
@@ -541,6 +531,11 @@ const styles = StyleSheet.create({
     fontSize: 15,
     color: COLORS.textPrimary,
     fontWeight: '500',
+  },
+  divider: {
+    height: 1,
+    backgroundColor: COLORS.gray200,
+    marginVertical: SPACING.md,
   },
   editSectionButton: {
     backgroundColor: COLORS.primary,

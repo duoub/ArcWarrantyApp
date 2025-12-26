@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -18,9 +18,13 @@ import { COLORS, SPACING, BORDER_RADIUS, SHADOWS } from '../../../config/theme';
 import CustomHeader from '../../../components/CustomHeader';
 import ProvinceSelector from '../../../components/ProvinceSelector';
 import { useAuthStore } from '../../../store/authStore';
+import { profileService } from '../../../api/profileService';
+import { authService } from '../../../api/authService';
+import { API_CONFIG } from '../../../config/constants';
 
-// Validation Schema for Personal Info
-const personalInfoSchema = z.object({
+// Validation Schema for Profile Info (Combined)
+const profileInfoSchema = z.object({
+  // Personal Info
   name: z.string().min(1, 'Họ tên là bắt buộc'),
   phone: z.string().min(1, 'Số điện thoại là bắt buộc'),
   email: z.string().email('Email không hợp lệ').optional().or(z.literal('')),
@@ -28,77 +32,81 @@ const personalInfoSchema = z.object({
   city: z.string().min(1, 'Tỉnh/Thành phố là bắt buộc'),
   cccd: z.string().optional(),
   taxCode: z.string().optional(),
-});
-
-// Validation Schema for Bank Info
-const bankInfoSchema = z.object({
+  // Bank Info
   bankAccountNumber: z.string().min(1, 'Số tài khoản là bắt buộc'),
   bankAccountName: z.string().min(1, 'Tên tài khoản là bắt buộc'),
   bankName: z.string().min(1, 'Ngân hàng là bắt buộc'),
 });
 
-type PersonalInfoFormData = z.infer<typeof personalInfoSchema>;
-type BankInfoFormData = z.infer<typeof bankInfoSchema>;
+type ProfileInfoFormData = z.infer<typeof profileInfoSchema>;
 
-interface EditProfileScreenProps {
-  route: {
-    params: {
-      section: 'personal' | 'bank';
-    };
-  };
-}
+const EditProfileScreen = () => {
 
-const EditProfileScreen: React.FC<EditProfileScreenProps> = ({ route }) => {
   const navigation = useNavigation();
-  const { user } = useAuthStore();
-  const { section } = route.params;
+  const { user, setUser } = useAuthStore();
   const [isLoading, setIsLoading] = useState(false);
 
-  const isPersonalSection = section === 'personal';
+  useEffect(() => {
+    console.log('User updated:', user);
+  }, [user]);
 
-  // Personal Info Form
+  // Combined Profile Form
   const {
-    control: personalControl,
-    handleSubmit: handlePersonalSubmit,
-    formState: { errors: personalErrors },
-  } = useForm<PersonalInfoFormData>({
-    resolver: zodResolver(personalInfoSchema),
+    control,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<ProfileInfoFormData>({
+    resolver: zodResolver(profileInfoSchema),
     defaultValues: {
+      // Personal Info
       name: user?.name || '',
       phone: user?.phone || '',
       email: user?.email || '',
       address: user?.address || '',
-      city: user?.city || '',
+      city: user?.tinhthanh || '',
       cccd: user?.cccd || '',
-      taxCode: user?.taxCode || '',
+      taxCode: user?.taxcode || '',
+      // Bank Info
+      bankAccountNumber: user?.sotaikhoan || '',
+      bankAccountName: user?.tentaikhoan || '',
+      bankName: user?.nganhang || '',
     },
   });
 
-  // Bank Info Form
-  const {
-    control: bankControl,
-    handleSubmit: handleBankSubmit,
-    formState: { errors: bankErrors },
-  } = useForm<BankInfoFormData>({
-    resolver: zodResolver(bankInfoSchema),
-    defaultValues: {
-      bankAccountNumber: user?.bankAccountNumber || '',
-      bankAccountName: user?.bankAccountName || '',
-      bankName: user?.bankName || '',
-    },
-  });
-
-  const handleSavePersonalInfo = async (data: PersonalInfoFormData) => {
+  const handleSaveProfile = async (data: ProfileInfoFormData) => {
     try {
       setIsLoading(true);
 
-      // TODO: Implement API call to update personal info
-      console.log('Updating personal info:', data);
-      await new Promise((resolve) => setTimeout(resolve, 1500));
+      // Call API to update personal info
+      await profileService.updateProfile({
+        name: data.name,
+        phone: data.phone,
+        email: data.email || '',
+        address: data.address,
+        tinhthanh: data.city,
+        taxcode: data.taxCode || '',
+        sotaikhoan: data.bankAccountNumber,
+        tentaikhoan: data.bankAccountName,
+        nganhang: data.bankName
+      });
+
+      console.log('user before refresh', user);
+      // Refresh user profile data from server
+      if (user?.id) {
+        const updatedProfile = await authService.getProfile(user.id, API_CONFIG.STORE_ID);
+
+        console.log('updatedProfile', updatedProfile);
+        // Update user in store with new data (merge with existing user data)
+        setUser({
+          ...user,
+          ...updatedProfile,
+        });
+        console.log('👤 Profile updated successfully');
+      }
 
       Alert.alert(
         'Cập nhật thành công',
-        'Thông tin cá nhân đã được cập nhật thành công!',
+        'Thông tin hồ sơ đã được cập nhật thành công!',
         [
           {
             text: 'OK',
@@ -116,39 +124,14 @@ const EditProfileScreen: React.FC<EditProfileScreenProps> = ({ route }) => {
     }
   };
 
-  const handleSaveBankInfo = async (data: BankInfoFormData) => {
-    try {
-      setIsLoading(true);
-
-      // TODO: Implement API call to update bank info
-      console.log('Updating bank info:', data);
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-
-      Alert.alert(
-        'Cập nhật thành công',
-        'Thông tin ngân hàng đã được cập nhật thành công!',
-        [
-          {
-            text: 'OK',
-            onPress: () => navigation.goBack(),
-          },
-        ]
-      );
-    } catch (error) {
-      Alert.alert(
-        'Cập nhật thất bại',
-        error instanceof Error ? error.message : 'Đã có lỗi xảy ra. Vui lòng thử lại.'
-      );
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const renderPersonalInfoForm = () => (
+  const renderProfileForm = () => (
     <View style={styles.formContainer}>
+      {/* Personal Information Section */}
+      <Text style={styles.sectionTitle}>Thông tin cá nhân</Text>
+
       {/* Name */}
       <Controller
-        control={personalControl}
+        control={control}
         name="name"
         render={({ field: { onChange, onBlur, value } }) => (
           <View style={styles.inputContainer}>
@@ -158,7 +141,7 @@ const EditProfileScreen: React.FC<EditProfileScreenProps> = ({ route }) => {
             <TextInput
               style={[
                 styles.input,
-                personalErrors.name && styles.inputError,
+                errors.name && styles.inputError,
               ]}
               placeholder="Nhập họ tên"
               placeholderTextColor={COLORS.gray400}
@@ -167,8 +150,8 @@ const EditProfileScreen: React.FC<EditProfileScreenProps> = ({ route }) => {
               onBlur={onBlur}
               editable={!isLoading}
             />
-            {personalErrors.name && (
-              <Text style={styles.errorText}>{personalErrors.name.message}</Text>
+            {errors.name && (
+              <Text style={styles.errorText}>{errors.name.message}</Text>
             )}
           </View>
         )}
@@ -176,7 +159,7 @@ const EditProfileScreen: React.FC<EditProfileScreenProps> = ({ route }) => {
 
       {/* Phone */}
       <Controller
-        control={personalControl}
+        control={control}
         name="phone"
         render={({ field: { onChange, onBlur, value } }) => (
           <View style={styles.inputContainer}>
@@ -186,7 +169,7 @@ const EditProfileScreen: React.FC<EditProfileScreenProps> = ({ route }) => {
             <TextInput
               style={[
                 styles.input,
-                personalErrors.phone && styles.inputError,
+                errors.phone && styles.inputError,
               ]}
               placeholder="Nhập số điện thoại"
               placeholderTextColor={COLORS.gray400}
@@ -196,8 +179,8 @@ const EditProfileScreen: React.FC<EditProfileScreenProps> = ({ route }) => {
               editable={!isLoading}
               keyboardType="phone-pad"
             />
-            {personalErrors.phone && (
-              <Text style={styles.errorText}>{personalErrors.phone.message}</Text>
+            {errors.phone && (
+              <Text style={styles.errorText}>{errors.phone.message}</Text>
             )}
           </View>
         )}
@@ -205,7 +188,7 @@ const EditProfileScreen: React.FC<EditProfileScreenProps> = ({ route }) => {
 
       {/* Email */}
       <Controller
-        control={personalControl}
+        control={control}
         name="email"
         render={({ field: { onChange, onBlur, value } }) => (
           <View style={styles.inputContainer}>
@@ -213,7 +196,7 @@ const EditProfileScreen: React.FC<EditProfileScreenProps> = ({ route }) => {
             <TextInput
               style={[
                 styles.input,
-                personalErrors.email && styles.inputError,
+                errors.email && styles.inputError,
               ]}
               placeholder="Nhập email"
               placeholderTextColor={COLORS.gray400}
@@ -224,8 +207,8 @@ const EditProfileScreen: React.FC<EditProfileScreenProps> = ({ route }) => {
               keyboardType="email-address"
               autoCapitalize="none"
             />
-            {personalErrors.email && (
-              <Text style={styles.errorText}>{personalErrors.email.message}</Text>
+            {errors.email && (
+              <Text style={styles.errorText}>{errors.email.message}</Text>
             )}
           </View>
         )}
@@ -233,7 +216,7 @@ const EditProfileScreen: React.FC<EditProfileScreenProps> = ({ route }) => {
 
       {/* Address */}
       <Controller
-        control={personalControl}
+        control={control}
         name="address"
         render={({ field: { onChange, onBlur, value } }) => (
           <View style={styles.inputContainer}>
@@ -243,7 +226,7 @@ const EditProfileScreen: React.FC<EditProfileScreenProps> = ({ route }) => {
             <TextInput
               style={[
                 styles.input,
-                personalErrors.address && styles.inputError,
+                errors.address && styles.inputError,
               ]}
               placeholder="Nhập địa chỉ"
               placeholderTextColor={COLORS.gray400}
@@ -252,8 +235,8 @@ const EditProfileScreen: React.FC<EditProfileScreenProps> = ({ route }) => {
               onBlur={onBlur}
               editable={!isLoading}
             />
-            {personalErrors.address && (
-              <Text style={styles.errorText}>{personalErrors.address.message}</Text>
+            {errors.address && (
+              <Text style={styles.errorText}>{errors.address.message}</Text>
             )}
           </View>
         )}
@@ -261,7 +244,7 @@ const EditProfileScreen: React.FC<EditProfileScreenProps> = ({ route }) => {
 
       {/* City - Province Selector */}
       <Controller
-        control={personalControl}
+        control={control}
         name="city"
         render={({ field: { onChange, value } }) => (
           <View style={styles.inputContainer}>
@@ -273,44 +256,23 @@ const EditProfileScreen: React.FC<EditProfileScreenProps> = ({ route }) => {
               onProvinceChange={onChange}
               placeholder="Chọn tỉnh/thành phố"
             />
-            {personalErrors.city && (
-              <Text style={styles.errorText}>{personalErrors.city.message}</Text>
+            {errors.city && (
+              <Text style={styles.errorText}>{errors.city.message}</Text>
             )}
           </View>
         )}
       />
 
-      {/* CCCD */}
+      {/* Tax Code/ID */}
       <Controller
-        control={personalControl}
-        name="cccd"
-        render={({ field: { onChange, onBlur, value } }) => (
-          <View style={styles.inputContainer}>
-            <Text style={styles.inputLabel}>CCCD/CMND</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Nhập số CCCD/CMND"
-              placeholderTextColor={COLORS.gray400}
-              value={value}
-              onChangeText={onChange}
-              onBlur={onBlur}
-              editable={!isLoading}
-              keyboardType="number-pad"
-            />
-          </View>
-        )}
-      />
-
-      {/* Tax Code */}
-      <Controller
-        control={personalControl}
+        control={control}
         name="taxCode"
         render={({ field: { onChange, onBlur, value } }) => (
           <View style={styles.inputContainer}>
-            <Text style={styles.inputLabel}>Mã số thuế</Text>
+            <Text style={styles.inputLabel}>Mã số thuế/CCCD</Text>
             <TextInput
               style={styles.input}
-              placeholder="Nhập mã số thuế"
+              placeholder="Nhập mã số thuế/CCCD"
               placeholderTextColor={COLORS.gray400}
               value={value}
               onChangeText={onChange}
@@ -320,14 +282,16 @@ const EditProfileScreen: React.FC<EditProfileScreenProps> = ({ route }) => {
           </View>
         )}
       />
-    </View>
-  );
 
-  const renderBankInfoForm = () => (
-    <View style={styles.formContainer}>
+      {/* Divider */}
+      <View style={styles.divider} />
+
+      {/* Bank Information Section */}
+      <Text style={styles.sectionTitle}>Thông tin ngân hàng</Text>
+
       {/* Bank Account Number */}
       <Controller
-        control={bankControl}
+        control={control}
         name="bankAccountNumber"
         render={({ field: { onChange, onBlur, value } }) => (
           <View style={styles.inputContainer}>
@@ -337,7 +301,7 @@ const EditProfileScreen: React.FC<EditProfileScreenProps> = ({ route }) => {
             <TextInput
               style={[
                 styles.input,
-                bankErrors.bankAccountNumber && styles.inputError,
+                errors.bankAccountNumber && styles.inputError,
               ]}
               placeholder="Nhập số tài khoản"
               placeholderTextColor={COLORS.gray400}
@@ -347,8 +311,8 @@ const EditProfileScreen: React.FC<EditProfileScreenProps> = ({ route }) => {
               editable={!isLoading}
               keyboardType="number-pad"
             />
-            {bankErrors.bankAccountNumber && (
-              <Text style={styles.errorText}>{bankErrors.bankAccountNumber.message}</Text>
+            {errors.bankAccountNumber && (
+              <Text style={styles.errorText}>{errors.bankAccountNumber.message}</Text>
             )}
           </View>
         )}
@@ -356,7 +320,7 @@ const EditProfileScreen: React.FC<EditProfileScreenProps> = ({ route }) => {
 
       {/* Bank Account Name */}
       <Controller
-        control={bankControl}
+        control={control}
         name="bankAccountName"
         render={({ field: { onChange, onBlur, value } }) => (
           <View style={styles.inputContainer}>
@@ -366,7 +330,7 @@ const EditProfileScreen: React.FC<EditProfileScreenProps> = ({ route }) => {
             <TextInput
               style={[
                 styles.input,
-                bankErrors.bankAccountName && styles.inputError,
+                errors.bankAccountName && styles.inputError,
               ]}
               placeholder="Nhập tên tài khoản"
               placeholderTextColor={COLORS.gray400}
@@ -375,8 +339,8 @@ const EditProfileScreen: React.FC<EditProfileScreenProps> = ({ route }) => {
               onBlur={onBlur}
               editable={!isLoading}
             />
-            {bankErrors.bankAccountName && (
-              <Text style={styles.errorText}>{bankErrors.bankAccountName.message}</Text>
+            {errors.bankAccountName && (
+              <Text style={styles.errorText}>{errors.bankAccountName.message}</Text>
             )}
           </View>
         )}
@@ -384,7 +348,7 @@ const EditProfileScreen: React.FC<EditProfileScreenProps> = ({ route }) => {
 
       {/* Bank Name */}
       <Controller
-        control={bankControl}
+        control={control}
         name="bankName"
         render={({ field: { onChange, onBlur, value } }) => (
           <View style={styles.inputContainer}>
@@ -394,7 +358,7 @@ const EditProfileScreen: React.FC<EditProfileScreenProps> = ({ route }) => {
             <TextInput
               style={[
                 styles.input,
-                bankErrors.bankName && styles.inputError,
+                errors.bankName && styles.inputError,
               ]}
               placeholder="Nhập tên ngân hàng"
               placeholderTextColor={COLORS.gray400}
@@ -403,8 +367,8 @@ const EditProfileScreen: React.FC<EditProfileScreenProps> = ({ route }) => {
               onBlur={onBlur}
               editable={!isLoading}
             />
-            {bankErrors.bankName && (
-              <Text style={styles.errorText}>{bankErrors.bankName.message}</Text>
+            {errors.bankName && (
+              <Text style={styles.errorText}>{errors.bankName.message}</Text>
             )}
           </View>
         )}
@@ -417,7 +381,7 @@ const EditProfileScreen: React.FC<EditProfileScreenProps> = ({ route }) => {
       <StatusBar barStyle="light-content" backgroundColor={COLORS.primary} />
 
       <CustomHeader
-        title={isPersonalSection ? 'Chỉnh sửa thông tin cá nhân' : 'Chỉnh sửa thông tin ngân hàng'}
+        title="Chỉnh sửa hồ sơ"
         leftIcon={<Text style={styles.backIcon}>‹</Text>}
         onLeftPress={() => navigation.goBack()}
       />
@@ -427,7 +391,7 @@ const EditProfileScreen: React.FC<EditProfileScreenProps> = ({ route }) => {
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
       >
-        {isPersonalSection ? renderPersonalInfoForm() : renderBankInfoForm()}
+        {renderProfileForm()}
 
         {/* Update Button */}
         <TouchableOpacity
@@ -435,7 +399,7 @@ const EditProfileScreen: React.FC<EditProfileScreenProps> = ({ route }) => {
             styles.updateButton,
             isLoading && styles.updateButtonDisabled,
           ]}
-          onPress={isPersonalSection ? handlePersonalSubmit(handleSavePersonalInfo) : handleBankSubmit(handleSaveBankInfo)}
+          onPress={handleSubmit(handleSaveProfile)}
           activeOpacity={0.8}
           disabled={isLoading}
         >
@@ -475,6 +439,18 @@ const styles = StyleSheet.create({
     padding: SPACING.lg,
     borderRadius: BORDER_RADIUS.xl,
     ...SHADOWS.md,
+  },
+  sectionTitle: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: COLORS.textPrimary,
+    marginBottom: SPACING.md,
+    marginTop: SPACING.xs,
+  },
+  divider: {
+    height: 1,
+    backgroundColor: COLORS.gray200,
+    marginVertical: SPACING.lg,
   },
 
   // Input Fields
