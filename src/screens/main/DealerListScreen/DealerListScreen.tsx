@@ -7,62 +7,47 @@ import {
   TouchableOpacity,
   StatusBar,
   TextInput,
+  ActivityIndicator,
+  Alert,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
 import { COLORS, SPACING, BORDER_RADIUS, SHADOWS } from '../../../config/theme';
 import CustomHeader from '../../../components/CustomHeader';
 import Avatar from '../../../components/Avatar';
+import { dealerService } from '../../../api/dealerService';
+import { DealerInfo } from '../../../types/dealer';
+import { InOutStackParamList } from '../../../navigation/MainNavigator';
 
-interface Dealer {
-  id: string;
-  name: string;
-  phone: string;
-  address: string;
-}
+type DealerListNavigationProp = StackNavigationProp<InOutStackParamList, 'DealerList'>;
 
 const DealerListScreen = () => {
-  const navigation = useNavigation();
+  const navigation = useNavigation<DealerListNavigationProp>();
   const [searchQuery, setSearchQuery] = useState('');
-  const [dealers, setDealers] = useState<Dealer[]>([]);
-  const [filteredDealers, setFilteredDealers] = useState<Dealer[]>([]);
+  const [dealers, setDealers] = useState<DealerInfo[]>([]);
+  const [filteredDealers, setFilteredDealers] = useState<DealerInfo[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
 
-  // Mock data - replace with API call
+  // Fetch dealer list from API
   useEffect(() => {
-    const mockData: Dealer[] = [
-      {
-        id: '1',
-        name: 'Đại lý Hà Nội 1',
-        phone: '0901234567',
-        address: '123 Đường ABC, Quận Hoàn Kiếm, Hà Nội',
-      },
-      {
-        id: '2',
-        name: 'Đại lý Hà Nội 2',
-        phone: '0912345678',
-        address: '456 Đường XYZ, Quận Đống Đa, Hà Nội',
-      },
-      {
-        id: '3',
-        name: 'Đại lý TP.HCM 1',
-        phone: '0923456789',
-        address: '789 Đường LMN, Quận 1, TP.HCM',
-      },
-      {
-        id: '4',
-        name: 'Đại lý Đà Nẵng',
-        phone: '0934567890',
-        address: '321 Đường PQR, Quận Hải Châu, Đà Nẵng',
-      },
-      {
-        id: '5',
-        name: 'Đại lý Cần Thơ',
-        phone: '0945678901',
-        address: '654 Đường STU, Quận Ninh Kiều, Cần Thơ',
-      },
-    ];
-    setDealers(mockData);
-    setFilteredDealers(mockData);
+    fetchDealers();
   }, []);
+
+  const fetchDealers = async () => {
+    try {
+      setIsLoading(true);
+      const response = await dealerService.getDealerList();
+      setDealers(response.list);
+      setFilteredDealers(response.list);
+    } catch (error) {
+      Alert.alert(
+        'Lỗi',
+        error instanceof Error ? error.message : 'Không thể tải danh sách đại lý. Vui lòng thử lại.'
+      );
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   // Search filter
   useEffect(() => {
@@ -80,13 +65,19 @@ const DealerListScreen = () => {
     }
   }, [searchQuery, dealers]);
 
-  const handleSelectDealer = (dealer: Dealer) => {
-    // TODO: Handle dealer selection - pass data back to InOutScreen
+  const handleSelectDealer = (dealer: DealerInfo) => {
     console.log('Selected dealer:', dealer);
-    navigation.goBack();
+    navigation.navigate('InOut', {
+      selectedDealer: {
+        id: dealer.id,
+        name: dealer.name,
+        phone: dealer.phone,
+        address: dealer.address,
+      },
+    });
   };
 
-  const renderDealer = ({ item }: { item: Dealer }) => (
+  const renderDealer = ({ item }: { item: DealerInfo }) => (
     <TouchableOpacity
       style={styles.dealerCard}
       onPress={() => handleSelectDealer(item)}
@@ -94,7 +85,7 @@ const DealerListScreen = () => {
     >
       <Avatar size={60} style={styles.dealerAvatar} />
       <View style={styles.dealerInfo}>
-        <Text style={styles.dealerName}>Tên đại lý {item.name}</Text>
+        <Text style={styles.dealerName}>{item.name}</Text>
         <Text style={styles.dealerDetail}>
           <Text style={styles.detailLabel}>SĐT:</Text> {item.phone}
         </Text>
@@ -139,18 +130,25 @@ const DealerListScreen = () => {
       </View>
 
       {/* Dealer List */}
-      <FlatList
-        data={filteredDealers}
-        renderItem={renderDealer}
-        keyExtractor={(item) => item.id}
-        contentContainerStyle={styles.listContainer}
-        showsVerticalScrollIndicator={false}
-        ListEmptyComponent={
-          <View style={styles.emptyContainer}>
-            <Text style={styles.emptyText}>Không tìm thấy đại lý</Text>
-          </View>
-        }
-      />
+      {isLoading ? (
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color={COLORS.primary} />
+          <Text style={styles.loadingText}>Đang tải danh sách đại lý...</Text>
+        </View>
+      ) : (
+        <FlatList
+          data={filteredDealers}
+          renderItem={renderDealer}
+          keyExtractor={(item) => String(item.id)}
+          contentContainerStyle={styles.listContainer}
+          showsVerticalScrollIndicator={false}
+          ListEmptyComponent={
+            <View style={styles.emptyContainer}>
+              <Text style={styles.emptyText}>Không tìm thấy đại lý</Text>
+            </View>
+          }
+        />
+      )}
     </View>
   );
 };
@@ -236,6 +234,19 @@ const styles = StyleSheet.create({
   detailLabel: {
     fontWeight: '600',
     color: COLORS.textPrimary,
+  },
+
+  // Loading State
+  loadingContainer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: SPACING.xl * 2,
+  },
+  loadingText: {
+    fontSize: 15,
+    color: COLORS.textSecondary,
+    marginTop: SPACING.md,
   },
 
   // Empty State

@@ -51,7 +51,14 @@ export type MenuStackParamList = {
 };
 
 export type InOutStackParamList = {
-  InOut: undefined;
+  InOut: {
+    selectedDealer?: {
+      id: number;
+      name: string;
+      phone: string;
+      address: string;
+    };
+  } | undefined;
   DealerList: undefined;
 };
 

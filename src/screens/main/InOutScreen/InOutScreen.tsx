@@ -10,7 +10,7 @@ import {
   StatusBar,
   Image,
 } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -24,6 +24,7 @@ import { InOutStackParamList } from '../../../navigation/MainNavigator';
 import { commonStyles } from '../../../styles/commonStyles';
 
 type InOutScreenNavigationProp = StackNavigationProp<InOutStackParamList, 'InOut'>;
+type InOutScreenRouteProp = RouteProp<InOutStackParamList, 'InOut'>;
 
 // Validation Schema
 const inOutSchema = z.object({
@@ -34,16 +35,25 @@ type InOutFormData = z.infer<typeof inOutSchema>;
 
 const InOutScreen = () => {
   const navigation = useNavigation<InOutScreenNavigationProp>();
+  const route = useRoute<InOutScreenRouteProp>();
   const [isLoading, setIsLoading] = useState(false);
   const [showScanner, setShowScanner] = useState(false);
   const { user } = useAuthStore();
-  const [customerInfo] = useState({
-    id: 0,
-    name: '',
-    phone: '',
-    address: '',
-  });
+  const [selectedDealer, setSelectedDealer] = useState<{
+    id: number;
+    name: string;
+    phone: string;
+    address: string;
+  } | null>(null);
   const [avatarKey, setAvatarKey] = useState(0);
+
+  // Handle dealer selection from navigation params
+  useEffect(() => {
+    if (route.params?.selectedDealer) {
+      setSelectedDealer(route.params.selectedDealer);
+      console.log('📍 Dealer selected:', route.params.selectedDealer);
+    }
+  }, [route.params?.selectedDealer]);
 
   // Log user info khi component mount để debug
   useEffect(() => {
@@ -92,6 +102,14 @@ const InOutScreen = () => {
     navigation.navigate('DealerList');
   };
 
+  const handleResetToSellIn = () => {
+    setSelectedDealer(null);
+    console.log('🔄 Reset to sell-in mode');
+  };
+
+  // Check if we're in sell-out mode
+  const isSellOutMode = selectedDealer !== null;
+
   const handleSaveInfo = async (data: InOutFormData) => {
     try {
       setIsLoading(true);
@@ -129,33 +147,74 @@ const InOutScreen = () => {
 
       <View style={styles.contentContainer}>
         {/* Customer Info Card - Hiển thị thông tin user đã login hoặc dealer được chọn */}
-        <View style={styles.customerCard}>
+        <View style={[
+          styles.customerCard,
+          isSellOutMode && styles.customerCardSellOut,
+        ]}>
+          {/* Mode Indicator Badge */}
+          <View style={[
+            styles.modeBadge,
+            isSellOutMode ? styles.modeBadgeSellOut : styles.modeBadgeSellIn,
+          ]}>
+            <Text style={styles.modeBadgeText}>
+              {isSellOutMode ? '📦 SELL OUT' : '📥 SELL IN'}
+            </Text>
+          </View>
+
           <View style={styles.customerHeader}>
-            <Avatar key={avatarKey} uri={user?.avatar} size={50} style={styles.avatarContainer} />
+            <Avatar
+              key={avatarKey}
+              uri={isSellOutMode ? undefined : user?.avatar}
+              size={50}
+              style={styles.avatarContainer}
+            />
             <View style={styles.customerInfo}>
               <Text style={styles.customerName}>
-                {customerInfo.name || (user ? user.name : 'Chưa chọn đại lý')}
+                {isSellOutMode
+                  ? selectedDealer?.name
+                  : (user ? user.name : 'Chưa đăng nhập')
+                }
               </Text>
-              {(customerInfo.phone || user?.phone) && (
+              {(isSellOutMode ? selectedDealer?.phone : user?.phone) && (
                 <Text style={styles.customerPhone}>
-                  SĐT: {customerInfo.phone || user?.phone}
+                  SĐT: {isSellOutMode ? selectedDealer?.phone : user?.phone}
                 </Text>
               )}
-              {(customerInfo.address) && (
+              {isSellOutMode && selectedDealer?.address && (
                 <Text style={styles.customerAddress} numberOfLines={1}>
-                  {customerInfo.address}
+                  {selectedDealer.address}
                 </Text>
               )}
             </View>
           </View>
 
-          <TouchableOpacity
-            style={styles.selectDealerButton}
-            onPress={handleSelectDealer}
-            activeOpacity={0.7}
-          >
-            <Text style={styles.selectDealerText}>Chọn sell out cho đại lý</Text>
-          </TouchableOpacity>
+          <View style={styles.buttonRow}>
+            <TouchableOpacity
+              style={[
+                styles.dealerActionButton,
+                isSellOutMode && styles.dealerActionButtonSecondary,
+              ]}
+              onPress={handleSelectDealer}
+              activeOpacity={0.7}
+            >
+              <Text style={[
+                styles.dealerActionButtonText,
+                isSellOutMode && styles.dealerActionButtonTextSecondary,
+              ]}>
+                {isSellOutMode ? '🔄 Đổi đại lý' : '📦 Chọn sell out'}
+              </Text>
+            </TouchableOpacity>
+
+            {isSellOutMode && (
+              <TouchableOpacity
+                style={styles.resetButton}
+                onPress={handleResetToSellIn}
+                activeOpacity={0.7}
+              >
+                <Text style={styles.resetButtonText}>↩️ Về Sell In</Text>
+              </TouchableOpacity>
+            )}
+          </View>
         </View>
 
         {/* Scan Card */}
@@ -269,6 +328,12 @@ const styles = StyleSheet.create({
     padding: SPACING.md,
     borderRadius: BORDER_RADIUS.lg,
     ...SHADOWS.md,
+    borderWidth: 2,
+    borderColor: COLORS.primary + '30',
+  },
+  customerCardSellOut: {
+    borderColor: COLORS.secondary + '50',
+    backgroundColor: COLORS.secondary + '05',
   },
   customerHeader: {
     flexDirection: 'row',
@@ -296,14 +361,64 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: COLORS.textSecondary,
   },
-  selectDealerButton: {
+
+  // Mode Badge
+  modeBadge: {
+    position: 'absolute',
+    top: SPACING.sm,
+    right: SPACING.sm,
+    paddingHorizontal: SPACING.sm,
+    paddingVertical: 4,
+    borderRadius: BORDER_RADIUS.sm,
+    zIndex: 1,
+  },
+  modeBadgeSellIn: {
+    backgroundColor: COLORS.primary + '20',
+  },
+  modeBadgeSellOut: {
+    backgroundColor: COLORS.secondary + '30',
+  },
+  modeBadgeText: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: COLORS.textPrimary,
+  },
+
+  // Button Row
+  buttonRow: {
+    flexDirection: 'row',
+    gap: SPACING.sm,
+  },
+  dealerActionButton: {
+    flex: 1,
     backgroundColor: COLORS.secondary,
     paddingVertical: SPACING.sm,
     paddingHorizontal: SPACING.md,
     borderRadius: BORDER_RADIUS.md,
     alignItems: 'center',
   },
-  selectDealerText: {
+  dealerActionButtonSecondary: {
+    backgroundColor: COLORS.white,
+    borderWidth: 1.5,
+    borderColor: COLORS.secondary,
+  },
+  dealerActionButtonText: {
+    color: COLORS.white,
+    fontSize: 13,
+    fontWeight: '600',
+  },
+  dealerActionButtonTextSecondary: {
+    color: COLORS.secondary,
+  },
+  resetButton: {
+    flex: 1,
+    backgroundColor: COLORS.primary,
+    paddingVertical: SPACING.sm,
+    paddingHorizontal: SPACING.md,
+    borderRadius: BORDER_RADIUS.md,
+    alignItems: 'center',
+  },
+  resetButtonText: {
     color: COLORS.white,
     fontSize: 13,
     fontWeight: '600',
