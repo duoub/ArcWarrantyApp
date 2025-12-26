@@ -49,6 +49,7 @@ const parseWarrantyInfo = (raw: WarrantyInfoRaw): WarrantyInfo => {
     serial: raw.serial || '',
     customerName: raw.customername || '',
     customerMobile: raw.customermobile || '',
+    customerPhone: raw.customerphone || '',
     customerAddress: raw.customeraddress || '',
     note: raw.note || '',
     type: raw.type || '',
@@ -109,7 +110,7 @@ export const warrantyLookupService = {
       // Parse raw data to clean format
       const parsedData: WarrantyInfo[] = result.map(parseWarrantyInfo);
 
-      console.log('✅ Parsed warranty info:', parsedData[0]);
+      console.log('✅ Parsed warranty info:', parsedData);
 
       return {
         success: true,

@@ -80,4 +80,48 @@ export const profileService = {
       throw new Error('Đã có lỗi xảy ra. Vui lòng thử lại.');
     }
   },
+
+  /**
+   * Edit notification settings
+   * API: /editnotification
+   */
+  editNotification: async (enablenotification: boolean): Promise<{ status: boolean }> => {
+    try {
+      const credentials = getUserCredentials();
+
+      const body = {
+        userid: credentials.username,
+        token: credentials.username,
+        enablenotification: enablenotification,
+        storeid: credentials.storeid,
+      };
+
+      // Build API URL
+      const url = buildApiUrl('/editnotification');
+
+      console.log('🔔 Updating notification settings:', url, body);
+
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(body),
+      });
+
+      const result = await response.json();
+
+      console.log('🔔 Notification update response:', result);
+
+      return {
+        status: true,
+      };
+    } catch (error) {
+      console.error('❌ Edit notification error:', error);
+      if (error instanceof Error) {
+        throw error;
+      }
+      throw new Error('Đã có lỗi xảy ra. Vui lòng thử lại.');
+    }
+  },
 };

@@ -21,6 +21,7 @@ import Avatar from '../../../components/Avatar';
 import { useAuthStore } from '../../../store/authStore';
 import { ProfileStackParamList } from '../../../navigation/MainNavigator';
 import { uploadService } from '../../../api/uploadService';
+import { profileService } from '../../../api/profileService';
 
 type ProfileScreenNavigationProp = StackNavigationProp<ProfileStackParamList, 'Profile'>;
 
@@ -177,6 +178,19 @@ const ProfileScreen = () => {
 
   const handleChangePassword = () => {
     navigation.navigate('ChangePassword');
+  };
+
+  const handleToggleNotification = async (value: boolean) => {
+    try {
+      setNotificationsEnabled(value);
+      await profileService.editNotification(value);
+      Alert.alert('Thành công', `Đã ${value ? 'bật' : 'tắt'} thông báo`);
+    } catch (error: any) {
+      // Revert on error
+      setNotificationsEnabled(!value);
+      Alert.alert('Lỗi', error.message || 'Không thể cập nhật cài đặt thông báo');
+      console.error('Toggle notification error:', error);
+    }
   };
 
   const handleLogout = () => {
@@ -383,7 +397,7 @@ const ProfileScreen = () => {
               </View>
               <Switch
                 value={notificationsEnabled}
-                onValueChange={setNotificationsEnabled}
+                onValueChange={handleToggleNotification}
                 trackColor={{ false: COLORS.gray300, true: COLORS.primary }}
                 thumbColor={COLORS.white}
               />

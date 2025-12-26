@@ -20,6 +20,10 @@ export interface UploadImageResponse {
   data?: string; // Image URL
 }
 
+export interface UploadedFile {
+  fileid: string;
+}
+
 /**
  * Upload image data (supports both URI and base64)
  */
@@ -255,10 +259,10 @@ export const uploadService = {
 
   /**
    * Upload multiple images sequentially
-   * Returns array of uploaded image URLs
+   * Returns array of uploaded files with format [{ fileid: url }, { fileid: url }, ...]
    */
-  uploadMultipleImages: async (imagePaths: string[]): Promise<string[]> => {
-    const uploadedUrls: string[] = [];
+  uploadMultipleImages: async (imagePaths: string[]): Promise<UploadedFile[]> => {
+    const uploadedFiles: UploadedFile[] = [];
 
     console.log(`📤 Starting upload of ${imagePaths.length} images...`);
 
@@ -270,8 +274,8 @@ export const uploadService = {
         const response = await uploadService.uploadImage(imagePath);
 
         if (response.status && response.data) {
-          uploadedUrls.push(response.data);
-          console.log(`✅ Image ${i + 1} uploaded successfully`);
+          uploadedFiles.push({ fileid: response.data });
+          console.log(`✅ Image ${i + 1} uploaded successfully: ${response.data}`);
         } else {
           throw new Error(`Upload image ${i + 1} failed`);
         }
@@ -281,7 +285,8 @@ export const uploadService = {
       }
     }
 
-    console.log(`✅ All ${uploadedUrls.length} images uploaded successfully`);
-    return uploadedUrls;
+    console.log(`✅ All ${uploadedFiles.length} images uploaded successfully`);
+    console.log(`📋 Uploaded files:`, uploadedFiles);
+    return uploadedFiles;
   },
 };

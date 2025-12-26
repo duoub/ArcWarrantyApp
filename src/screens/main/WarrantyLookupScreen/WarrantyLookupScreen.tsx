@@ -23,7 +23,7 @@ const WarrantyLookupScreen = () => {
   const navigation = useNavigation();
   const [keyword, setKeyword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [result, setResult] = useState<WarrantyInfo | null>(null);
+  const [results, setResults] = useState<WarrantyInfo[]>([]);
   const [showScanner, setShowScanner] = useState(false);
 
   const handleScanQR = () => {
@@ -47,15 +47,15 @@ const WarrantyLookupScreen = () => {
 
     try {
       setIsLoading(true);
-      setResult(null);
+      setResults([]);
 
       const response = await warrantyLookupService.lookupWarranty({
         keyword: keyword.trim(),
       });
 
       if (response.data && response.data.length > 0) {
-        // Take the first result
-        setResult(response.data[0]);
+        // Set all results
+        setResults(response.data);
       } else {
         Alert.alert(
           'Không tìm thấy',
@@ -161,118 +161,139 @@ const WarrantyLookupScreen = () => {
           </TouchableOpacity>
         </View>
 
-        {/* Result Card */}
-        {result && (
-          <View style={styles.resultCard}>
-            <View style={styles.resultHeader}>
-              <Text style={styles.resultTitle}>Thông tin bảo hành</Text>
-              <View
-                style={[
-                  styles.statusBadge,
-                  { backgroundColor: getStatusInfo(result.status).bgColor },
-                ]}
-              >
-                <Text
-                  style={[
-                    styles.statusText,
-                    { color: getStatusInfo(result.status).color },
-                  ]}
-                >
-                  {getStatusInfo(result.status).text}
+        {/* Result Cards */}
+        {results.length > 0 && (
+          <>
+            {results.length > 1 && (
+              <View style={styles.resultCountCard}>
+                <Text style={styles.resultCountText}>
+                  Tìm thấy {results.length} kết quả
                 </Text>
               </View>
-            </View>
-
-            <View style={styles.resultBody}>
-              {/* Serial */}
-              <View style={styles.infoRow}>
-                <Text style={styles.infoLabel}>Số serial:</Text>
-                <Text style={styles.infoValue}>{result.serial}</Text>
-              </View>
-
-              {/* Product Code */}
-              {result.code && (
-                <View style={styles.infoRow}>
-                  <Text style={styles.infoLabel}>Mã sản phẩm:</Text>
-                  <Text style={styles.infoValue}>{result.code}</Text>
-                </View>
-              )}
-
-              {/* Product Name */}
-              <View style={styles.infoRow}>
-                <Text style={styles.infoLabel}>Sản phẩm:</Text>
-                <Text style={styles.infoValue}>{result.namesp.trim() || result.name.trim()}</Text>
-              </View>
-
-              {/* Product Type */}
-              {result.type && (
-                <View style={styles.infoRow}>
-                  <Text style={styles.infoLabel}>Chủng loại:</Text>
-                  <Text style={styles.infoValue}>{result.type}</Text>
-                </View>
-              )}
-
-              {/* Customer Name */}
-              {result.customerName && (
-                <View style={styles.infoRow}>
-                  <Text style={styles.infoLabel}>Khách hàng:</Text>
-                  <Text style={styles.infoValue}>{result.customerName}</Text>
-                </View>
-              )}
-
-              {/* Phone */}
-              {result.customerMobile && (
-                <View style={styles.infoRow}>
-                  <Text style={styles.infoLabel}>Số điện thoại:</Text>
-                  <Text style={styles.infoValue}>{result.customerMobile}</Text>
-                </View>
-              )}
-
-              {/* Address */}
-              {result.customerAddress && (
-                <View style={styles.infoRow}>
-                  <Text style={styles.infoLabel}>Địa chỉ:</Text>
-                  <Text style={styles.infoValue}>{result.customerAddress}</Text>
-                </View>
-              )}
-
-              {/* Divider */}
-              <View style={styles.divider} />
-
-              {/* Active Date */}
-              <View style={styles.infoRow}>
-                <Text style={styles.infoLabel}>Ngày kích hoạt:</Text>
-                <Text style={styles.infoValue}>{result.activeDate}</Text>
-              </View>
-
-              {/* Warranty Time */}
-              {result.warrantyTime && (
-                <View style={styles.infoRow}>
-                  <Text style={styles.infoLabel}>Thời gian BH:</Text>
-                  <Text style={styles.infoValue}>{result.warrantyTime}</Text>
-                </View>
-              )}
-
-              {/* Warranty Expiry */}
-              <View style={styles.infoRow}>
-                <Text style={styles.infoLabel}>Hết hạn BH:</Text>
-                <Text style={[styles.infoValue, styles.infoValueHighlight]}>
-                  {result.expiryDate}
-                </Text>
-              </View>
-
-              {/* Note */}
-              {result.note && (
-                <>
-                  <View style={styles.divider} />
-                  <View style={styles.infoRow}>
-                    <Text style={styles.infoLabel}>Ghi chú:</Text>
-                    <Text style={styles.infoValue}>{result.note}</Text>
+            )}
+            {results.map((result, index) => (
+              <View key={`${result.serial}-${index}`} style={styles.resultCard}>
+                <View style={styles.resultHeader}>
+                  <Text style={styles.resultTitle}>
+                    Thông tin bảo hành {results.length > 1 ? `(${index + 1}/${results.length})` : ''}
+                  </Text>
+                  <View
+                    style={[
+                      styles.statusBadge,
+                      { backgroundColor: getStatusInfo(result.status).bgColor },
+                    ]}
+                  >
+                    <Text
+                      style={[
+                        styles.statusText,
+                        { color: getStatusInfo(result.status).color },
+                      ]}
+                    >
+                      {getStatusInfo(result.status).text}
+                    </Text>
                   </View>
-                </>
-              )}
-            </View>
-          </View>
+                </View>
+
+                <View style={styles.resultBody}>
+                  {/* Serial */}
+                  <View style={styles.infoRow}>
+                    <Text style={styles.infoLabel}>Số serial:</Text>
+                    <Text style={styles.infoValue}>{result.serial}</Text>
+                  </View>
+
+                  {/* Product Code */}
+                  {result.code && (
+                    <View style={styles.infoRow}>
+                      <Text style={styles.infoLabel}>Mã sản phẩm:</Text>
+                      <Text style={styles.infoValue}>{result.code}</Text>
+                    </View>
+                  )}
+
+                  {/* Product Name */}
+                  <View style={styles.infoRow}>
+                    <Text style={styles.infoLabel}>Sản phẩm:</Text>
+                    <Text style={styles.infoValue}>{result.namesp.trim() || result.name.trim()}</Text>
+                  </View>
+
+                  {/* Product Type */}
+                  {result.type && (
+                    <View style={styles.infoRow}>
+                      <Text style={styles.infoLabel}>Chủng loại:</Text>
+                      <Text style={styles.infoValue}>{result.type}</Text>
+                    </View>
+                  )}
+
+                  {/* Customer Name */}
+                  {result.customerName && (
+                    <View style={styles.infoRow}>
+                      <Text style={styles.infoLabel}>Khách hàng:</Text>
+                      <Text style={styles.infoValue}>{result.customerName}</Text>
+                    </View>
+                  )}
+
+                  {/* Phone - Mobile */}
+                  {result.customerMobile && (
+                    <View style={styles.infoRow}>
+                      <Text style={styles.infoLabel}>Số điện thoại:</Text>
+                      <Text style={styles.infoValue}>{result.customerMobile}</Text>
+                    </View>
+                  )}
+
+                  {/* Phone - customerPhone */}
+                  {result.customerPhone && result.customerPhone !== result.customerMobile && (
+                    <View style={styles.infoRow}>
+                      <Text style={styles.infoLabel}>SĐT khác:</Text>
+                      <Text style={styles.infoValue}>{result.customerPhone}</Text>
+                    </View>
+                  )}
+
+                  {/* Address */}
+                  {result.customerAddress && (
+                    <View style={styles.infoRow}>
+                      <Text style={styles.infoLabel}>Địa chỉ:</Text>
+                      <Text style={styles.infoValue}>{result.customerAddress}</Text>
+                    </View>
+                  )}
+
+                  {/* Divider */}
+                  <View style={styles.divider} />
+
+                  {/* Active Date */}
+                  <View style={styles.infoRow}>
+                    <Text style={styles.infoLabel}>Ngày kích hoạt:</Text>
+                    <Text style={styles.infoValue}>{result.activeDate}</Text>
+                  </View>
+
+                  {/* Warranty Time */}
+                  {result.warrantyTime && (
+                    <View style={styles.infoRow}>
+                      <Text style={styles.infoLabel}>Thời gian BH:</Text>
+                      <Text style={styles.infoValue}>{result.warrantyTime}</Text>
+                    </View>
+                  )}
+
+                  {/* Warranty Expiry */}
+                  <View style={styles.infoRow}>
+                    <Text style={styles.infoLabel}>Hết hạn BH:</Text>
+                    <Text style={[styles.infoValue, styles.infoValueHighlight]}>
+                      {result.expiryDate}
+                    </Text>
+                  </View>
+
+                  {/* Note */}
+                  {result.note && (
+                    <>
+                      <View style={styles.divider} />
+                      <View style={styles.infoRow}>
+                        <Text style={styles.infoLabel}>Ghi chú:</Text>
+                        <Text style={styles.infoValue}>{result.note}</Text>
+                      </View>
+                    </>
+                  )}
+                </View>
+              </View>
+            ))}
+          </>
         )}
 
         {/* Info Box */}
@@ -393,6 +414,24 @@ const styles = StyleSheet.create({
   },
   searchButtonDisabled: {
     opacity: 0.6,
+  },
+
+  // Result Count Card
+  resultCountCard: {
+    backgroundColor: COLORS.primary + '15',
+    marginHorizontal: SPACING.lg,
+    marginTop: SPACING.md,
+    paddingVertical: SPACING.sm,
+    paddingHorizontal: SPACING.md,
+    borderRadius: BORDER_RADIUS.md,
+    borderWidth: 1,
+    borderColor: COLORS.primary + '30',
+  },
+  resultCountText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: COLORS.primary,
+    textAlign: 'center',
   },
 
   // Result Card

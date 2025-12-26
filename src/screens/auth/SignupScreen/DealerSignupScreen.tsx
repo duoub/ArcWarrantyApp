@@ -23,7 +23,7 @@ import { COLORS, SPACING, BORDER_RADIUS } from '../../../config/theme';
 import { AuthStackParamList } from '../../../navigation/AuthNavigator';
 import CustomHeader from '../../../components/CustomHeader';
 import ProvinceSelector from '../../../components/ProvinceSelector';
-import { uploadService } from '../../../api/uploadService';
+import { uploadService, UploadedFile } from '../../../api/uploadService';
 
 type DealerSignupScreenNavigationProp = StackNavigationProp<AuthStackParamList, 'DealerSignup'>;
 
@@ -187,7 +187,7 @@ const DealerSignupScreen: React.FC = () => {
     try {
       setIsLoading(true);
 
-      let uploadedImageUrls: string[] = [];
+      let uploadedFiles: UploadedFile[] = [];
 
       // Step 1: Upload images
       console.log(`📤 Starting upload of ${images.length} images...`);
@@ -195,8 +195,8 @@ const DealerSignupScreen: React.FC = () => {
       try {
         // Extract URIs from ImageItem array
         const imagePaths = images.map((img) => img.uri);
-        uploadedImageUrls = await uploadService.uploadMultipleImages(imagePaths);
-        console.log(`✅ All images uploaded:`, uploadedImageUrls);
+        uploadedFiles = await uploadService.uploadMultipleImages(imagePaths);
+        console.log(`✅ All images uploaded:`, uploadedFiles);
       } catch (uploadError: any) {
         console.error('❌ Image upload failed:', uploadError);
         Alert.alert(
@@ -208,11 +208,11 @@ const DealerSignupScreen: React.FC = () => {
         return;
       }
 
-      // Step 2: Submit dealer signup with uploaded image URLs
-      // TODO: Call dealer signup API here with uploadedImageUrls
+      // Step 2: Submit dealer signup with uploaded image files
+      // TODO: Call dealer signup API here with uploadedFiles
       console.log('📋 Dealer Signup Data:', {
         ...data,
-        imageUrls: uploadedImageUrls,
+        files: uploadedFiles,
       });
 
       // Simulate API call

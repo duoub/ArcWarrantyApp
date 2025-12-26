@@ -13,6 +13,7 @@ export interface WarrantyInfoRaw {
   serial: string; // serial sản phẩm
   customername: string; // tên KH
   customermobile: string; // SĐT KH
+  customerphone: string; // SĐT KH (trường bổ sung)
   customeraddress: string; // Địa chỉ KH
   note: string; // ghi chú bảo hành
   type: string; // chủng loại
@@ -29,6 +30,7 @@ export interface WarrantyInfo {
   serial: string;
   customerName: string;
   customerMobile: string;
+  customerPhone: string;
   customerAddress: string;
   note: string;
   type: string;

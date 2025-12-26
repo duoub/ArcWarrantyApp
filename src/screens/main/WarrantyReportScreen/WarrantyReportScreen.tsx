@@ -21,7 +21,7 @@ import CustomHeader from '../../../components/CustomHeader';
 import BarcodeScanner from '../../../components/BarcodeScanner';
 import LocationSelector from '../../../components/LocationSelector';
 import { Location } from '../../../types/province';
-import { uploadService } from '../../../api/uploadService';
+import { uploadService, UploadedFile } from '../../../api/uploadService';
 
 const WarrantyReportScreen = () => {
   const navigation = useNavigation();
@@ -175,15 +175,15 @@ const WarrantyReportScreen = () => {
     try {
       setIsLoading(true);
 
-      let uploadedImageUrls: string[] = [];
+      let uploadedFiles: UploadedFile[] = [];
 
       // Step 1: Upload images if any
       if (images.length > 0) {
         console.log(`📤 Starting upload of ${images.length} images...`);
 
         try {
-          uploadedImageUrls = await uploadService.uploadMultipleImages(images);
-          console.log(`✅ All images uploaded:`, uploadedImageUrls);
+          uploadedFiles = await uploadService.uploadMultipleImages(images);
+          console.log(`✅ All images uploaded:`, uploadedFiles);
         } catch (uploadError: any) {
           console.error('❌ Image upload failed:', uploadError);
           Alert.alert(
@@ -196,8 +196,8 @@ const WarrantyReportScreen = () => {
         }
       }
 
-      // Step 2: Submit warranty report with uploaded image URLs
-      // TODO: Call warranty report API here with uploadedImageUrls
+      // Step 2: Submit warranty report with uploaded image files
+      // TODO: Call warranty report API here with uploadedFiles
       console.log('📋 Submitting warranty report with data:', {
         serial,
         customerName,
@@ -207,7 +207,7 @@ const WarrantyReportScreen = () => {
         ward: ward?.TenDiaBan,
         address,
         issueDescription,
-        imageUrls: uploadedImageUrls,
+        files: uploadedFiles,
       });
 
       // Simulate API call

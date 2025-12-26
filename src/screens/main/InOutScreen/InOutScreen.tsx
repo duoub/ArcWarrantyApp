@@ -69,6 +69,7 @@ const InOutScreen = () => {
     handleSubmit,
     formState: { errors },
     setValue,
+    getValues,
   } = useForm<InOutFormData>({
     resolver: zodResolver(inOutSchema),
     defaultValues: {
@@ -81,7 +82,9 @@ const InOutScreen = () => {
   };
 
   const handleScanComplete = (data: string) => {
-    setValue('serial', data);
+    const currentSerial = getValues('serial');
+    const newSerial = currentSerial ? `${currentSerial};${data}` : data;
+    setValue('serial', newSerial);
     setShowScanner(false);
   };
 
