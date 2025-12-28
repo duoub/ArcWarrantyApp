@@ -3,7 +3,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { ActivityIndicator, View, StyleSheet } from 'react-native';
 import { useAuthStore } from '../store/authStore';
 import { COLORS } from '../config/theme';
-import AuthNavigator from './AuthNavigator';
+import PreLoginRootNavigator from './PreLoginRootNavigator';
 import MainNavigator from './MainNavigator';
 
 const RootNavigator = () => {
@@ -25,7 +25,7 @@ const RootNavigator = () => {
 
   return (
     <NavigationContainer>
-      {isAuthenticated ? <MainNavigator /> : <AuthNavigator />}
+      {isAuthenticated ? <MainNavigator /> : <PreLoginRootNavigator />}
     </NavigationContainer>
   );
 };

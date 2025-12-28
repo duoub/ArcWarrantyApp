@@ -22,9 +22,24 @@ import { distributionSystemService } from '../../../api/distributionSystemServic
 import { Distributor } from '../../../types/distributionSystem';
 import { openMapDirections } from '../../../utils/mapNavigation';
 import { Icon } from '../../../components/common';
+import { useAuthStore } from '../../../store/authStore';
 
 const DistributionSystemScreen = () => {
-  const navigation = useNavigation();
+  const navigation = useNavigation<any>();
+  const { isAuthenticated } = useAuthStore();
+
+  // Handle back button press
+  const handleBack = () => {
+    if (isAuthenticated) {
+      // Nếu đã login, back về screen trước đó
+      if (navigation.canGoBack()) {
+        navigation.goBack();
+      }
+    } else {
+      // Nếu chưa login, back về LoginScreen
+      navigation.navigate('Login');
+    }
+  };
   const [distributors, setDistributors] = useState<Distributor[]>([]);
   const [keyword, setKeyword] = useState('');
   const [searchKeyword, setSearchKeyword] = useState('');
@@ -150,7 +165,7 @@ const DistributionSystemScreen = () => {
         {/* Phone */}
         <View style={styles.infoRow}>
           <View style={styles.iconContainer}>
-            <Icon name="phone" size={16} color={COLORS.primary} />
+            <Icon name="phone" size={16} color={COLORS.gray500} />
           </View>
           <View style={styles.infoDetail}>
             <Text style={styles.infoLabel}>Điện thoại</Text>
@@ -200,8 +215,8 @@ const DistributionSystemScreen = () => {
 
       <CustomHeader
         title="Hệ thống phân phối"
-        leftIcon={<Text style={styles.backIcon}>‹</Text>}
-        onLeftPress={() => navigation.goBack()}
+        leftIcon={<Icon name="back" size={24} color={COLORS.white} />}
+        onLeftPress={handleBack}
       />
 
       <View style={styles.content}>

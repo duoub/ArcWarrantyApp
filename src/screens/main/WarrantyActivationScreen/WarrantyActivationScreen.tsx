@@ -14,6 +14,7 @@ import {
   StatusBar,
   Image,
 } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -25,6 +26,7 @@ import LocationSelector from '../../../components/LocationSelector';
 import { commonStyles } from '../../../styles/commonStyles';
 import { Location } from '../../../types/province';
 import { Icon } from '../../../components/common';
+import { useAuthStore } from '../../../store/authStore';
 
 // Validation Schema
 const warrantyActivationSchema = z.object({
@@ -48,11 +50,26 @@ const warrantyActivationSchema = z.object({
 type WarrantyActivationFormData = z.infer<typeof warrantyActivationSchema>;
 
 const WarrantyActivationScreen = () => {
+  const navigation = useNavigation<any>();
+  const { isAuthenticated } = useAuthStore();
   const [isLoading, setIsLoading] = useState(false);
   const [showScanner, setShowScanner] = useState(false);
   const [province, setProvince] = useState<Location | null>(null);
   const [district, setDistrict] = useState<Location | null>(null);
   const [ward, setWard] = useState<Location | null>(null);
+
+  // Handle back button press
+  const handleBack = () => {
+    if (isAuthenticated) {
+      // Nếu đã login, back về screen trước đó
+      if (navigation.canGoBack()) {
+        navigation.goBack();
+      }
+    } else {
+      // Nếu chưa login, back về LoginScreen
+      navigation.navigate('Login');
+    }
+  };
 
   const {
     control,
@@ -143,6 +160,8 @@ const WarrantyActivationScreen = () => {
       {/* Custom Header */}
       <CustomHeader
         title="Kích hoạt bảo hành"
+        leftIcon={<Icon name="back" size={24} color={COLORS.white} />}
+        onLeftPress={handleBack}
       />
 
       <KeyboardAvoidingView

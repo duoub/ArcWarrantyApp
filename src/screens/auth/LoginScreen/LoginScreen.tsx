@@ -10,19 +10,21 @@ import {
   Platform,
   ActivityIndicator,
   Alert,
+  ScrollView,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { COLORS, SPACING, BORDER_RADIUS } from '../../../config/theme';
-import { AuthStackParamList } from '../../../navigation/AuthNavigator';
+import { PreLoginRootStackParamList } from '../../../navigation/PreLoginRootNavigator';
 import { loginSchema, LoginFormData } from '../../../utils/validation';
 import { Icon } from '../../../components/common';
 import { authService } from '../../../api/authService';
 import { useAuthStore } from '../../../store/authStore';
+import PreLoginNavigator from '../../../navigation/PreLoginNavigator';
 
-type LoginScreenNavigationProp = StackNavigationProp<AuthStackParamList, 'Login'>;
+type LoginScreenNavigationProp = StackNavigationProp<PreLoginRootStackParamList, 'Login'>;
 
 const LoginScreen = () => {
   const navigation = useNavigation<LoginScreenNavigationProp>();
@@ -67,23 +69,29 @@ const LoginScreen = () => {
   };
 
   return (
-    <KeyboardAvoidingView
-      style={styles.container}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-    >
-      <View style={styles.content}>
-        {/* Logo Section */}
-        <View style={styles.logoSection}>
-          <Image
-            source={require('../../../assets/images/logo.png')}
-            style={styles.logo}
-            resizeMode="contain"
-          />
-          <Text style={styles.tagline}>Quản lý bảo hành chuyên nghiệp</Text>
-        </View>
+    <View style={styles.container}>
+      <KeyboardAvoidingView
+        style={styles.keyboardView}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      >
+        <ScrollView
+          style={styles.scrollView}
+          contentContainerStyle={styles.scrollContent}
+          showsVerticalScrollIndicator={false}
+        >
+          <View style={styles.content}>
+            {/* Logo Section */}
+            <View style={styles.logoSection}>
+              <Image
+                source={require('../../../assets/images/logo.png')}
+                style={styles.logo}
+                resizeMode="contain"
+              />
+              <Text style={styles.tagline}>Quản lý bảo hành chuyên nghiệp</Text>
+            </View>
 
-        {/* Login Card */}
-        <View style={styles.loginCard}>
+            {/* Login Card */}
+            <View style={styles.loginCard}>
           {/* Card Header */}
           <Text style={styles.welcomeText}>Đăng nhập</Text>
 
@@ -197,12 +205,17 @@ const LoginScreen = () => {
           </View>
         </View>
 
-        {/* Footer */}
-        <View style={styles.footer}>
-          <Text style={styles.footerText}>Sản phẩm đẳng cấp từ <Text style={styles.signupLink}>MALAYSIA</Text></Text>
-        </View>
-      </View>
-    </KeyboardAvoidingView>
+            {/* Footer */}
+            <View style={styles.footer}>
+              <Text style={styles.footerText}>Sản phẩm đẳng cấp từ <Text style={styles.signupLink}>MALAYSIA</Text></Text>
+            </View>
+          </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
+
+      {/* Pre-Login Bottom Navigation */}
+      <PreLoginNavigator />
+    </View>
   );
 };
 
@@ -210,6 +223,15 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: COLORS.white,
+  },
+  keyboardView: {
+    flex: 1,
+  },
+  scrollView: {
+    flex: 1,
+  },
+  scrollContent: {
+    flexGrow: 1,
   },
   content: {
     flex: 1,
