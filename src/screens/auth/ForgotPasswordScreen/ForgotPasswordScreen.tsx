@@ -59,7 +59,9 @@ const ForgotPasswordScreen = () => {
   };
 
   const handleBackToLogin = () => {
-    navigation.navigate('Login');
+    if (navigation.canGoBack()) {
+      navigation.goBack();
+    }
   };
 
   // Success State

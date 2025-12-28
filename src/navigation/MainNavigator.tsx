@@ -40,6 +40,7 @@ export type HomeStackParamList = {
 
 export type MenuStackParamList = {
   Menu: undefined;
+  WarrantyActivation: undefined;
   WarrantyStationList: undefined;
   WarrantyReport: undefined;
   WarrantyLookup: undefined;
@@ -104,6 +105,7 @@ const MenuStackNavigator = () => {
   return (
     <MenuStack.Navigator screenOptions={{ headerShown: false }}>
       <MenuStack.Screen name="Menu" component={MenuScreen} />
+      <MenuStack.Screen name="WarrantyActivation" component={WarrantyActivationScreen} />
       <MenuStack.Screen name="WarrantyStationList" component={WarrantyStationListScreen} />
       <MenuStack.Screen name="WarrantyReport" component={WarrantyReportScreen} />
       <MenuStack.Screen name="WarrantyLookup" component={WarrantyLookupScreen} />

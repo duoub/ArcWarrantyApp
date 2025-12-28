@@ -26,7 +26,6 @@ import LocationSelector from '../../../components/LocationSelector';
 import { commonStyles } from '../../../styles/commonStyles';
 import { Location } from '../../../types/province';
 import { Icon } from '../../../components/common';
-import { useAuthStore } from '../../../store/authStore';
 
 // Validation Schema
 const warrantyActivationSchema = z.object({
@@ -51,7 +50,6 @@ type WarrantyActivationFormData = z.infer<typeof warrantyActivationSchema>;
 
 const WarrantyActivationScreen = () => {
   const navigation = useNavigation<any>();
-  const { isAuthenticated } = useAuthStore();
   const [isLoading, setIsLoading] = useState(false);
   const [showScanner, setShowScanner] = useState(false);
   const [province, setProvince] = useState<Location | null>(null);
@@ -60,14 +58,9 @@ const WarrantyActivationScreen = () => {
 
   // Handle back button press
   const handleBack = () => {
-    if (isAuthenticated) {
-      // Nếu đã login, back về screen trước đó
-      if (navigation.canGoBack()) {
-        navigation.goBack();
-      }
-    } else {
-      // Nếu chưa login, back về LoginScreen
-      navigation.navigate('Login');
+    // Luôn dùng goBack() để có animation đúng (left to right)
+    if (navigation.canGoBack()) {
+      navigation.goBack();
     }
   };
 

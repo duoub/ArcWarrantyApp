@@ -1,5 +1,5 @@
 import React from 'react';
-import { createStackNavigator } from '@react-navigation/stack';
+import { createStackNavigator, CardStyleInterpolators } from '@react-navigation/stack';
 import LoginScreen from '../screens/auth/LoginScreen/LoginScreen';
 import SignupScreen from '../screens/auth/SignupScreen/SignupScreen';
 import DealerSignupScreen from '../screens/auth/SignupScreen/DealerSignupScreen';
@@ -29,6 +29,7 @@ const PreLoginRootNavigator = () => {
       screenOptions={{
         headerShown: false,
         cardStyle: { backgroundColor: '#FFFFFF' },
+        cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
       }}
     >
       <Stack.Screen name="Login" component={LoginScreen} />

@@ -22,22 +22,15 @@ import { distributionSystemService } from '../../../api/distributionSystemServic
 import { Distributor } from '../../../types/distributionSystem';
 import { openMapDirections } from '../../../utils/mapNavigation';
 import { Icon } from '../../../components/common';
-import { useAuthStore } from '../../../store/authStore';
 
 const DistributionSystemScreen = () => {
   const navigation = useNavigation<any>();
-  const { isAuthenticated } = useAuthStore();
 
   // Handle back button press
   const handleBack = () => {
-    if (isAuthenticated) {
-      // Nếu đã login, back về screen trước đó
-      if (navigation.canGoBack()) {
-        navigation.goBack();
-      }
-    } else {
-      // Nếu chưa login, back về LoginScreen
-      navigation.navigate('Login');
+    // Luôn dùng goBack() để có animation đúng (left to right)
+    if (navigation.canGoBack()) {
+      navigation.goBack();
     }
   };
   const [distributors, setDistributors] = useState<Distributor[]>([]);
