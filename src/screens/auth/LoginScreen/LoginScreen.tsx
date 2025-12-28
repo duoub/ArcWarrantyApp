@@ -18,6 +18,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { COLORS, SPACING, BORDER_RADIUS } from '../../../config/theme';
 import { AuthStackParamList } from '../../../navigation/AuthNavigator';
 import { loginSchema, LoginFormData } from '../../../utils/validation';
+import { Icon } from '../../../components/common';
 import { authService } from '../../../api/authService';
 import { useAuthStore } from '../../../store/authStore';
 
@@ -147,9 +148,11 @@ const LoginScreen = () => {
                     onPress={() => setShowPassword(!showPassword)}
                     disabled={isLoading}
                   >
-                    <Text>
-                      {showPassword ? 'Ẩn' : 'Hiện'}
-                    </Text>
+                    <Icon
+                      name={showPassword ? 'eye-off' : 'eye'}
+                      size={20}
+                      color={COLORS.gray500}
+                    />
                   </TouchableOpacity>
                 </View>
                 {errors.password && (
@@ -288,9 +291,6 @@ const styles = StyleSheet.create({
   eyeIcon: {
     padding: SPACING.xs,
     marginLeft: SPACING.xs,
-  },
-  eyeIconText: {
-    fontSize: 22,
   },
   errorText: {
     fontSize: 12,

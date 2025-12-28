@@ -13,6 +13,7 @@ import {
 import { COLORS, SPACING, BORDER_RADIUS, SHADOWS } from '../config/theme';
 import { warrantyLookupService } from '../api/warrantyLookupService';
 import { WarrantyInfo } from '../types/warrantyLookup';
+import { Icon } from './common';
 
 interface CustomerLookupModalProps {
   visible: boolean;
@@ -119,7 +120,7 @@ const CustomerLookupModal: React.FC<CustomerLookupModalProps> = ({
           <View style={styles.searchSection}>
             <Text style={styles.searchLabel}>Nhập số điện thoại</Text>
             <View style={styles.searchWrapper}>
-              <Text style={styles.searchIcon}>🔍</Text>
+              <Icon name="search" size={20} color={COLORS.gray400} />
               <TextInput
                 style={styles.searchInput}
                 placeholder="Số điện thoại"
@@ -326,10 +327,7 @@ const styles = StyleSheet.create({
     borderColor: COLORS.gray200,
     paddingHorizontal: SPACING.md,
     marginBottom: SPACING.md,
-  },
-  searchIcon: {
-    fontSize: 20,
-    marginRight: SPACING.sm,
+    gap: SPACING.sm,
   },
   searchInput: {
     flex: 1,

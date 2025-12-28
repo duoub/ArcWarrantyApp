@@ -18,6 +18,7 @@ import BarcodeScanner from '../../../components/BarcodeScanner';
 import { commonStyles } from '../../../styles/commonStyles';
 import { warrantyLookupService } from '../../../api/warrantyLookupService';
 import { WarrantyInfo, RepairInfo } from '../../../types/warrantyLookup';
+import { Icon } from '../../../components/common';
 
 const WarrantyLookupScreen = () => {
   const navigation = useNavigation();
@@ -162,7 +163,7 @@ const WarrantyLookupScreen = () => {
             Nhập thông tin tra cứu
           </Text>
           <View style={styles.searchWrapper}>
-            <Text style={styles.searchIcon}>🔍</Text>
+            <Icon name="search" size={18} color={COLORS.gray500} style={styles.searchIcon} />
             <TextInput
               style={styles.searchInput}
               placeholder="Số Serial / SĐT"
@@ -478,7 +479,7 @@ const WarrantyLookupScreen = () => {
 
         {/* Info Box */}
         <View style={[commonStyles.infoBox, styles.infoBoxMargin]}>
-          <Text style={commonStyles.infoBoxIcon}>ℹ️</Text>
+          <Icon name="info" size={18} color={COLORS.accent} style={commonStyles.infoBoxIcon} />
           <View style={commonStyles.infoBoxContent}>
             <Text style={commonStyles.infoBoxText}>
               Bạn có thể tra cứu thông tin bảo hành bằng số serial sản phẩm

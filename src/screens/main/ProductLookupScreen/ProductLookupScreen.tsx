@@ -18,6 +18,7 @@ import BarcodeScanner from '../../../components/BarcodeScanner';
 import { commonStyles } from '../../../styles/commonStyles';
 import { productLookupService } from '../../../api/productLookupService';
 import { ProductInfo } from '../../../types/productLookup';
+import { Icon } from '../../../components/common';
 
 const ProductLookupScreen = () => {
   const navigation = useNavigation();
@@ -118,7 +119,7 @@ const ProductLookupScreen = () => {
             Nhập số serial sản phẩm
           </Text>
           <View style={styles.searchWrapper}>
-            <Text style={styles.searchIcon}>🔍</Text>
+            <Icon name="search" size={18} color={COLORS.gray500} style={styles.searchIcon} />
             <TextInput
               style={styles.searchInput}
               placeholder="Serial"
@@ -248,7 +249,7 @@ const ProductLookupScreen = () => {
 
         {/* Info Box */}
         <View style={[commonStyles.infoBox, styles.infoBoxMargin]}>
-          <Text style={commonStyles.infoBoxIcon}>ℹ️</Text>
+          <Icon name="info" size={18} color={COLORS.accent} style={commonStyles.infoBoxIcon} />
           <View style={commonStyles.infoBoxContent}>
             <Text style={commonStyles.infoBoxText}>
               Nhập số serial trên tem sản phẩm hoặc quét mã QR để kiểm tra

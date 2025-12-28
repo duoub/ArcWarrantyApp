@@ -28,6 +28,7 @@ import { uploadService, UploadedFile } from '../../../api/uploadService';
 import { warrantyService } from '../../../api/warrantyService';
 import { warrantyLookupService } from '../../../api/warrantyLookupService';
 import { provinceService } from '../../../api/provinceService';
+import { Icon } from '../../../components/common';
 import CustomerLookupModal from '../../../components/CustomerLookupModal';
 import { WarrantyInfo } from '../../../types/warrantyLookup';
 
@@ -468,16 +469,17 @@ const WarrantyReportScreen = () => {
                       Số serial <Text style={styles.required}>*</Text>
                     </Text>
                     <TouchableOpacity onPress={handleSearchByPhone}>
-                      <Text style={styles.linkText}>
-                        📞 Tìm theo Số điện thoại
-                      </Text>
+                      <View style={styles.linkRow}>
+                        <Icon name="phone" size={14} color={COLORS.primary} />
+                        <Text style={styles.linkText}>Tìm theo Số điện thoại</Text>
+                      </View>
                     </TouchableOpacity>
                   </View>
                   <View style={[
                     styles.inputWrapper,
                     errors.serial && styles.inputWrapperError,
                   ]}>
-                    <Text style={styles.inputIcon}>🔍</Text>
+                    <Icon name="search" size={18} color={COLORS.gray500} style={styles.inputIcon} />
                     <TextInput
                       style={styles.input}
                       placeholder="Serial"
@@ -526,7 +528,7 @@ const WarrantyReportScreen = () => {
                     styles.inputWrapper,
                     errors.customerName && styles.inputWrapperError,
                   ]}>
-                    <Text style={styles.inputIcon}>👤</Text>
+                    <Icon name="user" size={20} color={COLORS.gray400} style={styles.inputIcon} />
                     <TextInput
                       style={styles.input}
                       placeholder="Họ tên"
@@ -557,7 +559,7 @@ const WarrantyReportScreen = () => {
                     styles.inputWrapper,
                     errors.phone && styles.inputWrapperError,
                   ]}>
-                    <Text style={styles.inputIcon}>📞</Text>
+                    <Icon name="phone" size={20} color={COLORS.gray400} style={styles.inputIcon} />
                     <TextInput
                       style={styles.input}
                       placeholder="Số điện thoại"
@@ -654,7 +656,7 @@ const WarrantyReportScreen = () => {
                     styles.inputWrapper,
                     errors.address && styles.inputWrapperError,
                   ]}>
-                    <Text style={styles.inputIcon}>📍</Text>
+                    <Icon name="location" size={18} color={COLORS.gray500} style={styles.inputIcon} />
                     <TextInput
                       style={styles.input}
                       placeholder="Địa chỉ"
@@ -823,6 +825,11 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: COLORS.primary,
   },
+  linkRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
   inputWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -841,7 +848,6 @@ const styles = StyleSheet.create({
     paddingVertical: SPACING.sm,
   },
   inputIcon: {
-    fontSize: 20,
     marginRight: SPACING.sm,
   },
   textareaIcon: {

@@ -15,6 +15,7 @@ import { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
 import { COLORS, SPACING, BORDER_RADIUS, SHADOWS } from '../../../config/theme';
 import CustomHeader from '../../../components/CustomHeader';
 import { MenuStackParamList, MainTabParamList } from '../../../navigation/MainNavigator';
+import { Icon, IconName } from '../../../components/common';
 
 type MenuScreenNavigationProp = CompositeNavigationProp<
   StackNavigationProp<MenuStackParamList, 'Menu'>,
@@ -22,7 +23,7 @@ type MenuScreenNavigationProp = CompositeNavigationProp<
 >;
 
 interface MenuItem {
-  icon: string;
+  icon: IconName;
   label: string;
   onPress: () => void;
 }
@@ -41,17 +42,17 @@ const MenuScreen = () => {
       title: 'Bán hàng',
       items: [
         {
-          icon: '📦',
+          icon: 'product-info',
           label: 'Thông tin sản phẩm',
           onPress: () => navigation.navigate('Product'),
         },
         {
-          icon: '💼',
+          icon: 'sales-policy',
           label: 'Chính sách bán hàng',
           onPress: () => Alert.alert('Chính sách bán hàng', 'Chức năng đang phát triển'),
         },
         {
-          icon: '🏪',
+          icon: 'distribution',
           label: 'Hệ thống phân phối',
           onPress: () => navigation.navigate('DistributionSystem'),
         },
@@ -61,32 +62,32 @@ const MenuScreen = () => {
       title: 'Bảo hành điện tử',
       items: [
         {
-          icon: '✅',
+          icon: 'warranty-activation',
           label: 'Kích hoạt bảo hành',
           onPress: () => navigation.navigate('WarrantyActivation'),
         },
         {
-          icon: '🔍',
+          icon: 'warranty-lookup',
           label: 'Tra cứu bảo hành',
           onPress: () => navigation.navigate('WarrantyLookup'),
         },
         {
-          icon: '🛠️',
+          icon: 'warranty-report',
           label: 'Báo ca bảo hành',
           onPress: () => navigation.navigate('WarrantyReport'),
         },
         {
-          icon: '✓',
+          icon: 'product-lookup',
           label: 'Tra cứu sản phẩm chính hãng',
           onPress: () => navigation.navigate('ProductLookup'),
         },
         {
-          icon: '📄',
+          icon: 'warranty-policy',
           label: 'Chính sách bảo hành',
           onPress: () => Alert.alert('Chính sách bảo hành', 'Chức năng đang phát triển'),
         },
         {
-          icon: '🏭',
+          icon: 'warranty-station',
           label: 'Hệ thống điểm bảo hành',
           onPress: () => navigation.navigate('WarrantyStationList'),
         },
@@ -96,17 +97,17 @@ const MenuScreen = () => {
       title: 'Khác',
       items: [
         {
-          icon: '🔔',
+          icon: 'notification',
           label: 'Thông báo',
           onPress: () => navigation.navigate('Notification'),
         },
         {
-          icon: '📰',
+          icon: 'news',
           label: 'Tin tức',
           onPress: () => navigation.navigate('News'),
         },
         {
-          icon: '📞',
+          icon: 'contact',
           label: 'Liên hệ',
           onPress: () => navigation.navigate('Contact'),
         },
@@ -123,7 +124,7 @@ const MenuScreen = () => {
     >
       <View style={styles.menuItemLeft}>
         <View style={styles.iconContainer}>
-          <Text style={styles.icon}>{item.icon}</Text>
+          <Icon name={item.icon} size={22} color={COLORS.primary} />
         </View>
         <Text style={styles.menuItemLabel}>{item.label}</Text>
       </View>
@@ -215,9 +216,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: SPACING.md,
-  },
-  icon: {
-    fontSize: 20,
   },
   menuItemLabel: {
     fontSize: 15,

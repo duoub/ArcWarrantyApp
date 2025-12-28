@@ -6,11 +6,12 @@
 import React from 'react';
 import { View, Text, TextInput, TextInputProps, StyleSheet } from 'react-native';
 import { COLORS, SPACING, TYPOGRAPHY, BORDER_RADIUS } from '../../config/theme';
+import { Icon, IconName } from './Icon';
 
 interface FormInputProps extends TextInputProps {
   label: string;
   error?: string;
-  icon?: string;
+  icon?: IconName;
   isFocused?: boolean;
   hasError?: boolean;
   rightElement?: React.ReactNode;
@@ -35,7 +36,7 @@ export const FormInput: React.FC<FormInputProps> = ({
           hasError && styles.inputWrapperError,
         ]}
       >
-        {icon && <Text style={styles.icon}>{icon}</Text>}
+        {icon && <Icon name={icon} size={20} color={COLORS.gray500} style={styles.iconStyle} />}
         <TextInput
           style={styles.input}
           placeholderTextColor={COLORS.gray400}
@@ -79,8 +80,7 @@ const styles = StyleSheet.create({
     ...TYPOGRAPHY.body,
     color: COLORS.textPrimary,
   },
-  icon: {
-    fontSize: 20,
+  iconStyle: {
     marginRight: SPACING.sm,
   },
   errorText: {

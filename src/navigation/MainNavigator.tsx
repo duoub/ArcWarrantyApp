@@ -1,8 +1,9 @@
 import React from 'react';
-import { Text, View, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, TouchableOpacity, StyleSheet } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
 import { COLORS, SPACING, SHADOWS } from '../config/theme';
+import { Icon } from '../components/common';
 import HomeScreen from '../screens/main/HomeScreen/HomeScreen';
 import MenuScreen from '../screens/main/MenuScreen/MenuScreen';
 import WarrantyActivationScreen from '../screens/main/WarrantyActivationScreen/WarrantyActivationScreen';
@@ -82,7 +83,7 @@ const CenterTabButton = ({ onPress, focused }: { onPress: () => void; focused: b
     activeOpacity={0.8}
   >
     <View style={[styles.centerButtonInner, focused && styles.centerButtonFocused]}>
-      <Text style={styles.centerButtonIcon}>📥</Text>
+      <Icon name="in-out" size={32} color={COLORS.white} />
     </View>
   </TouchableOpacity>
 );
@@ -173,7 +174,7 @@ const MainNavigator = () => {
           title: 'Trang chủ',
           headerShown: false,
           tabBarIcon: ({ color }) => (
-            <Text style={{ fontSize: 24 }}>🏠</Text>
+            <Icon name="home" size={24} color={color} />
           ),
         }}
       />
@@ -184,7 +185,7 @@ const MainNavigator = () => {
           title: 'Kích hoạt',
           headerShown: false,
           tabBarIcon: ({ color }) => (
-            <Text style={{ fontSize: 24 }}>✅</Text>
+            <Icon name="warranty-activation" size={24} color={color} />
           ),
         }}
       />
@@ -213,7 +214,7 @@ const MainNavigator = () => {
           title: 'Tài khoản',
           headerShown: false,
           tabBarIcon: ({ color }) => (
-            <Text style={{ fontSize: 24 }}>👤</Text>
+            <Icon name="profile" size={24} color={color} />
           ),
         }}
       />
@@ -224,7 +225,7 @@ const MainNavigator = () => {
           title: 'Menu',
           headerShown: false,
           tabBarIcon: ({ color }) => (
-            <Text style={{ fontSize: 24 }}>📋</Text>
+            <Icon name="menu" size={24} color={color} />
           ),
         }}
       />
@@ -253,9 +254,6 @@ const styles = StyleSheet.create({
   centerButtonFocused: {
     backgroundColor: COLORS.primaryDark,
     transform: [{ scale: 1.05 }],
-  },
-  centerButtonIcon: {
-    fontSize: 36,
   },
 });
 

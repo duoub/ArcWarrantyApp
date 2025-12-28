@@ -18,6 +18,7 @@ import Avatar from '../../../components/Avatar';
 import { dealerService } from '../../../api/dealerService';
 import { DealerInfo } from '../../../types/dealer';
 import { InOutStackParamList } from '../../../navigation/MainNavigator';
+import { Icon } from '../../../components/common';
 
 type DealerListNavigationProp = StackNavigationProp<InOutStackParamList, 'DealerList'>;
 
@@ -109,7 +110,7 @@ const DealerListScreen = () => {
       {/* Search Bar */}
       <View style={styles.searchContainer}>
         <View style={styles.searchBar}>
-          <Text style={styles.searchIcon}>🔍</Text>
+          <Icon name="search" size={18} color={COLORS.gray500} style={styles.searchIcon} />
           <TextInput
             style={styles.searchInput}
             placeholder="Tên / SĐT / Email"

@@ -24,6 +24,7 @@ import BarcodeScanner from '../../../components/BarcodeScanner';
 import LocationSelector from '../../../components/LocationSelector';
 import { commonStyles } from '../../../styles/commonStyles';
 import { Location } from '../../../types/province';
+import { Icon } from '../../../components/common';
 
 // Validation Schema
 const warrantyActivationSchema = z.object({
@@ -154,293 +155,293 @@ const WarrantyActivationScreen = () => {
           keyboardShouldPersistTaps="handled"
         >
 
-        {/* Form Card */}
-        <View style={styles.formCard}>
-          {/* Serial Number */}
-          <Controller
-            control={control}
-            name="serial"
-            render={({ field: { onChange, onBlur, value } }) => (
-              <View style={styles.inputContainer}>
-                <View style={styles.labelRow}>
-                  <Text style={styles.inputLabel}>
-                    Số serial <Text style={styles.required}>*</Text>
-                  </Text>
-                  <TouchableOpacity
-                    style={styles.infoButton}
-                    onPress={handleHelp}
-                    activeOpacity={0.7}
+          {/* Form Card */}
+          <View style={styles.formCard}>
+            {/* Serial Number */}
+            <Controller
+              control={control}
+              name="serial"
+              render={({ field: { onChange, onBlur, value } }) => (
+                <View style={styles.inputContainer}>
+                  <View style={styles.labelRow}>
+                    <Text style={styles.inputLabel}>
+                      Số serial <Text style={styles.required}>*</Text>
+                    </Text>
+                    <TouchableOpacity
+                      style={styles.infoButton}
+                      onPress={handleHelp}
+                      activeOpacity={0.7}
+                    >
+                      <Icon name="question" size={22} color={COLORS.accent} />
+                    </TouchableOpacity>
+                  </View>
+                  <View
+                    style={[
+                      styles.inputWrapper,
+                      errors.serial && styles.inputWrapperError,
+                    ]}
                   >
-                    <Text style={styles.infoIcon}>ℹ️</Text>
-                  </TouchableOpacity>
-                </View>
-                <View
-                  style={[
-                    styles.inputWrapper,
-                    errors.serial && styles.inputWrapperError,
-                  ]}
-                >
-                  <Text style={styles.inputIcon}>🔍</Text>
-                  <TextInput
-                    style={styles.input}
-                    placeholder="Nhập số serial"
-                    placeholderTextColor={COLORS.gray400}
-                    value={value}
-                    onChangeText={onChange}
-                    onBlur={onBlur}
-                    editable={!isLoading}
-                    multiline
-                    numberOfLines={2}
-                  />
-                  <TouchableOpacity
-                    style={styles.scanButton}
-                    onPress={handleScanQR}
-                    disabled={isLoading}
-                  >
-                    <Image
-                      source={require('../../../assets/images/scan_me.png')}
-                      style={styles.scanImage}
-                      resizeMode="contain"
+                    <Icon name="search" size={18} color={COLORS.gray500} style={styles.inputIcon} />
+                    <TextInput
+                      style={styles.input}
+                      placeholder="Nhập số serial"
+                      placeholderTextColor={COLORS.gray400}
+                      value={value}
+                      onChangeText={onChange}
+                      onBlur={onBlur}
+                      editable={!isLoading}
+                      multiline
+                      numberOfLines={2}
                     />
-                  </TouchableOpacity>
+                    <TouchableOpacity
+                      style={styles.scanButton}
+                      onPress={handleScanQR}
+                      disabled={isLoading}
+                    >
+                      <Image
+                        source={require('../../../assets/images/scan_me.png')}
+                        style={styles.scanImage}
+                        resizeMode="contain"
+                      />
+                    </TouchableOpacity>
+                  </View>
+                  {errors.serial && (
+                    <Text style={styles.errorText}>{errors.serial.message}</Text>
+                  )}
                 </View>
-                {errors.serial && (
-                  <Text style={styles.errorText}>{errors.serial.message}</Text>
-                )}
-              </View>
-            )}
-          />
+              )}
+            />
 
-          {/* Customer Name */}
-          <Controller
-            control={control}
-            name="customerName"
-            render={({ field: { onChange, onBlur, value } }) => (
-              <View style={styles.inputContainer}>
-                <Text style={styles.inputLabel}>
-                  Tên khách hàng <Text style={styles.required}>*</Text>
-                </Text>
-                <View
-                  style={[
-                    styles.inputWrapper,
-                    errors.customerName && styles.inputWrapperError,
-                  ]}
-                >
-                  <Text style={styles.inputIcon}>👤</Text>
-                  <TextInput
-                    style={styles.input}
-                    placeholder="Nhập họ tên"
-                    placeholderTextColor={COLORS.gray400}
-                    value={value}
-                    onChangeText={onChange}
-                    onBlur={onBlur}
-                    editable={!isLoading}
-                  />
-                </View>
-                {errors.customerName && (
-                  <Text style={styles.errorText}>
-                    {errors.customerName.message}
+            {/* Customer Name */}
+            <Controller
+              control={control}
+              name="customerName"
+              render={({ field: { onChange, onBlur, value } }) => (
+                <View style={styles.inputContainer}>
+                  <Text style={styles.inputLabel}>
+                    Tên khách hàng <Text style={styles.required}>*</Text>
                   </Text>
-                )}
-              </View>
-            )}
-          />
-
-          {/* Phone Number */}
-          <Controller
-            control={control}
-            name="phone"
-            render={({ field: { onChange, onBlur, value } }) => (
-              <View style={styles.inputContainer}>
-                <Text style={styles.inputLabel}>
-                  Số điện thoại <Text style={styles.required}>*</Text>
-                </Text>
-                <View
-                  style={[
-                    styles.inputWrapper,
-                    errors.phone && styles.inputWrapperError,
-                  ]}
-                >
-                  <Text style={styles.inputIcon}>📞</Text>
-                  <TextInput
-                    style={styles.input}
-                    placeholder="Nhập số điện thoại"
-                    placeholderTextColor={COLORS.gray400}
-                    value={value}
-                    onChangeText={onChange}
-                    onBlur={onBlur}
-                    keyboardType="phone-pad"
-                    editable={!isLoading}
-                  />
+                  <View
+                    style={[
+                      styles.inputWrapper,
+                      errors.customerName && styles.inputWrapperError,
+                    ]}
+                  >
+                    <Icon name="user" size={20} color={COLORS.gray400} style={styles.inputIcon} />
+                    <TextInput
+                      style={styles.input}
+                      placeholder="Nhập họ tên"
+                      placeholderTextColor={COLORS.gray400}
+                      value={value}
+                      onChangeText={onChange}
+                      onBlur={onBlur}
+                      editable={!isLoading}
+                    />
+                  </View>
+                  {errors.customerName && (
+                    <Text style={styles.errorText}>
+                      {errors.customerName.message}
+                    </Text>
+                  )}
                 </View>
-                {errors.phone && (
-                  <Text style={styles.errorText}>{errors.phone.message}</Text>
-                )}
-              </View>
-            )}
-          />
-
-          {/* Province */}
-          <View style={styles.inputContainer}>
-            <Text style={styles.inputLabel}>
-              Tỉnh thành <Text style={styles.required}>*</Text>
-            </Text>
-            <LocationSelector
-              parentCode=""
-              selectedLocation={province?.TenDiaBan || ''}
-              onLocationChange={(location) => {
-                setProvince(location);
-                setValue('tinhthanh', location?.TenDiaBan || '');
-                setDistrict(null);
-                setWard(null);
-                setValue('quanhuyen', '');
-                setValue('xaphuong', '');
-              }}
-              placeholder="Chọn tỉnh thành"
+              )}
             />
-            {errors.tinhthanh && (
-              <Text style={styles.errorText}>{errors.tinhthanh.message}</Text>
-            )}
-          </View>
 
-          {/* District */}
-          <View style={styles.inputContainer}>
-            <Text style={styles.inputLabel}>
-              Quận huyện <Text style={styles.required}>*</Text>
-            </Text>
-            <LocationSelector
-              parentCode={province?.MaDiaBan || ''}
-              selectedLocation={district?.TenDiaBan || ''}
-              onLocationChange={(location) => {
-                setDistrict(location);
-                setValue('quanhuyen', location?.TenDiaBan || '');
-                setWard(null);
-                setValue('xaphuong', '');
-              }}
-              placeholder="Chọn quận huyện"
-              disabled={!province}
-            />
-            {errors.quanhuyen && (
-              <Text style={styles.errorText}>{errors.quanhuyen.message}</Text>
-            )}
-          </View>
-
-          {/* Ward */}
-          <View style={styles.inputContainer}>
-            <Text style={styles.inputLabel}>
-              Xã phường <Text style={styles.required}>*</Text>
-            </Text>
-            <LocationSelector
-              parentCode={district?.MaDiaBan || ''}
-              selectedLocation={ward?.TenDiaBan || ''}
-              onLocationChange={(location) => {
-                setWard(location);
-                setValue('xaphuong', location?.TenDiaBan || '');
-              }}
-              placeholder="Chọn xã phường"
-              disabled={!district}
-            />
-            {errors.xaphuong && (
-              <Text style={styles.errorText}>{errors.xaphuong.message}</Text>
-            )}
-          </View>
-
-          {/* Address */}
-          <Controller
-            control={control}
-            name="address"
-            render={({ field: { onChange, onBlur, value } }) => (
-              <View style={styles.inputContainer}>
-                <Text style={styles.inputLabel}>
-                  Địa chỉ <Text style={styles.required}>*</Text>
-                </Text>
-                <View
-                  style={[
-                    styles.inputWrapper,
-                    errors.address && styles.inputWrapperError,
-                  ]}
-                >
-                  <Text style={styles.inputIcon}>📍</Text>
-                  <TextInput
-                    style={styles.input}
-                    placeholder="Nhập địa chỉ"
-                    placeholderTextColor={COLORS.gray400}
-                    value={value}
-                    onChangeText={onChange}
-                    onBlur={onBlur}
-                    editable={!isLoading}
-                    multiline
-                    numberOfLines={2}
-                  />
+            {/* Phone Number */}
+            <Controller
+              control={control}
+              name="phone"
+              render={({ field: { onChange, onBlur, value } }) => (
+                <View style={styles.inputContainer}>
+                  <Text style={styles.inputLabel}>
+                    Số điện thoại <Text style={styles.required}>*</Text>
+                  </Text>
+                  <View
+                    style={[
+                      styles.inputWrapper,
+                      errors.phone && styles.inputWrapperError,
+                    ]}
+                  >
+                    <Icon name="phone" size={20} color={COLORS.gray400} style={styles.inputIcon} />
+                    <TextInput
+                      style={styles.input}
+                      placeholder="Nhập số điện thoại"
+                      placeholderTextColor={COLORS.gray400}
+                      value={value}
+                      onChangeText={onChange}
+                      onBlur={onBlur}
+                      keyboardType="phone-pad"
+                      editable={!isLoading}
+                    />
+                  </View>
+                  {errors.phone && (
+                    <Text style={styles.errorText}>{errors.phone.message}</Text>
+                  )}
                 </View>
-                {errors.address && (
-                  <Text style={styles.errorText}>{errors.address.message}</Text>
-                )}
-              </View>
-            )}
-          />
+              )}
+            />
 
-          {/* Email */}
-          <Controller
-            control={control}
-            name="email"
-            render={({ field: { onChange, onBlur, value } }) => (
-              <View style={styles.inputContainer}>
-                <Text style={styles.inputLabel}>Email</Text>
-                <View
-                  style={[
-                    styles.inputWrapper,
-                    errors.email && styles.inputWrapperError,
-                  ]}
-                >
-                  <Text style={styles.inputIcon}>📧</Text>
-                  <TextInput
-                    style={styles.input}
-                    placeholder="Nhập email (không bắt buộc)"
-                    placeholderTextColor={COLORS.gray400}
-                    value={value}
-                    onChangeText={onChange}
-                    onBlur={onBlur}
-                    keyboardType="email-address"
-                    autoCapitalize="none"
-                    editable={!isLoading}
-                  />
-                </View>
-                {errors.email && (
-                  <Text style={styles.errorText}>{errors.email.message}</Text>
-                )}
-              </View>
-            )}
-          />
-
-          {/* Info Box */}
-          <View style={commonStyles.infoBox}>
-            <Text style={commonStyles.infoBoxIcon}>ℹ️</Text>
-            <View style={commonStyles.infoBoxContent}>
-              <Text style={commonStyles.infoBoxText}>
-                Vui lòng điền đầy đủ thông tin để kích hoạt bảo hành. Thông tin
-                này sẽ được sử dụng cho việc hỗ trợ và bảo hành sản phẩm.
+            {/* Province */}
+            <View style={styles.inputContainer}>
+              <Text style={styles.inputLabel}>
+                Tỉnh thành <Text style={styles.required}>*</Text>
               </Text>
+              <LocationSelector
+                parentCode=""
+                selectedLocation={province?.TenDiaBan || ''}
+                onLocationChange={(location) => {
+                  setProvince(location);
+                  setValue('tinhthanh', location?.TenDiaBan || '');
+                  setDistrict(null);
+                  setWard(null);
+                  setValue('quanhuyen', '');
+                  setValue('xaphuong', '');
+                }}
+                placeholder="Chọn tỉnh thành"
+              />
+              {errors.tinhthanh && (
+                <Text style={styles.errorText}>{errors.tinhthanh.message}</Text>
+              )}
             </View>
-          </View>
 
-          {/* Activate Button */}
-          <TouchableOpacity
-            style={[
-              styles.activateButton,
-              isLoading && styles.activateButtonDisabled,
-            ]}
-            onPress={handleSubmit(handleActivate)}
-            activeOpacity={0.8}
-            disabled={isLoading}
-          >
-            {isLoading ? (
-              <ActivityIndicator color={COLORS.white} size="small" />
-            ) : (
-              <Text style={styles.activateButtonText}>Kích hoạt</Text>
-            )}
-          </TouchableOpacity>
-        </View>
+            {/* District */}
+            <View style={styles.inputContainer}>
+              <Text style={styles.inputLabel}>
+                Quận huyện <Text style={styles.required}>*</Text>
+              </Text>
+              <LocationSelector
+                parentCode={province?.MaDiaBan || ''}
+                selectedLocation={district?.TenDiaBan || ''}
+                onLocationChange={(location) => {
+                  setDistrict(location);
+                  setValue('quanhuyen', location?.TenDiaBan || '');
+                  setWard(null);
+                  setValue('xaphuong', '');
+                }}
+                placeholder="Chọn quận huyện"
+                disabled={!province}
+              />
+              {errors.quanhuyen && (
+                <Text style={styles.errorText}>{errors.quanhuyen.message}</Text>
+              )}
+            </View>
+
+            {/* Ward */}
+            <View style={styles.inputContainer}>
+              <Text style={styles.inputLabel}>
+                Xã phường <Text style={styles.required}>*</Text>
+              </Text>
+              <LocationSelector
+                parentCode={district?.MaDiaBan || ''}
+                selectedLocation={ward?.TenDiaBan || ''}
+                onLocationChange={(location) => {
+                  setWard(location);
+                  setValue('xaphuong', location?.TenDiaBan || '');
+                }}
+                placeholder="Chọn xã phường"
+                disabled={!district}
+              />
+              {errors.xaphuong && (
+                <Text style={styles.errorText}>{errors.xaphuong.message}</Text>
+              )}
+            </View>
+
+            {/* Address */}
+            <Controller
+              control={control}
+              name="address"
+              render={({ field: { onChange, onBlur, value } }) => (
+                <View style={styles.inputContainer}>
+                  <Text style={styles.inputLabel}>
+                    Địa chỉ <Text style={styles.required}>*</Text>
+                  </Text>
+                  <View
+                    style={[
+                      styles.inputWrapper,
+                      errors.address && styles.inputWrapperError,
+                    ]}
+                  >
+                    <Icon name="location" size={18} color={COLORS.gray500} style={styles.inputIcon} />
+                    <TextInput
+                      style={styles.input}
+                      placeholder="Nhập địa chỉ"
+                      placeholderTextColor={COLORS.gray400}
+                      value={value}
+                      onChangeText={onChange}
+                      onBlur={onBlur}
+                      editable={!isLoading}
+                      multiline
+                      numberOfLines={2}
+                    />
+                  </View>
+                  {errors.address && (
+                    <Text style={styles.errorText}>{errors.address.message}</Text>
+                  )}
+                </View>
+              )}
+            />
+
+            {/* Email */}
+            <Controller
+              control={control}
+              name="email"
+              render={({ field: { onChange, onBlur, value } }) => (
+                <View style={styles.inputContainer}>
+                  <Text style={styles.inputLabel}>Email</Text>
+                  <View
+                    style={[
+                      styles.inputWrapper,
+                      errors.email && styles.inputWrapperError,
+                    ]}
+                  >
+                    <Icon name="mail" size={18} color={COLORS.gray500} style={styles.inputIcon} />
+                    <TextInput
+                      style={styles.input}
+                      placeholder="Nhập email (không bắt buộc)"
+                      placeholderTextColor={COLORS.gray400}
+                      value={value}
+                      onChangeText={onChange}
+                      onBlur={onBlur}
+                      keyboardType="email-address"
+                      autoCapitalize="none"
+                      editable={!isLoading}
+                    />
+                  </View>
+                  {errors.email && (
+                    <Text style={styles.errorText}>{errors.email.message}</Text>
+                  )}
+                </View>
+              )}
+            />
+
+            {/* Info Box */}
+            <View style={commonStyles.infoBox}>
+              <Icon name="info" size={18} color={COLORS.accent} style={commonStyles.infoBoxIcon} />
+              <View style={commonStyles.infoBoxContent}>
+                <Text style={commonStyles.infoBoxText}>
+                  Vui lòng điền đầy đủ thông tin để kích hoạt bảo hành. Thông tin
+                  này sẽ được sử dụng cho việc hỗ trợ và bảo hành sản phẩm.
+                </Text>
+              </View>
+            </View>
+
+            {/* Activate Button */}
+            <TouchableOpacity
+              style={[
+                styles.activateButton,
+                isLoading && styles.activateButtonDisabled,
+              ]}
+              onPress={handleSubmit(handleActivate)}
+              activeOpacity={0.8}
+              disabled={isLoading}
+            >
+              {isLoading ? (
+                <ActivityIndicator color={COLORS.white} size="small" />
+              ) : (
+                <Text style={styles.activateButtonText}>Kích hoạt</Text>
+              )}
+            </TouchableOpacity>
+          </View>
 
           {/* Bottom Spacing */}
           <View style={styles.bottomSpacing} />
@@ -524,7 +525,6 @@ const styles = StyleSheet.create({
     borderColor: COLORS.error,
   },
   inputIcon: {
-    fontSize: 20,
     marginRight: SPACING.sm,
   },
   input: {
@@ -536,9 +536,6 @@ const styles = StyleSheet.create({
   scanButton: {
     padding: SPACING.xs,
     marginLeft: SPACING.xs,
-  },
-  scanIcon: {
-    fontSize: 24,
   },
   scanImage: {
     width: 32,

@@ -19,6 +19,7 @@ import {
 import { COLORS, SPACING, BORDER_RADIUS, SHADOWS } from '../config/theme';
 import { provinceService } from '../api/provinceService';
 import { Province } from '../types/province';
+import { Icon } from './common';
 
 interface ProvinceSelectorProps {
   selectedProvince: string;
@@ -114,7 +115,7 @@ const ProvinceSelector: React.FC<ProvinceSelectorProps> = ({
 
             {/* Modal Search */}
             <View style={styles.modalSearchContainer}>
-              <Text style={styles.searchIcon}>🔍</Text>
+              <Icon name="search" size={18} color={COLORS.gray500} style={styles.searchIcon} />
               <TextInput
                 style={styles.modalSearchInput}
                 placeholder="Tìm kiếm tỉnh/thành phố..."

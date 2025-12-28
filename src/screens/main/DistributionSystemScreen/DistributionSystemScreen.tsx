@@ -21,6 +21,7 @@ import ProvinceSelector from '../../../components/ProvinceSelector';
 import { distributionSystemService } from '../../../api/distributionSystemService';
 import { Distributor } from '../../../types/distributionSystem';
 import { openMapDirections } from '../../../utils/mapNavigation';
+import { Icon } from '../../../components/common';
 
 const DistributionSystemScreen = () => {
   const navigation = useNavigation();
@@ -149,7 +150,7 @@ const DistributionSystemScreen = () => {
         {/* Phone */}
         <View style={styles.infoRow}>
           <View style={styles.iconContainer}>
-            <Text style={styles.icon}>📞</Text>
+            <Icon name="phone" size={16} color={COLORS.primary} />
           </View>
           <View style={styles.infoDetail}>
             <Text style={styles.infoLabel}>Điện thoại</Text>
@@ -162,7 +163,7 @@ const DistributionSystemScreen = () => {
         {/* Address */}
         <View style={styles.infoRow}>
           <View style={styles.iconContainer}>
-            <Text style={styles.icon}>📍</Text>
+            <Icon name="location" size={16} color={COLORS.gray500} />
           </View>
           <View style={styles.infoDetail}>
             <Text style={styles.infoLabel}>Địa chỉ</Text>
@@ -178,7 +179,7 @@ const DistributionSystemScreen = () => {
           onPress={() => handleCallPhone(item.SoDienThoai)}
           activeOpacity={0.7}
         >
-          <Text style={styles.buttonIcon}>📞</Text>
+          <Icon name="phone" size={18} color="#2E7D32" />
           <Text style={styles.buttonTextCall}>Gọi ngay</Text>
         </TouchableOpacity>
         <TouchableOpacity
@@ -186,7 +187,7 @@ const DistributionSystemScreen = () => {
           onPress={() => handleShowMap(item)}
           activeOpacity={0.7}
         >
-          <Text style={styles.buttonIcon}>🧭</Text>
+          <Icon name="location" size={18} color="#E65100" />
           <Text style={styles.buttonTextMap}>Chỉ đường</Text>
         </TouchableOpacity>
       </View>
@@ -208,7 +209,7 @@ const DistributionSystemScreen = () => {
         <View style={styles.filterSection}>
           {/* Search Input */}
           <View style={styles.searchContainer}>
-            <Text style={styles.searchIcon}>🔍</Text>
+            <Icon name="search" size={18} color={COLORS.gray500} style={styles.searchIcon} />
             <TextInput
               style={styles.searchInput}
               placeholder="Tên nhà phân phối"
@@ -246,7 +247,7 @@ const DistributionSystemScreen = () => {
             </View>
           ) : distributors.length === 0 ? (
             <View style={styles.emptyContainer}>
-              <Text style={styles.emptyIcon}>🔍</Text>
+              <Icon name="search" size={48} color={COLORS.gray300} style={styles.emptyIcon} />
               <Text style={styles.emptyText}>
                 Không tìm thấy nhà phân phối
               </Text>
@@ -365,9 +366,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginRight: SPACING.sm,
   },
-  icon: {
-    fontSize: 16,
-  },
   infoDetail: {
     flex: 1,
   },
@@ -409,9 +407,6 @@ const styles = StyleSheet.create({
   },
   buttonMap: {
     backgroundColor: '#FFF3E0',
-  },
-  buttonIcon: {
-    fontSize: 18,
   },
   buttonTextCall: {
     fontSize: 14,

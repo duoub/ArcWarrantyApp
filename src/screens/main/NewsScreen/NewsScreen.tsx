@@ -13,6 +13,7 @@ import {
 import { useNavigation } from '@react-navigation/native';
 import { COLORS, SPACING, BORDER_RADIUS, SHADOWS } from '../../../config/theme';
 import CustomHeader from '../../../components/CustomHeader';
+import { Icon } from '../../../components/common';
 
 interface NewsArticle {
   id: string;
@@ -147,7 +148,7 @@ const NewsScreen = () => {
 
       <View style={styles.searchContainer}>
         <View style={styles.searchInputWrapper}>
-          <Text style={styles.searchIcon}>🔍</Text>
+          <Icon name="search" size={18} color={COLORS.gray500} style={styles.searchIcon} />
           <TextInput
             style={styles.searchInput}
             placeholder="Tìm kiếm tin tức"

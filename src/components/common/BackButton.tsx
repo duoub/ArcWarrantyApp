@@ -4,19 +4,18 @@
  */
 
 import React from 'react';
-import { TouchableOpacity, Text, StyleSheet } from 'react-native';
-import { COLORS, SPACING, BORDER_RADIUS } from '../../config/theme';
+import { TouchableOpacity, StyleSheet } from 'react-native';
+import { COLORS, BORDER_RADIUS } from '../../config/theme';
+import { Icon } from './Icon';
 
 interface BackButtonProps {
   onPress: () => void;
   disabled?: boolean;
-  icon?: string;
 }
 
 export const BackButton: React.FC<BackButtonProps> = ({
   onPress,
   disabled = false,
-  icon = '←',
 }) => {
   return (
     <TouchableOpacity
@@ -24,7 +23,7 @@ export const BackButton: React.FC<BackButtonProps> = ({
       onPress={onPress}
       disabled={disabled}
     >
-      <Text style={styles.icon}>{icon}</Text>
+      <Icon name="back" size={20} color={COLORS.textPrimary} />
     </TouchableOpacity>
   );
 };
@@ -42,9 +41,5 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 2,
-  },
-  icon: {
-    fontSize: 20,
-    color: COLORS.textPrimary,
   },
 });

@@ -13,9 +13,10 @@ import {
 import { useNavigation } from '@react-navigation/native';
 import { COLORS, SPACING, BORDER_RADIUS, SHADOWS } from '../../../config/theme';
 import CustomHeader from '../../../components/CustomHeader';
+import { Icon } from '../../../components/common';
 
 interface ContactInfo {
-  icon: string;
+  icon: 'location' | 'phone' | 'mobile' | 'website';
   label: string;
   value: string;
   link?: string;
@@ -27,27 +28,27 @@ const ContactScreen = () => {
 
   const contactInfos: ContactInfo[] = [
     {
-      icon: '📍',
+      icon: 'location',
       label: 'Địa chỉ:',
       value: 'Khu Công Nghiệp Hapro, Lệ Chi, Gia Lâm, TP Hà Nội',
       type: 'address',
     },
     {
-      icon: '📞',
+      icon: 'phone',
       label: 'Điện thoại:',
       value: '1800 646778',
       link: 'tel:1800646778',
       type: 'phone',
     },
     {
-      icon: '📱',
+      icon: 'mobile',
       label: 'Hotline:',
       value: '03592.33333',
       link: 'tel:0359233333',
       type: 'phone',
     },
     {
-      icon: '🌐',
+      icon: 'website',
       label: 'Website:',
       value: 'https://akito.vn/',
       link: 'https://akito.vn/',
@@ -85,7 +86,7 @@ const ContactScreen = () => {
         disabled={!item.link}
       >
         <View style={styles.iconContainer}>
-          <Text style={styles.iconText}>{item.icon}</Text>
+          <Icon name={item.icon} size={24} color={COLORS.primary} />
         </View>
         <View style={styles.contactTextContainer}>
           <Text style={styles.contactLabel}>{item.label}</Text>
@@ -113,7 +114,7 @@ const ContactScreen = () => {
       {/* Custom Header */}
       <CustomHeader
         title="Liên hệ"
-        leftIcon={<Text style={styles.backIcon}>‹</Text>}
+        leftIcon={<Icon name="back" size={24} color={COLORS.white} />}
         onLeftPress={handleBackPress}
       />
 
@@ -171,11 +172,6 @@ const styles = StyleSheet.create({
   },
   scrollView: {
     flex: 1,
-  },
-  backIcon: {
-    fontSize: 28,
-    color: COLORS.white,
-    fontWeight: '400',
   },
 
   // Header Image
@@ -237,9 +233,6 @@ const styles = StyleSheet.create({
     marginRight: SPACING.md,
     borderWidth: 1,
     borderColor: COLORS.gray200,
-  },
-  iconText: {
-    fontSize: 24,
   },
   contactTextContainer: {
     flex: 1,

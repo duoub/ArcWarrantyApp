@@ -19,6 +19,7 @@ import { AuthStackParamList } from '../../../navigation/AuthNavigator';
 import { forgotPasswordSchema, ForgotPasswordFormData } from '../../../utils/validation';
 import { authService } from '../../../api/authService';
 import { commonStyles } from '../../../styles/commonStyles';
+import { Icon } from '../../../components/common';
 
 type ForgotPasswordScreenNavigationProp = StackNavigationProp<AuthStackParamList, 'ForgotPassword'>;
 
@@ -71,7 +72,7 @@ const ForgotPasswordScreen = () => {
         <View style={styles.content}>
           {/* Success Icon */}
           <View style={styles.successIconContainer}>
-            <Text style={styles.successIcon}>📱</Text>
+            <Icon name="mobile" size={64} color={COLORS.success} />
           </View>
 
           {/* Success Message */}
@@ -89,7 +90,10 @@ const ForgotPasswordScreen = () => {
             style={styles.backButton}
             onPress={handleBackToLogin}
           >
-            <Text style={styles.backButtonText}>← Quay lại đăng nhập</Text>
+            <View style={styles.backButtonContent}>
+              <Icon name="back" size={20} color={COLORS.primary} />
+              <Text style={styles.backButtonText}>Quay lại đăng nhập</Text>
+            </View>
           </TouchableOpacity>
         </View>
       </KeyboardAvoidingView>
@@ -109,12 +113,12 @@ const ForgotPasswordScreen = () => {
           onPress={handleBackToLogin}
           disabled={isLoading}
         >
-          <Text style={styles.topBackButtonText}>←</Text>
+          <Icon name="back" size={24} color={COLORS.primary} />
         </TouchableOpacity>
 
         {/* Icon */}
         <View style={styles.iconContainer}>
-          <Text style={styles.lockIcon}>🔒</Text>
+          <Icon name="lock" size={48} color={COLORS.primary} />
         </View>
 
         {/* Title */}
@@ -161,7 +165,7 @@ const ForgotPasswordScreen = () => {
 
           {/* Info Box */}
           <View style={commonStyles.infoBox}>
-            <Text style={commonStyles.infoBoxIcon}>ℹ️</Text>
+            <Icon name="info" size={20} color={COLORS.info} />
             <View style={commonStyles.infoBoxContent}>
               <Text style={commonStyles.infoBoxText}>
                 Mã OTP sẽ hết hạn sau 5 phút
@@ -237,19 +241,10 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 2,
   },
-  topBackButtonText: {
-    fontSize: 24,
-    color: COLORS.primary,
-    fontWeight: '600',
-  },
-
   // Icon
   iconContainer: {
     alignItems: 'center',
     marginBottom: SPACING.md,
-  },
-  lockIcon: {
-    fontSize: 48,
   },
 
   // Title
@@ -391,9 +386,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: SPACING.lg,
   },
-  successIcon: {
-    fontSize: 64,
-  },
   successTitle: {
     fontSize: 24,
     fontWeight: '700',
@@ -424,6 +416,11 @@ const styles = StyleSheet.create({
   backButton: {
     alignItems: 'center',
     paddingVertical: SPACING.md,
+  },
+  backButtonContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
   },
   backButtonText: {
     fontSize: 16,

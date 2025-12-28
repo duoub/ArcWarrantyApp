@@ -24,6 +24,7 @@ import { uploadService } from '../../../api/uploadService';
 import { profileService } from '../../../api/profileService';
 import { authService } from '../../../api/authService';
 import { API_CONFIG } from '../../../config/constants';
+import { Icon } from '../../../components/common';
 
 type ProfileScreenNavigationProp = StackNavigationProp<ProfileStackParamList, 'Profile'>;
 
@@ -280,7 +281,7 @@ const ProfileScreen = () => {
             activeOpacity={0.7}
           >
             <View style={styles.sectionHeaderLeft}>
-              <Text style={styles.sectionIcon}>👤</Text>
+              <Icon name="profile-detail" size={20} color={COLORS.primary} />
               <Text style={styles.sectionTitle}>Thông tin hồ sơ</Text>
             </View>
             <Text style={styles.chevronIcon}>{showProfileInfo ? '▼' : '▶'}</Text>
@@ -291,35 +292,50 @@ const ProfileScreen = () => {
               {/* Personal Information */}
               <View style={styles.infoRow}>
                 <View style={styles.infoItem}>
-                  <Text style={styles.infoLabel}>📞 Điện thoại</Text>
+                  <View style={styles.infoLabelContainer}>
+                    <Icon name="phone" size={14} color={COLORS.textSecondary} />
+                    <Text style={styles.infoLabel}>Điện thoại</Text>
+                  </View>
                   <Text style={styles.infoValue}>{user?.phone || 'Chưa cập nhật'}</Text>
                 </View>
               </View>
 
               <View style={styles.infoRow}>
                 <View style={styles.infoItem}>
-                  <Text style={styles.infoLabel}>📧 Email</Text>
+                  <View style={styles.infoLabelContainer}>
+                    <Icon name="mail" size={14} color={COLORS.textSecondary} />
+                    <Text style={styles.infoLabel}>Email</Text>
+                  </View>
                   <Text style={styles.infoValue}>{user?.email || 'Chưa cập nhật'}</Text>
                 </View>
               </View>
 
               <View style={styles.infoRow}>
                 <View style={styles.infoItem}>
-                  <Text style={styles.infoLabel}>📍 Địa chỉ</Text>
+                  <View style={styles.infoLabelContainer}>
+                    <Icon name="location" size={14} color={COLORS.textSecondary} />
+                    <Text style={styles.infoLabel}>Địa chỉ</Text>
+                  </View>
                   <Text style={styles.infoValue}>{user?.address || 'Chưa cập nhật'}</Text>
                 </View>
               </View>
 
               <View style={styles.infoRow}>
                 <View style={styles.infoItem}>
-                  <Text style={styles.infoLabel}>🏙️ Tỉnh/Thành phố</Text>
+                  <View style={styles.infoLabelContainer}>
+                    <Icon name="city" size={14} color={COLORS.textSecondary} />
+                    <Text style={styles.infoLabel}>Tỉnh/Thành phố</Text>
+                  </View>
                   <Text style={styles.infoValue}>{user?.tinhthanh || 'Chưa cập nhật'}</Text>
                 </View>
               </View>
 
               <View style={styles.infoRow}>
                 <View style={styles.infoItem}>
-                  <Text style={styles.infoLabel}>🏷️ Mã số thuế/CCCD</Text>
+                  <View style={styles.infoLabelContainer}>
+                    <Icon name="profile" size={14} color={COLORS.textSecondary} />
+                    <Text style={styles.infoLabel}>Mã số thuế/CCCD</Text>
+                  </View>
                   <Text style={styles.infoValue}>{user?.taxcode || 'Chưa cập nhật'}</Text>
                 </View>
               </View>
@@ -329,21 +345,30 @@ const ProfileScreen = () => {
 
               <View style={styles.infoRow}>
                 <View style={styles.infoItem}>
-                  <Text style={styles.infoLabel}>🏦 Ngân hàng</Text>
+                  <View style={styles.infoLabelContainer}>
+                    <Icon name="bank" size={14} color={COLORS.textSecondary} />
+                    <Text style={styles.infoLabel}>Ngân hàng</Text>
+                  </View>
                   <Text style={styles.infoValue}>{user?.nganhang || 'Chưa cập nhật'}</Text>
                 </View>
               </View>
 
               <View style={styles.infoRow}>
                 <View style={styles.infoItem}>
-                  <Text style={styles.infoLabel}>💳 Số tài khoản</Text>
+                  <View style={styles.infoLabelContainer}>
+                    <Icon name="bank-account" size={14} color={COLORS.textSecondary} />
+                    <Text style={styles.infoLabel}>Số tài khoản</Text>
+                  </View>
                   <Text style={styles.infoValue}>{user?.sotaikhoan || 'Chưa cập nhật'}</Text>
                 </View>
               </View>
 
               <View style={styles.infoRow}>
                 <View style={styles.infoItem}>
-                  <Text style={styles.infoLabel}>👤 Tên tài khoản</Text>
+                  <View style={styles.infoLabelContainer}>
+                    <Icon name="account-name" size={14} color={COLORS.textSecondary} />
+                    <Text style={styles.infoLabel}>Tên tài khoản</Text>
+                  </View>
                   <Text style={styles.infoValue}>{user?.tentaikhoan || 'Chưa cập nhật'}</Text>
                 </View>
               </View>
@@ -353,7 +378,10 @@ const ProfileScreen = () => {
                 onPress={handleEditProfile}
                 activeOpacity={0.7}
               >
-                <Text style={styles.editSectionButtonText}>✏️ Chỉnh sửa</Text>
+                <View style={styles.editButtonContent}>
+                  <Icon name="menu" size={16} color={COLORS.primary} />
+                  <Text style={styles.editSectionButtonText}>Chỉnh sửa</Text>
+                </View>
               </TouchableOpacity>
             </View>
           )}
@@ -370,7 +398,7 @@ const ProfileScreen = () => {
             >
               <View style={styles.settingLeft}>
                 <View style={styles.settingIconContainer}>
-                  <Text style={styles.settingIcon}>🔐</Text>
+                  <Icon name="lock" size={20} color={COLORS.primary} />
                 </View>
                 <Text style={styles.settingLabel}>Đổi mật khẩu</Text>
               </View>
@@ -381,7 +409,7 @@ const ProfileScreen = () => {
             <View style={[styles.settingItem, styles.settingItemLast]}>
               <View style={styles.settingLeft}>
                 <View style={styles.settingIconContainer}>
-                  <Text style={styles.settingIcon}>🔔</Text>
+                  <Icon name="notification" size={20} color={COLORS.primary} />
                 </View>
                 <Text style={styles.settingLabel}>Thông báo</Text>
               </View>
@@ -401,7 +429,7 @@ const ProfileScreen = () => {
           onPress={handleLogout}
           activeOpacity={0.8}
         >
-          <Text style={styles.logoutIcon}>🚪</Text>
+          <Icon name="logout" size={20} color={COLORS.error} />
           <Text style={styles.logoutButtonText}>Đăng xuất</Text>
         </TouchableOpacity>
 
@@ -495,10 +523,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     flex: 1,
-  },
-  sectionIcon: {
-    fontSize: 22,
-    marginRight: SPACING.sm,
+    gap: SPACING.sm,
   },
   sectionTitle: {
     fontSize: 16,
@@ -521,10 +546,15 @@ const styles = StyleSheet.create({
   infoItem: {
     flex: 1,
   },
+  infoLabelContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginBottom: SPACING.xs,
+  },
   infoLabel: {
     fontSize: 13,
     color: COLORS.textSecondary,
-    marginBottom: SPACING.xs,
     fontWeight: '500',
   },
   infoValue: {
@@ -544,6 +574,11 @@ const styles = StyleSheet.create({
     borderRadius: BORDER_RADIUS.md,
     alignItems: 'center',
     marginTop: SPACING.xs,
+  },
+  editButtonContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
   },
   editSectionButtonText: {
     fontSize: 14,
@@ -591,9 +626,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginRight: SPACING.md,
   },
-  settingIcon: {
-    fontSize: 20,
-  },
   settingLabel: {
     fontSize: 15,
     fontWeight: '500',
@@ -618,10 +650,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: COLORS.error,
     ...SHADOWS.sm,
-  },
-  logoutIcon: {
-    fontSize: 20,
-    marginRight: SPACING.sm,
+    gap: SPACING.sm,
   },
   logoutButtonText: {
     fontSize: 15,

@@ -14,6 +14,7 @@ import { COLORS, SPACING, BORDER_RADIUS, SHADOWS } from '../../../config/theme';
 import { AuthStackParamList } from '../../../navigation/AuthNavigator';
 import CustomHeader from '../../../components/CustomHeader';
 import { commonStyles } from '../../../styles/commonStyles';
+import { Icon } from '../../../components/common';
 
 type SignupScreenNavigationProp = StackNavigationProp<AuthStackParamList, 'Signup'>;
 
@@ -105,7 +106,7 @@ const SignupScreen: React.FC = () => {
 
         {/* Info Box */}
         <View style={[commonStyles.infoBox, styles.infoBoxMargin]}>
-          <Text style={commonStyles.infoBoxIcon}>ℹ️</Text>
+          <Icon name="info" size={18} color={COLORS.accent} style={commonStyles.infoBoxIcon} />
           <View style={commonStyles.infoBoxContent}>
             <Text style={commonStyles.infoBoxText}>
               Trở thành hội viên Akito để nhận nhiều ưu đãi và quyền lợi đặc biệt

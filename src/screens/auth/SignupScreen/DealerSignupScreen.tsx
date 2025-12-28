@@ -23,6 +23,7 @@ import { COLORS, SPACING, BORDER_RADIUS } from '../../../config/theme';
 import { USER_TYPE } from '../../../config/constants';
 import { AuthStackParamList } from '../../../navigation/AuthNavigator';
 import CustomHeader from '../../../components/CustomHeader';
+import { Icon } from '../../../components/common';
 import ProvinceSelector from '../../../components/ProvinceSelector';
 import { uploadService, UploadedFile } from '../../../api/uploadService';
 import { authService } from '../../../api/authService';
@@ -524,7 +525,11 @@ const DealerSignupScreen: React.FC = () => {
                     style={styles.eyeIcon}
                     onPress={() => setShowPassword(!showPassword)}
                   >
-                    <Text style={styles.eyeIconText}>{showPassword ? 'Ẩn' : 'Hiện'}</Text>
+                    <Icon
+                      name={showPassword ? 'eye-off' : 'eye'}
+                      size={20}
+                      color={COLORS.gray500}
+                    />
                   </TouchableOpacity>
                 </View>
                 {errors.password && (
@@ -561,7 +566,11 @@ const DealerSignupScreen: React.FC = () => {
                     style={styles.eyeIcon}
                     onPress={() => setShowRePassword(!showRePassword)}
                   >
-                    <Text style={styles.eyeIconText}>{showRePassword ? 'Ẩn' : 'Hiện'}</Text>
+                    <Icon
+                      name={showRePassword ? 'eye-off' : 'eye'}
+                      size={20}
+                      color={COLORS.gray500}
+                    />
                   </TouchableOpacity>
                 </View>
                 {errors.repassword && (
@@ -715,11 +724,6 @@ const styles = StyleSheet.create({
     minWidth: 32,
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  eyeIconText: {
-    fontSize: 13,
-    color: COLORS.primary,
-    fontWeight: '600',
   },
 
   // Image Upload

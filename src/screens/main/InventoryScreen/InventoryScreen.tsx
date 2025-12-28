@@ -20,6 +20,7 @@ import BarcodeScanner from '../../../components/BarcodeScanner';
 import { HomeStackParamList } from '../../../navigation/MainNavigator';
 import { inventoryService } from '../../../api/inventoryService';
 import { InventoryItem } from '../../../types/inventory';
+import { Icon } from '../../../components/common';
 
 type InventoryScreenNavigationProp = StackNavigationProp<HomeStackParamList, 'Inventory'>;
 
@@ -148,47 +149,71 @@ const InventoryScreen = () => {
       {/* Product Details */}
       <View style={styles.cardBody}>
         <View style={styles.infoRow}>
-          <Text style={styles.infoLabel}>🏭 Hãng sản xuất:</Text>
+          <View style={styles.infoLabelContainer}>
+            <Icon name="factory" size={14} color={COLORS.textSecondary} />
+            <Text style={styles.infoLabel}>Hãng sản xuất:</Text>
+          </View>
           <Text style={styles.infoValue}>{item.tenhangsanxuat}</Text>
         </View>
 
         <View style={styles.infoRow}>
-          <Text style={styles.infoLabel}>📱 Model:</Text>
+          <View style={styles.infoLabelContainer}>
+            <Icon name="mobile" size={14} color={COLORS.textSecondary} />
+            <Text style={styles.infoLabel}>Model:</Text>
+          </View>
           <Text style={styles.infoValue}>{item.tenmodel}</Text>
         </View>
 
         <View style={styles.infoRow}>
-          <Text style={styles.infoLabel}>⏰ Thời gian bảo hành:</Text>
+          <View style={styles.infoLabelContainer}>
+            <Icon name="warranty-activation" size={14} color={COLORS.textSecondary} />
+            <Text style={styles.infoLabel}>Thời gian bảo hành:</Text>
+          </View>
           <Text style={styles.infoValue}>{item.thoigianbaohanh}</Text>
         </View>
 
         <View style={styles.infoRow}>
-          <Text style={styles.infoLabel}>📦 Ngày xuất kho:</Text>
+          <View style={styles.infoLabelContainer}>
+            <Icon name="package" size={14} color={COLORS.textSecondary} />
+            <Text style={styles.infoLabel}>Ngày xuất kho:</Text>
+          </View>
           <Text style={styles.infoValue}>{item.ngaynhapkho || 'Chưa cập nhật'}</Text>
         </View>
 
         {item.ngaymua && (
           <View style={styles.infoRow}>
-            <Text style={styles.infoLabel}>🛒 Ngày mua:</Text>
+            <View style={styles.infoLabelContainer}>
+              <Icon name="sell-out" size={14} color={COLORS.textSecondary} />
+              <Text style={styles.infoLabel}>Ngày mua:</Text>
+            </View>
             <Text style={styles.infoValue}>{item.ngaymua}</Text>
           </View>
         )}
 
         <View style={styles.infoRow}>
-          <Text style={styles.infoLabel}>📋 Trạng thái gửi kích hoạt bảo hành:</Text>
+          <View style={styles.infoLabelContainer}>
+            <Icon name="list" size={14} color={COLORS.textSecondary} />
+            <Text style={styles.infoLabel}>Trạng thái gửi kích hoạt bảo hành:</Text>
+          </View>
           <Text style={styles.infoValue}>{item.kichhoatbaohanhname}</Text>
         </View>
 
         {item.ngaykichhoat && (
           <View style={styles.infoRow}>
-            <Text style={styles.infoLabel}>📅 Ngày gửi kích hoạt bảo hành:</Text>
+            <View style={styles.infoLabelContainer}>
+              <Icon name="warranty-activation" size={14} color={COLORS.textSecondary} />
+              <Text style={styles.infoLabel}>Ngày gửi kích hoạt bảo hành:</Text>
+            </View>
             <Text style={styles.infoValue}>{item.ngaykichhoat}</Text>
           </View>
         )}
 
         {item.hanbaohanh && (
           <View style={styles.infoRow}>
-            <Text style={styles.infoLabel}>⏳ Ngày hết hạn bảo hành:</Text>
+            <View style={styles.infoLabelContainer}>
+              <Icon name="warranty-activation" size={14} color={COLORS.textSecondary} />
+              <Text style={styles.infoLabel}>Ngày hết hạn bảo hành:</Text>
+            </View>
             <Text style={styles.infoValue}>{item.hanbaohanh}</Text>
           </View>
         )}
@@ -203,7 +228,7 @@ const InventoryScreen = () => {
       {/* Custom Header */}
       <CustomHeader
         title="Kho hàng"
-        leftIcon={<Text style={styles.backIcon}>‹</Text>}
+        leftIcon={<Icon name="back" size={24} color={COLORS.white} />}
         onLeftPress={handleBackPress}
       />
 
@@ -233,7 +258,7 @@ const InventoryScreen = () => {
       {/* Search Bar */}
       <View style={styles.searchContainer}>
         <View style={styles.searchInputWrapper}>
-          <Text style={styles.searchIcon}>🔍</Text>
+          <Icon name="search" size={20} color={COLORS.gray400} />
           <TextInput
             style={styles.searchInput}
             placeholder="Từ khóa"
@@ -294,7 +319,7 @@ const InventoryScreen = () => {
         {/* Empty State */}
         {!isLoading && inventoryList.length === 0 && (
           <View style={styles.emptyContainer}>
-            <Text style={styles.emptyIcon}>📦</Text>
+            <Icon name="package" size={64} color={COLORS.gray300} />
             <Text style={styles.emptyText}>Không có sản phẩm nào</Text>
             <Text style={styles.emptySubtext}>
               {keyword ? 'Thử tìm kiếm với từ khóa khác' : 'Chưa có sản phẩm trong danh mục này'}
@@ -390,10 +415,7 @@ const styles = StyleSheet.create({
     borderColor: COLORS.gray200,
     paddingHorizontal: SPACING.md,
     height: 48,
-  },
-  searchIcon: {
-    fontSize: 20,
-    marginRight: SPACING.sm,
+    gap: SPACING.sm,
   },
   searchInput: {
     flex: 1,
@@ -471,10 +493,15 @@ const styles = StyleSheet.create({
   infoRow: {
     marginBottom: SPACING.sm,
   },
+  infoLabelContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginBottom: 2,
+  },
   infoLabel: {
     fontSize: 13,
     color: COLORS.textSecondary,
-    marginBottom: 2,
   },
   infoValue: {
     fontSize: 14,
@@ -512,16 +539,12 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingVertical: SPACING.xxl,
     paddingHorizontal: SPACING.xl,
-  },
-  emptyIcon: {
-    fontSize: 64,
-    marginBottom: SPACING.md,
+    gap: SPACING.md,
   },
   emptyText: {
     fontSize: 18,
     fontWeight: '600',
     color: COLORS.textPrimary,
-    marginBottom: SPACING.xs,
   },
   emptySubtext: {
     fontSize: 14,
@@ -550,13 +573,6 @@ const styles = StyleSheet.create({
 
   bottomSpacing: {
     height: 100,
-  },
-
-  // Back Icon
-  backIcon: {
-    fontSize: 28,
-    color: COLORS.white,
-    fontWeight: '400',
   },
 });
 

@@ -21,6 +21,7 @@ import CustomHeader from '../../../components/CustomHeader';
 import { commonStyles } from '../../../styles/commonStyles';
 import { passwordService } from '../../../api/passwordService';
 import { useAuthStore } from '../../../store/authStore';
+import { Icon } from '../../../components/common';
 
 // Validation Schema
 const changePasswordSchema = z
@@ -153,7 +154,11 @@ const ChangePasswordScreen = () => {
                     onPress={() => setShowOldPassword(!showOldPassword)}
                     activeOpacity={0.7}
                   >
-                    <Text style={styles.eyeIconText}>{showOldPassword ? 'Ẩn' : 'Hiện'}</Text>
+                    <Icon
+                      name={showOldPassword ? 'eye-off' : 'eye'}
+                      size={20}
+                      color={COLORS.gray500}
+                    />
                   </TouchableOpacity>
                 </View>
                 {errors.oldPassword && (
@@ -193,7 +198,11 @@ const ChangePasswordScreen = () => {
                     onPress={() => setShowNewPassword(!showNewPassword)}
                     activeOpacity={0.7}
                   >
-                    <Text style={styles.eyeIconText}>{showNewPassword ? 'Ẩn' : 'Hiện'}</Text>
+                    <Icon
+                      name={showNewPassword ? 'eye-off' : 'eye'}
+                      size={20}
+                      color={COLORS.gray500}
+                    />
                   </TouchableOpacity>
                 </View>
                 {errors.newPassword && (
@@ -233,7 +242,11 @@ const ChangePasswordScreen = () => {
                     onPress={() => setShowConfirmPassword(!showConfirmPassword)}
                     activeOpacity={0.7}
                   >
-                    <Text style={styles.eyeIconText}>{showConfirmPassword ? 'Ẩn' : 'Hiện'}</Text>
+                    <Icon
+                      name={showConfirmPassword ? 'eye-off' : 'eye'}
+                      size={20}
+                      color={COLORS.gray500}
+                    />
                   </TouchableOpacity>
                 </View>
                 {errors.confirmPassword && (
@@ -245,7 +258,7 @@ const ChangePasswordScreen = () => {
 
           {/* Password Requirements - Using commonStyles.infoBox */}
           <View style={commonStyles.infoBox}>
-            <Text style={commonStyles.infoBoxIcon}>ℹ️</Text>
+            <Icon name="info" size={18} color={COLORS.accent} style={commonStyles.infoBoxIcon} />
             <View style={commonStyles.infoBoxContent}>
               <Text style={commonStyles.infoBoxText}>
                 <Text style={styles.requirementTitle}>Yêu cầu mật khẩu:{'\n'}</Text>
@@ -343,11 +356,6 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  eyeIconText: {
-    fontSize: 13,
-    color: COLORS.primary,
-    fontWeight: '600',
   },
 
   // Requirements

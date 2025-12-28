@@ -22,6 +22,7 @@ import BarcodeScanner from '../../../components/BarcodeScanner';
 import { useAuthStore } from '../../../store/authStore';
 import { InOutStackParamList } from '../../../navigation/MainNavigator';
 import { commonStyles } from '../../../styles/commonStyles';
+import { Icon } from '../../../components/common';
 
 type InOutScreenNavigationProp = StackNavigationProp<InOutStackParamList, 'InOut'>;
 type InOutScreenRouteProp = RouteProp<InOutStackParamList, 'InOut'>;
@@ -156,9 +157,16 @@ const InOutScreen = () => {
             styles.modeBadge,
             isSellOutMode ? styles.modeBadgeSellOut : styles.modeBadgeSellIn,
           ]}>
-            <Text style={styles.modeBadgeText}>
-              {isSellOutMode ? '📦 SELL OUT' : '📥 SELL IN'}
-            </Text>
+            <View style={styles.modeBadgeContent}>
+              <Icon
+                name={isSellOutMode ? 'sell-out' : 'sell-in'}
+                size={14}
+                color={COLORS.textPrimary}
+              />
+              <Text style={styles.modeBadgeText}>
+                {isSellOutMode ? 'SELL OUT' : 'SELL IN'}
+              </Text>
+            </View>
           </View>
 
           <View style={styles.customerHeader}>
@@ -197,12 +205,19 @@ const InOutScreen = () => {
               onPress={handleSelectDealer}
               activeOpacity={0.7}
             >
-              <Text style={[
-                styles.dealerActionButtonText,
-                isSellOutMode && styles.dealerActionButtonTextSecondary,
-              ]}>
-                {isSellOutMode ? '🔄 Đổi đại lý' : '📦 Chọn sell out'}
-              </Text>
+              <View style={styles.buttonContent}>
+                <Icon
+                  name="sell-out"
+                  size={16}
+                  color={isSellOutMode ? COLORS.secondary : COLORS.white}
+                />
+                <Text style={[
+                  styles.dealerActionButtonText,
+                  isSellOutMode && styles.dealerActionButtonTextSecondary,
+                ]}>
+                  {isSellOutMode ? 'Đổi đại lý' : 'Chọn sell out'}
+                </Text>
+              </View>
             </TouchableOpacity>
 
             {isSellOutMode && (
@@ -211,7 +226,10 @@ const InOutScreen = () => {
                 onPress={handleResetToSellIn}
                 activeOpacity={0.7}
               >
-                <Text style={styles.resetButtonText}>↩️ Về Sell In</Text>
+                <View style={styles.buttonContent}>
+                  <Icon name="back" size={16} color={COLORS.white} />
+                  <Text style={styles.resetButtonText}>Về Sell In</Text>
+                </View>
               </TouchableOpacity>
             )}
           </View>
@@ -269,7 +287,7 @@ const InOutScreen = () => {
 
           {/* Info hint */}
           <View style={commonStyles.infoBox}>
-            <Text style={commonStyles.infoBoxIcon}>ℹ️</Text>
+            <Icon name="info" size={20} color={COLORS.info} />
             <View style={commonStyles.infoBoxContent}>
               <Text style={commonStyles.infoBoxText}>
                 Vui lòng quét mã QR hoặc nhập số serial để lưu thông tin
@@ -378,6 +396,11 @@ const styles = StyleSheet.create({
   modeBadgeSellOut: {
     backgroundColor: COLORS.secondary + '30',
   },
+  modeBadgeContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
   modeBadgeText: {
     fontSize: 11,
     fontWeight: '700',
@@ -388,6 +411,11 @@ const styles = StyleSheet.create({
   buttonRow: {
     flexDirection: 'row',
     gap: SPACING.sm,
+  },
+  buttonContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
   },
   dealerActionButton: {
     flex: 1,

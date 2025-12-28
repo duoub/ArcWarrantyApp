@@ -19,6 +19,7 @@ import {
 import { COLORS, SPACING, BORDER_RADIUS, SHADOWS } from '../config/theme';
 import { provinceService } from '../api/provinceService';
 import { Location } from '../types/province';
+import { Icon } from './common';
 
 interface LocationSelectorProps {
   /**
@@ -173,7 +174,7 @@ const LocationSelector: React.FC<LocationSelectorProps> = ({
 
             {/* Search Input */}
             <View style={styles.searchContainer}>
-              <Text style={styles.searchIcon}>🔍</Text>
+              <Icon name="search" size={18} color={COLORS.gray500} style={styles.searchIcon} />
               <TextInput
                 style={styles.searchInput}
                 placeholder="Tìm kiếm..."
