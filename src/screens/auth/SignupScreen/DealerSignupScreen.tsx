@@ -20,10 +20,12 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import ImagePicker from 'react-native-image-crop-picker';
 import { COLORS, SPACING, BORDER_RADIUS } from '../../../config/theme';
+import { USER_TYPE } from '../../../config/constants';
 import { AuthStackParamList } from '../../../navigation/AuthNavigator';
 import CustomHeader from '../../../components/CustomHeader';
 import ProvinceSelector from '../../../components/ProvinceSelector';
 import { uploadService, UploadedFile } from '../../../api/uploadService';
+import { authService } from '../../../api/authService';
 
 type DealerSignupScreenNavigationProp = StackNavigationProp<AuthStackParamList, 'DealerSignup'>;
 
@@ -173,8 +175,8 @@ const DealerSignupScreen: React.FC = () => {
 
   const onSubmit = async (data: DealerSignupFormData) => {
     // Validate images
-    if (images.length < 2) {
-      Alert.alert('Thông báo', 'Vui lòng tải lên ít nhất 2 hình ảnh');
+    if (images.length < 4) {
+      Alert.alert('Thông báo', 'Vui lòng tải lên ít nhất 4 hình ảnh');
       return;
     }
 
@@ -209,18 +211,39 @@ const DealerSignupScreen: React.FC = () => {
       }
 
       // Step 2: Submit dealer signup with uploaded image files
-      // TODO: Call dealer signup API here with uploadedFiles
       console.log('📋 Dealer Signup Data:', {
         ...data,
         files: uploadedFiles,
       });
 
-      // Simulate API call
-      await new Promise<void>((resolve) => setTimeout(() => resolve(), 1000));
+      // Prepare signup request data
+      const signupData = {
+        tendangnhap: data.tendangnhap,
+        pasword: data.password, // Note: API uses 'pasword' typo
+        hoten: data.hoten,
+        phone: data.phone,
+        email: data.email || '',
+        repassword: data.repassword,
+        address: data.address,
+        imgs: uploadedFiles,
+        loai: USER_TYPE.DEALER, // 2 for Dealer
+        tendiaban: '', // Will be implemented later
+        madiaban: '', // Will be implemented later
+        sotaikhoan: data.sotaikhoan,
+        nganhang: data.nganhang,
+        tentaikhoan: data.tentaikhoan,
+      };
+
+      console.log('🚀 Calling signup API with data:', signupData);
+
+      // Call signup API
+      const response = await authService.signup(signupData);
+
+      console.log('✅ Signup successful:', response);
 
       Alert.alert(
         'Đăng ký thành công',
-        'Tài khoản đại lý của bạn đã được tạo thành công!',
+        response.message || 'Tài khoản đại lý của bạn đã được tạo thành công!',
         [
           {
             text: 'OK',
@@ -553,7 +576,7 @@ const DealerSignupScreen: React.FC = () => {
             <Text style={styles.sectionTitle}>
               Hình ảnh <Text style={styles.required}>*</Text>
             </Text>
-            <Text style={styles.sectionSubtitle}>Tối thiểu 2 hình ảnh</Text>
+            <Text style={styles.sectionSubtitle}>Tối thiểu 4 hình ảnh gồm Giấy tờ doanh nghiệp và ảnh cửa hàng</Text>
 
             <View style={styles.imageGrid}>
               {images.map((image, index) => (

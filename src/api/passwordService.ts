@@ -3,6 +3,7 @@
  * API calls for password management
  */
 
+import { API_CONFIG } from '../config/constants';
 import { buildApiUrl, getUserCredentials } from '../utils/apiHelper';
 
 interface UpdatePasswordRequest {
@@ -33,14 +34,14 @@ export const passwordService = {
 
       // Prepare request body
       const requestBody = {
-        storeid: credentials.storeid,
+        storeid: API_CONFIG.STORE_ID,
         userid: credentials.userid,
         oldpass: oldPassword,
         newpass: newPassword,
       };
 
       console.log('🔑 Updating password:', {
-        storeid: credentials.storeid,
+        storeid: API_CONFIG.STORE_ID,
         userid: credentials.userid,
       });
 

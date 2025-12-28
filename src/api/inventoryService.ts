@@ -12,6 +12,7 @@ import {
   InventoryItemRaw,
   InventoryItem,
 } from '../types/inventory';
+import { API_CONFIG } from '../config/constants';
 
 /**
  * Parse and transform raw API data to clean app format
@@ -49,7 +50,7 @@ export const inventoryService = {
 
       // Build API URL with query params
       const url = buildApiUrl('/getlistgiaodich', {
-        storeid: credentials.storeid,
+        storeid: API_CONFIG.STORE_ID,
         userid: credentials.username,
         upage: page,
         type: type,
@@ -113,7 +114,7 @@ export const inventoryService = {
       const url = buildApiUrl('/guikichhoatbaohanh');
 
       const requestData = {
-        storeid: credentials.storeid,
+        storeid: API_CONFIG.STORE_ID,
         username: credentials.username,
         id: params.id,
       };

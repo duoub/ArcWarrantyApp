@@ -45,7 +45,7 @@ export const uploadService = {
       const credentials = getUserCredentials();
 
       // Build the upload URL
-      const url = `${API_CONFIG.BASE_URL}/uploadavatar?storeid=${credentials.storeid}&userid=${credentials.userid}`;
+      const url = `${API_CONFIG.BASE_URL}/uploadavatar?storeid=${API_CONFIG.STORE_ID}&userid=${credentials.username}`;
 
       // Get file path
       const imageObj = typeof imageData === 'string' ? { uri: imageData } : imageData;
@@ -156,10 +156,8 @@ export const uploadService = {
    */
   uploadImage: async (imageData: string | UploadImageData): Promise<UploadImageResponse> => {
     try {
-      const credentials = getUserCredentials();
-
       // Build the upload URL
-      const url = `${API_CONFIG.BASE_URL_MOBILE}/uploadImagev2?storeid=${credentials.storeid}`;
+      const url = `${API_CONFIG.BASE_URL_MOBILE}/uploadImagev2?storeid=${API_CONFIG.STORE_ID}`;
 
       // Get file path
       const imageObj = typeof imageData === 'string' ? { uri: imageData } : imageData;

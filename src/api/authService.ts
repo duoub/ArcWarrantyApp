@@ -122,14 +122,35 @@ export const authService = {
   },
 
   /**
-   * Register new user
+   * Register new user (Dealer/Distributor)
+   * API: /signup?storeid=xxx
    */
   signup: async (data: SignupRequest): Promise<SignupResponse> => {
-    return apiRequest<SignupResponse>({
-      method: 'POST',
-      url: '/auth/register',
-      data,
-    });
+    try {
+      const response = await fetch(`${API_CONFIG.BASE_URL}/signup?storeid=${API_CONFIG.STORE_ID}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      });
+
+      const result = await response.json();
+
+      if (!result.status) {
+        throw new Error(result.message || 'Đăng ký thất bại');
+      }
+
+      return {
+        status: result.status,
+        message: result.message || 'Đăng ký thành công',
+      };
+    } catch (error) {
+      if (error instanceof Error) {
+        throw error;
+      }
+      throw new Error('Đã có lỗi xảy ra. Vui lòng thử lại.');
+    }
   },
 
   /**

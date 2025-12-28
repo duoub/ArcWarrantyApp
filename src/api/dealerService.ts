@@ -10,6 +10,7 @@ import {
   DealerInfoRaw,
   DealerInfo,
 } from '../types/dealer';
+import { API_CONFIG } from '../config/constants';
 
 /**
  * Parse and transform raw API data to clean app format
@@ -36,7 +37,7 @@ export const dealerService = {
 
       // Build API URL with query params
       const apiParams: Record<string, string> = {
-        storeid: credentials.storeid,
+        storeid: API_CONFIG.STORE_ID,
         userid: credentials.userid,
         upage: String(params?.upage || 1),
         TicketRange: params?.TicketRange || '',

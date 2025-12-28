@@ -12,6 +12,7 @@ import {
   Province,
   Location,
 } from '../types/province';
+import { API_CONFIG } from '../config/constants';
 
 const PROVINCE_CACHE_KEY = '@provinces_cache';
 const LOCATION_CACHE_PREFIX = '@location_cache_';
@@ -65,9 +66,9 @@ export const provinceService = {
       }
 
       // Fetch from API
-      const credentials = getUserCredentials();
+      // const credentials = getUserCredentials();
       const url = buildApiUrl('/gettinhthanh', {
-        storeid: credentials.storeid,
+        storeid: API_CONFIG.STORE_ID,
       });
 
       const response = await fetch(url, {
@@ -167,9 +168,9 @@ export const provinceService = {
       }
 
       // Fetch from API
-      const credentials = getUserCredentials();
+      // const credentials = getUserCredentials();
       const url = buildApiUrl('/getdiaban', {
-        storeid: credentials.storeid,
+        storeid: API_CONFIG.STORE_ID,
         macha: parentCode,
       });
 

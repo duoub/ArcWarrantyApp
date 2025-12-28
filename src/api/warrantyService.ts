@@ -10,6 +10,7 @@ import {
   WarrantyReportRequest,
   WarrantyReportResponse,
 } from '../types/warranty';
+import { API_CONFIG } from '../config/constants';
 
 export const warrantyService = {
   /**
@@ -24,7 +25,7 @@ export const warrantyService = {
       const url = buildApiUrl('/activeserial');
 
       const requestData = {
-        storeid: credentials.storeid,
+        storeid: API_CONFIG.STORE_ID,
         keyword: data.serial,
         cusname: data.customerName,
         cusmobile: data.phone,
@@ -86,7 +87,7 @@ export const warrantyService = {
       const url = buildApiUrl('/arepairserial?v=2');
 
       const requestData = {
-        storeid: credentials.storeid,
+        storeid: API_CONFIG.STORE_ID,
         keyword: data.serial,
         custask: data.issueDescription,
         cusname: data.customerName,

@@ -104,6 +104,12 @@ export const DATE_FORMATS = {
   API_TIME: 'yyyy-MM-dd HH:mm:ss',
 };
 
+// User Types
+export const USER_TYPE = {
+  DISTRIBUTOR: '1', // Nhà phân phối
+  DEALER: '2', // Đại lý
+};
+
 export default {
   APP_NAME,
   APP_VERSION,
@@ -116,4 +122,5 @@ export default {
   ERROR_MESSAGES,
   SUCCESS_MESSAGES,
   DATE_FORMATS,
+  USER_TYPE,
 };

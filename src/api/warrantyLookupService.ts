@@ -163,12 +163,12 @@ export const warrantyLookupService = {
     params: WarrantyLookupRequest
   ): Promise<WarrantyLookupResponse> => {
     try {
-      const credentials = getUserCredentials();
+      // const credentials = getUserCredentials();
       const { keyword, fromdate, todate } = params;
 
       // Build API URL with query params
       const apiParams: Record<string, string> = {
-        token: credentials.storeid,
+        token: API_CONFIG.STORE_ID,
         keyword: keyword,
       };
 
@@ -230,12 +230,12 @@ export const warrantyLookupService = {
     params: RepairLookupRequest
   ): Promise<RepairLookupResponse> => {
     try {
-      const credentials = getUserCredentials();
+      // const credentials = getUserCredentials();
       const { keyword } = params;
 
       // Build API URL with query params
       const apiParams: Record<string, string> = {
-        token: credentials.storeid,
+        token: API_CONFIG.STORE_ID,
         keyword: keyword,
       };
 

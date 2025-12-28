@@ -10,6 +10,7 @@ import {
   ProductInfoRaw,
   ProductInfo,
 } from '../types/productLookup';
+import { API_CONFIG } from '../config/constants';
 
 /**
  * Parse and transform raw API data to clean app format
@@ -36,12 +37,12 @@ export const productLookupService = {
     params: ProductLookupRequest
   ): Promise<ProductLookupResponse> => {
     try {
-      const credentials = getUserCredentials();
+      // const credentials = getUserCredentials();
       const { imeiserial } = params;
 
       // Build API URL with query params
       const url = buildApiUrl('/getlistcheckproduct', {
-        storeid: credentials.storeid,
+        storeid: API_CONFIG.STORE_ID,
         imeiserial: imeiserial,
         getjson: 1,
       });

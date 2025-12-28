@@ -10,6 +10,7 @@ import {
   ProfileDataRaw,
   ProfileData,
 } from '../types/profile';
+import { API_CONFIG } from '../config/constants';
 
 /**
  * Parse and transform raw API data to clean app format
@@ -39,7 +40,7 @@ export const profileService = {
       // Build API URL with query params
       const url = buildApiUrl('/getprofile', {
         userid: credentials.username,
-        storeid: credentials.storeid,
+        storeid: API_CONFIG.STORE_ID,
         typeget: typeget,
       });
 
@@ -93,7 +94,7 @@ export const profileService = {
         userid: credentials.username,
         token: credentials.username,
         enablenotification: enablenotification,
-        storeid: credentials.storeid,
+        storeid: API_CONFIG.STORE_ID,
       };
 
       // Build API URL
@@ -146,7 +147,7 @@ export const profileService = {
       const body = {
         userid: credentials.userid,
         token: credentials.userid,
-        storeid: credentials.storeid,
+        storeid: API_CONFIG.STORE_ID,
         name: data.name,
         phone: data.phone,
         email: data.email,

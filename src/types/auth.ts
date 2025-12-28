@@ -55,18 +55,25 @@ export interface LoginResponse {
 }
 
 export interface SignupRequest {
-  name: string;
-  email: string;
-  phone: string;
-  password: string;
-  passwordConfirm: string;
-  verificationMethod: 'email' | 'sms';
+  tendangnhap: string; // Username
+  pasword: string; // Password (typo from API)
+  hoten: string; // Full name
+  phone: string; // Phone number
+  email: string; // Email
+  repassword: string; // Confirm password
+  address: string; // Address
+  images?: Array<{ fileid: string }>;
+  loai: string; // User type (1: Distributor, 2: Dealer)
+  tendiaban?: string; // Dealer name (optional)
+  madiaban?: string; // Dealer code (optional)
+  sotaikhoan: string; // Bank account number
+  nganhang: string; // Bank name
+  tentaikhoan: string; // Bank account holder name
 }
 
 export interface SignupResponse {
+  status: boolean;
   message: string;
-  email: string;
-  phone?: string;
 }
 
 export interface VerifyOTPRequest {

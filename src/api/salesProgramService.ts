@@ -13,6 +13,7 @@ import {
   SalesProgramItemRaw,
   SalesProgramItem,
 } from '../types/salesProgram';
+import { API_CONFIG } from '../config/constants';
 
 /**
  * Parse and transform raw API data to clean app format
@@ -47,7 +48,7 @@ export const salesProgramService = {
       // Build API URL with query params
       const url = buildApiUrl('/getprofile', {
         userid: credentials.username,
-        storeid: credentials.storeid,
+        storeid: API_CONFIG.STORE_ID,
         typeget: typeget,
       });
 
@@ -103,7 +104,7 @@ export const salesProgramService = {
 
       const requestData = {
         idct: params.idct,
-        storeid: credentials.storeid,
+        storeid: API_CONFIG.STORE_ID,
         userid: credentials.username,
       };
 

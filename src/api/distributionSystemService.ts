@@ -10,6 +10,7 @@ import {
   DistributorRaw,
   Distributor,
 } from '../types/distributionSystem';
+import { API_CONFIG } from '../config/constants';
 
 /**
  * Parse and transform raw API data to clean app format
@@ -32,12 +33,11 @@ export const distributionSystemService = {
     params: GetDistributorsRequest
   ): Promise<GetDistributorsResponse> => {
     try {
-      const credentials = getUserCredentials();
       const { page, tentinhthanh, keyword = '' } = params;
 
       // Build API URL with query params
       const url = buildApiUrl('/getlistnhaphanphoi', {
-        storeid: credentials.storeid,
+        storeid: API_CONFIG.STORE_ID,
         page: page,
         tentinhthanh: tentinhthanh,
         keyword: keyword,
