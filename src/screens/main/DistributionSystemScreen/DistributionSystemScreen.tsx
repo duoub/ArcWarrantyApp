@@ -20,6 +20,7 @@ import CustomHeader from '../../../components/CustomHeader';
 import ProvinceSelector from '../../../components/ProvinceSelector';
 import { distributionSystemService } from '../../../api/distributionSystemService';
 import { Distributor } from '../../../types/distributionSystem';
+import { openMapDirections } from '../../../utils/mapNavigation';
 
 const DistributionSystemScreen = () => {
   const navigation = useNavigation();
@@ -133,7 +134,7 @@ const DistributionSystemScreen = () => {
   };
 
   const handleShowMap = (distributor: Distributor) => {
-    Alert.alert('Chỉ đường', `Chỉ đường đến ${distributor.TenTram}`);
+    openMapDirections(distributor.DiaChi, distributor.TenTram);
   };
 
   const renderDistributor = (item: Distributor) => (

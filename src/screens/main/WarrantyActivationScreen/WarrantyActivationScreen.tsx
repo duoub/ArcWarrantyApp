@@ -58,6 +58,7 @@ const WarrantyActivationScreen = () => {
     handleSubmit,
     formState: { errors },
     setValue,
+    getValues,
     reset,
   } = useForm<WarrantyActivationFormData>({
     resolver: zodResolver(warrantyActivationSchema),
@@ -78,7 +79,9 @@ const WarrantyActivationScreen = () => {
   };
 
   const handleScanComplete = (data: string) => {
-    setValue('serial', data);
+    const currentSerial = getValues('serial');
+    const newSerial = currentSerial ? `${currentSerial};${data}` : data;
+    setValue('serial', newSerial);
     setShowScanner(false);
   };
 

@@ -20,6 +20,7 @@ import CustomHeader from '../../../components/CustomHeader';
 import ProvinceSelector from '../../../components/ProvinceSelector';
 import { warrantyStationService } from '../../../api/warrantyStationService';
 import { WarrantyStation } from '../../../types/warrantyStation';
+import { openMapDirections } from '../../../utils/mapNavigation';
 
 const WarrantyStationListScreen = () => {
   const navigation = useNavigation();
@@ -133,8 +134,7 @@ const WarrantyStationListScreen = () => {
   };
 
   const handleShowMap = (station: WarrantyStation) => {
-    // TODO: Implement map navigation
-    Alert.alert('Chỉ đường', `Chỉ đường đến ${station.TenTram}`);
+    openMapDirections(station.DiaChi, station.TenTram);
   };
 
   const renderStation = (item: WarrantyStation) => (
