@@ -124,8 +124,6 @@ const WarrantyReportScreen = () => {
         }
       });
 
-      console.log('📍 Extracted location names:', { provinceName, districtName, wardName });
-
       // Step 1: Find and set province
       if (provinceName) {
         const provincesResponse = await provinceService.getProvinces();
@@ -136,7 +134,6 @@ const WarrantyReportScreen = () => {
         if (foundProvince) {
           setProvince(foundProvince);
           setValue('tinhthanh', foundProvince.TenDiaBan);
-          console.log('✅ Province set:', foundProvince.TenDiaBan);
 
           // Step 2: Find and set district
           if (districtName) {
@@ -148,7 +145,6 @@ const WarrantyReportScreen = () => {
             if (foundDistrict) {
               setDistrict(foundDistrict);
               setValue('quanhuyen', foundDistrict.TenDiaBan);
-              console.log('✅ District set:', foundDistrict.TenDiaBan);
 
               // Step 3: Find and set ward
               if (wardName) {
@@ -160,7 +156,6 @@ const WarrantyReportScreen = () => {
                 if (foundWard) {
                   setWard(foundWard);
                   setValue('xaphuong', foundWard.TenDiaBan);
-                  console.log('✅ Ward set:', foundWard.TenDiaBan);
                 }
               }
             }
@@ -168,7 +163,6 @@ const WarrantyReportScreen = () => {
         }
       }
     } catch (error) {
-      console.error('❌ Error auto-filling locations:', error);
       // Silently fail - user can manually select if auto-fill fails
     }
   };
@@ -192,14 +186,6 @@ const WarrantyReportScreen = () => {
     if (customer.formattedAddress) {
       autoFillLocations(customer);
     }
-
-    console.log('✅ Customer selected and auto-filled:', {
-      serial: customer.serial,
-      name: customer.customerName,
-      phone: customer.customerMobile || customer.customerPhone,
-      address: customer.customerAddress,
-      formattedAddress: customer.formattedAddress,
-    });
   };
 
   const handleSerialBlur = async (serial: string) => {
@@ -207,7 +193,6 @@ const WarrantyReportScreen = () => {
 
     try {
       setIsLookingUpSerial(true);
-      console.log('🔍 Looking up warranty info for serial:', serial);
 
       const response = await warrantyLookupService.lookupWarranty({
         keyword: serial.trim(),
@@ -215,8 +200,6 @@ const WarrantyReportScreen = () => {
 
       if (response.data && response.data.length > 0) {
         const warrantyInfo = response.data[0]; // Take first result
-
-        console.log('✅ Found warranty info, auto-filling fields:', warrantyInfo);
 
         // Auto-fill customer information if available
         if (warrantyInfo.customerName) {
@@ -242,8 +225,6 @@ const WarrantyReportScreen = () => {
           autoFillLocations(warrantyInfo);
         }
       } else {
-        console.log('ℹ️ No warranty info found for serial:', serial);
-
         // Reset customer fields if no data found
         setValue('customerName', '');
         setValue('phone', '');
@@ -258,8 +239,6 @@ const WarrantyReportScreen = () => {
         setValue('xaphuong', '');
       }
     } catch (error) {
-      console.error('❌ Error looking up warranty info:', error);
-
       // Reset customer fields on error
       setValue('customerName', '');
       setValue('phone', '');
@@ -329,7 +308,6 @@ const WarrantyReportScreen = () => {
     } catch (error: any) {
       if (error.code !== 'E_PICKER_CANCELLED') {
         Alert.alert('Lỗi', 'Không thể chụp ảnh. Vui lòng thử lại.');
-        console.error('Camera error:', error);
       }
     }
   };
@@ -348,7 +326,6 @@ const WarrantyReportScreen = () => {
     } catch (error: any) {
       if (error.code !== 'E_PICKER_CANCELLED') {
         Alert.alert('Lỗi', 'Không thể chọn ảnh. Vui lòng thử lại.');
-        console.error('Image picker error:', error);
       }
     }
   };
@@ -366,13 +343,9 @@ const WarrantyReportScreen = () => {
 
       // Step 1: Upload images if any
       if (images.length > 0) {
-        console.log(`📤 Starting upload of ${images.length} images...`);
-
         try {
           uploadedFiles = await uploadService.uploadMultipleImages(images);
-          console.log(`✅ All images uploaded:`, uploadedFiles);
         } catch (uploadError: any) {
-          console.error('❌ Image upload failed:', uploadError);
           Alert.alert(
             'Lỗi upload ảnh',
             uploadError.message || 'Không thể upload ảnh. Vui lòng thử lại.',
@@ -384,18 +357,6 @@ const WarrantyReportScreen = () => {
       }
 
       // Step 2: Submit warranty report with uploaded image files
-      console.log('📋 Submitting warranty report with data:', {
-        serial: data.serial,
-        customerName: data.customerName,
-        phone: data.phone,
-        tinhthanh: data.tinhthanh,
-        quanhuyen: data.quanhuyen,
-        xaphuong: data.xaphuong,
-        address: data.address,
-        issueDescription: data.issueDescription,
-        files: uploadedFiles,
-      });
-
       const response = await warrantyService.report({
         serial: data.serial,
         issueDescription: data.issueDescription,
@@ -427,7 +388,6 @@ const WarrantyReportScreen = () => {
         ]
       );
     } catch (error: any) {
-      console.error('❌ Submit error:', error);
       Alert.alert(
         'Lỗi',
         error instanceof Error ? error.message : 'Đã có lỗi xảy ra. Vui lòng thử lại.',

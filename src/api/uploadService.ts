@@ -84,15 +84,6 @@ export const uploadService = {
         normalizedPath = fileUri.replace('file://', '');
       }
 
-      console.log('📤 Uploading avatar:', {
-        filename,
-        platform: Platform.OS,
-        mimeType,
-        originalUri: fileUri,
-        normalizedPath,
-        url,
-      });
-
       // Use react-native-blob-util for proper multipart upload
       const response = await ReactNativeBlobUtil.fetch(
         'POST',
@@ -110,9 +101,6 @@ export const uploadService = {
         ]
       );
 
-      console.log('📤 Response status:', response.respInfo.status);
-      console.log('📤 Response data:', response.data);
-
       if (response.respInfo.status < 200 || response.respInfo.status >= 300) {
         throw new Error(`Upload ảnh thất bại: ${response.respInfo.status}`);
       }
@@ -126,13 +114,10 @@ export const uploadService = {
         try {
           const result = JSON.parse(responseText);
           avatarUrl = result.response || result.data || result.url || responseText;
-          console.log('📤 Parsed JSON, avatar URL:', avatarUrl);
         } catch (e) {
-          console.log('📤 Response is not JSON, using as plain text');
+          // Response is not JSON, using as plain text
         }
       }
-
-      console.log('📤 Final avatar URL:', avatarUrl);
 
       return {
         status: true,
@@ -140,8 +125,6 @@ export const uploadService = {
         data: avatarUrl,
       };
     } catch (error: any) {
-      console.error('❌ Avatar upload error:', error);
-
       if (error instanceof Error) {
         throw error;
       }
@@ -195,13 +178,6 @@ export const uploadService = {
         normalizedPath = fileUri.replace('file://', '');
       }
 
-      console.log('📤 Uploading image:', {
-        filename,
-        platform: Platform.OS,
-        mimeType,
-        url,
-      });
-
       // Use react-native-blob-util for proper multipart upload
       const response = await ReactNativeBlobUtil.fetch(
         'POST',
@@ -217,9 +193,6 @@ export const uploadService = {
         ]
       );
 
-      console.log('📤 Upload complete: ', response);
-      console.log('📤 Upload response status:', response.respInfo.status);
-
       if (response.respInfo.status < 200 || response.respInfo.status >= 300) {
         throw new Error(`Upload ảnh thất bại: ${response.respInfo.status}`);
       }
@@ -234,11 +207,9 @@ export const uploadService = {
           const result = JSON.parse(responseText);
           imageUrl = result.response || result.data || result.url || responseText;
         } catch (e) {
-          console.log('📤 Response is not JSON, using as plain text');
+          // Response is not JSON, using as plain text
         }
       }
-
-      console.log('📤 Image uploaded successfully:', imageUrl);
 
       return {
         status: true,
@@ -246,8 +217,6 @@ export const uploadService = {
         data: imageUrl,
       };
     } catch (error: any) {
-      console.error('❌ Image upload error:', error);
-
       if (error instanceof Error) {
         throw error;
       }
@@ -262,29 +231,22 @@ export const uploadService = {
   uploadMultipleImages: async (imagePaths: string[]): Promise<UploadedFile[]> => {
     const uploadedFiles: UploadedFile[] = [];
 
-    console.log(`📤 Starting upload of ${imagePaths.length} images...`);
-
     for (let i = 0; i < imagePaths.length; i++) {
       const imagePath = imagePaths[i];
-      console.log(`📤 Uploading image ${i + 1}/${imagePaths.length}...`);
 
       try {
         const response = await uploadService.uploadImage(imagePath);
 
         if (response.status && response.data) {
           uploadedFiles.push({ fileid: response.data });
-          console.log(`✅ Image ${i + 1} uploaded successfully: ${response.data}`);
         } else {
           throw new Error(`Upload image ${i + 1} failed`);
         }
       } catch (error: any) {
-        console.error(`❌ Failed to upload image ${i + 1}:`, error);
         throw new Error(`Upload ảnh thứ ${i + 1} thất bại: ${error.message}`);
       }
     }
 
-    console.log(`✅ All ${uploadedFiles.length} images uploaded successfully`);
-    console.log(`📋 Uploaded files:`, uploadedFiles);
     return uploadedFiles;
   },
 };
