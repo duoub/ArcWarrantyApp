@@ -21,6 +21,7 @@ import Avatar from '../../../components/Avatar';
 import { HomeStackParamList } from '../../../navigation/MainNavigator';
 import { profileService } from '../../../api/profileService';
 import { ProfileData } from '../../../types/profile';
+import { NotificationService } from '../../../utils/notificationService';
 
 type HomeScreenNavigationProp = StackNavigationProp<HomeStackParamList, 'Home'>;
 
@@ -30,6 +31,8 @@ const BANNER_HEIGHT = BANNER_WIDTH * 0.5;
 
 // Default banners if API doesn't return any
 const DEFAULT_BANNERS = [
+  require('../../../assets/images/banner.jpg'),
+  require('../../../assets/images/banner.jpg'),
   require('../../../assets/images/banner.jpg'),
 ];
 
@@ -42,6 +45,42 @@ const HomeScreen = () => {
   const [profileData, setProfileData] = useState<ProfileData | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const banners = DEFAULT_BANNERS;
+
+  // Initialize Firebase Cloud Messaging
+  useEffect(() => {
+    const initializeNotifications = async () => {
+      // Request permission
+      const hasPermission = await NotificationService.requestUserPermission();
+
+      if (hasPermission) {
+        // Get FCM token
+        const token = await NotificationService.getToken();
+
+        if (token) {
+          // You can send this token to your backend server to store it
+          console.log('FCM Token obtained:', token);
+
+          // Optional: Subscribe to a topic
+          // await NotificationService.subscribeToTopic('warranty_updates');
+        }
+      }
+
+      // Setup notification listeners
+      const unsubscribe = NotificationService.setupNotificationListeners();
+
+      return unsubscribe;
+    };
+
+    const unsubscribe = initializeNotifications();
+
+    return () => {
+      unsubscribe.then(unsub => {
+        if (unsub && typeof unsub === 'function') {
+          unsub();
+        }
+      });
+    };
+  }, []);
 
   // Load profile data from API
   useEffect(() => {
@@ -125,131 +164,131 @@ const HomeScreen = () => {
       <CustomHeader title="Trang chủ" />
 
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
-      {/* Banner Slider */}
-      <View style={styles.bannerContainer}>
-        <FlatList
-          ref={bannerListRef}
-          data={banners}
-          renderItem={renderBanner}
-          keyExtractor={(_, index) => `banner-${index}`}
-          horizontal
-          pagingEnabled
-          showsHorizontalScrollIndicator={false}
-          onMomentumScrollEnd={(event) => {
-            const index = Math.round(
-              event.nativeEvent.contentOffset.x / BANNER_WIDTH
-            );
-            setCurrentBannerIndex(index);
-          }}
-        />
+        {/* Banner Slider */}
+        <View style={styles.bannerContainer}>
+          <FlatList
+            ref={bannerListRef}
+            data={banners}
+            renderItem={renderBanner}
+            keyExtractor={(_, index) => `banner-${index}`}
+            horizontal
+            pagingEnabled
+            showsHorizontalScrollIndicator={false}
+            onMomentumScrollEnd={(event) => {
+              const index = Math.round(
+                event.nativeEvent.contentOffset.x / BANNER_WIDTH
+              );
+              setCurrentBannerIndex(index);
+            }}
+          />
 
-        {/* Pagination Dots */}
-        <View style={styles.paginationContainer}>
-          {banners.map((_, index) => (
-            <View
-              key={`dot-${index}`}
-              style={[
-                styles.paginationDot,
-                index === currentBannerIndex && styles.paginationDotActive,
-              ]}
-            />
-          ))}
-        </View>
-      </View>
-
-      {/* User Profile Section */}
-      {isAuthenticated && user && (
-        <View style={styles.userCard}>
-          <View style={styles.userLeft}>
-            <Avatar uri={user.avatar} size={48} />
-            <View style={styles.userInfo}>
-              <Text style={styles.userName}>{user.name}</Text>
-              <Text style={styles.userEmail}>{user.email}</Text>
-            </View>
+          {/* Pagination Dots */}
+          <View style={styles.paginationContainer}>
+            {banners.map((_, index) => (
+              <View
+                key={`dot-${index}`}
+                style={[
+                  styles.paginationDot,
+                  index === currentBannerIndex && styles.paginationDotActive,
+                ]}
+              />
+            ))}
           </View>
+        </View>
+
+        {/* User Profile Section */}
+        {isAuthenticated && user && (
+          <View style={styles.userCard}>
+            <View style={styles.userLeft}>
+              <Avatar uri={user.avatar} size={48} />
+              <View style={styles.userInfo}>
+                <Text style={styles.userName}>{user.name}</Text>
+                <Text style={styles.userEmail}>{user.email}</Text>
+              </View>
+            </View>
+            <TouchableOpacity
+              style={styles.programButton}
+              onPress={handleSalesProgramPress}
+              activeOpacity={0.7}
+            >
+              <Text style={styles.programButtonText}>
+                Gói chương trình sale
+              </Text>
+              <Text style={styles.chevronIcon}>›</Text>
+            </TouchableOpacity>
+          </View>
+        )}
+
+        {/* Quick Action - Inventory */}
+        {isAuthenticated && (
           <TouchableOpacity
-            style={styles.programButton}
-            onPress={handleSalesProgramPress}
+            style={styles.actionCard}
+            onPress={handleInventoryPress}
             activeOpacity={0.7}
           >
-            <Text style={styles.programButtonText}>
-              Gói chương trình sale
-            </Text>
+            <View style={styles.actionLeft}>
+              <View style={styles.actionIconContainer}>
+                <Text style={styles.actionIcon}>📦</Text>
+              </View>
+              <Text style={styles.actionLabel}>Kho hàng</Text>
+            </View>
             <Text style={styles.chevronIcon}>›</Text>
           </TouchableOpacity>
-        </View>
-      )}
+        )}
 
-      {/* Quick Action - Inventory */}
-      {isAuthenticated && (
-        <TouchableOpacity
-          style={styles.actionCard}
-          onPress={handleInventoryPress}
-          activeOpacity={0.7}
-        >
-          <View style={styles.actionLeft}>
-            <View style={styles.actionIconContainer}>
-              <Text style={styles.actionIcon}>📦</Text>
-            </View>
-            <Text style={styles.actionLabel}>Kho hàng</Text>
-          </View>
-          <Text style={styles.chevronIcon}>›</Text>
-        </TouchableOpacity>
-      )}
+        {/* Reward Summary Table */}
+        {isAuthenticated && (
+          <View style={styles.rewardSection}>
+            <Text style={styles.sectionTitle}>Tiền thưởng</Text>
 
-      {/* Reward Summary Table */}
-      {isAuthenticated && (
-        <View style={styles.rewardSection}>
-          <Text style={styles.sectionTitle}>Tiền thưởng</Text>
+            <View style={styles.tableCard}>
+              {/* Table Header */}
+              <View style={styles.tableHeader}>
+                <Text style={[styles.tableHeaderText, styles.tableColLeft]}>
+                  Mục thưởng
+                </Text>
+                <Text style={[styles.tableHeaderText, styles.tableColRight]}>
+                  Tiền thưởng
+                </Text>
+              </View>
 
-          <View style={styles.tableCard}>
-            {/* Table Header */}
-            <View style={styles.tableHeader}>
-              <Text style={[styles.tableHeaderText, styles.tableColLeft]}>
-                Mục thưởng
-              </Text>
-              <Text style={[styles.tableHeaderText, styles.tableColRight]}>
-                Tiền thưởng
-              </Text>
-            </View>
+              {/* Table Rows */}
+              <View style={styles.tableRow}>
+                <Text style={styles.tableLabel}>Chương trình sell in/out</Text>
+                <Text style={styles.tableValue}>
+                  {profileData?.salesProgram || '0'}
+                </Text>
+              </View>
 
-            {/* Table Rows */}
-            <View style={styles.tableRow}>
-              <Text style={styles.tableLabel}>Chương trình sell in/out</Text>
-              <Text style={styles.tableValue}>
-                {profileData?.salesProgram || '0'}
-              </Text>
-            </View>
+              <View style={styles.tableRow}>
+                <Text style={styles.tableLabel}>Hoa hồng kích hoạt bảo hành</Text>
+                <Text style={styles.tableValue}>
+                  {profileData?.warrantyCommission || '0'}
+                </Text>
+              </View>
 
-            <View style={styles.tableRow}>
-              <Text style={styles.tableLabel}>Hoa hồng kích hoạt bảo hành</Text>
-              <Text style={styles.tableValue}>
-                {profileData?.warrantyCommission || '0'}
-              </Text>
-            </View>
+              {/* Table Footer - Total */}
+              <View style={[styles.tableRow, styles.tableFooter]}>
+                <Text style={styles.tableFooterLabel}>Tổng cộng</Text>
+                <Text style={styles.tableFooterValue}>
+                  {profileData?.total || '0'}
+                </Text>
+              </View>
 
-            {/* Table Footer - Total */}
-            <View style={[styles.tableRow, styles.tableFooter]}>
-              <Text style={styles.tableFooterLabel}>Tổng cộng</Text>
-              <Text style={styles.tableFooterValue}>
-                {profileData?.total || '0'}
-              </Text>
-            </View>
-
-            {/* Table Footer - Paid */}
-            <View style={[styles.tableRow, styles.tableFooter]}>
-              <Text style={styles.tableFooterLabel}>Đã thanh toán</Text>
-              <Text style={styles.tableFooterValue}>
-                {profileData?.paid || '0'}
-              </Text>
+              {/* Table Footer - Paid */}
+              <View style={[styles.tableRow, styles.tableFooter]}>
+                <Text style={styles.tableFooterLabel}>Đã thanh toán</Text>
+                <Text style={styles.tableFooterValue}>
+                  {profileData?.paid || '0'}
+                </Text>
+              </View>
             </View>
           </View>
-        </View>
-      )}
+        )}
 
-      {/* Bottom Spacing */}
-      <View style={styles.bottomSpacing} />
-    </ScrollView>
+        {/* Bottom Spacing */}
+        <View style={styles.bottomSpacing} />
+      </ScrollView>
     </View>
   );
 };
