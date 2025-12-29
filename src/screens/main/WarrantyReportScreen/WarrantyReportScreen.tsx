@@ -21,7 +21,7 @@ import { z } from 'zod';
 import ImagePicker from 'react-native-image-crop-picker';
 import { COLORS, SPACING, BORDER_RADIUS, SHADOWS } from '../../../config/theme';
 import CustomHeader from '../../../components/CustomHeader';
-import BarcodeScanner from '../../../components/BarcodeScanner';
+import BarcodeScanner from '../../../components/BarcodeScanner/BarcodeScanner';
 import LocationSelector from '../../../components/LocationSelector';
 import { Location } from '../../../types/province';
 import { uploadService, UploadedFile } from '../../../api/uploadService';

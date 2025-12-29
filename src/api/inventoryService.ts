@@ -57,8 +57,6 @@ export const inventoryService = {
         keyword: keyword,
       });
 
-      console.log('📦 Fetching inventory:', url);
-
       const response = await fetch(url, {
         method: 'GET',
         headers: {
@@ -67,13 +65,6 @@ export const inventoryService = {
       });
 
       const result = await response.json();
-
-      console.log('📦 Inventory response:', {
-        count: result.count,
-        nextpage: result.nextpage,
-        listLength: result.list?.length,
-        firstItem: result.list?.[0],
-      });
 
       // API doesn't return status field, check if we have data
       const hasData = result.list !== undefined;
@@ -84,8 +75,6 @@ export const inventoryService = {
 
       // Parse raw data to clean format
       const parsedList: InventoryItem[] = (result.list || []).map(parseInventoryItem);
-
-      console.log('✅ Parsed first item:', parsedList[0]);
 
       return {
         status: true,
@@ -119,8 +108,6 @@ export const inventoryService = {
         id: params.id,
       };
 
-      console.log('🔓 Activating warranty:', requestData);
-
       const response = await fetch(url, {
         method: 'POST',
         headers: {
@@ -130,8 +117,6 @@ export const inventoryService = {
       });
 
       const result = await response.json();
-
-      console.log('🔓 Warranty activation response:', result);
 
       if (!result.status) {
         throw new Error(result.message || 'Không thể kích hoạt bảo hành');

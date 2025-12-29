@@ -11,6 +11,7 @@ import {
 import { useNavigation } from '@react-navigation/native';
 import { COLORS, SPACING, BORDER_RADIUS, SHADOWS } from '../../../config/theme';
 import CustomHeader from '../../../components/CustomHeader';
+import { commonStyles } from '../../../styles/commonStyles';
 
 interface Notification {
   id: string;
@@ -82,7 +83,6 @@ const NotificationScreen = () => {
 
   const handleNotificationPress = (notification: Notification) => {
     // Mark as read and navigate or show details
-    console.log('Notification pressed:', notification.id);
   };
 
   const renderNotificationCard = (notification: Notification, index: number) => (
@@ -106,27 +106,27 @@ const NotificationScreen = () => {
       {/* Custom Header */}
       <CustomHeader
         title="Thông báo"
-        leftIcon={<Text style={styles.backIcon}>‹</Text>}
+        leftIcon={<Text style={commonStyles.backIconMedium}>‹</Text>}
         onLeftPress={handleBackPress}
       />
 
       {/* Tabs */}
-      <View style={styles.tabsContainer}>
+      <View style={commonStyles.tabsContainer}>
         <TouchableOpacity
-          style={[styles.tab, activeTab === '0' && styles.tabActive]}
+          style={[commonStyles.tab, activeTab === '0' && commonStyles.tabActive]}
           onPress={() => setActiveTab('0')}
           activeOpacity={0.7}
         >
-          <Text style={[styles.tabText, activeTab === '0' && styles.tabTextActive]}>
+          <Text style={[commonStyles.tabText, activeTab === '0' && commonStyles.tabTextActive]}>
             Chưa đọc
           </Text>
         </TouchableOpacity>
         <TouchableOpacity
-          style={[styles.tab, activeTab === '1' && styles.tabActive]}
+          style={[commonStyles.tab, activeTab === '1' && commonStyles.tabActive]}
           onPress={() => setActiveTab('1')}
           activeOpacity={0.7}
         >
-          <Text style={[styles.tabText, activeTab === '1' && styles.tabTextActive]}>
+          <Text style={[commonStyles.tabText, activeTab === '1' && commonStyles.tabTextActive]}>
             Đã đọc
           </Text>
         </TouchableOpacity>
@@ -147,15 +147,15 @@ const NotificationScreen = () => {
             )}
           </View>
         ) : (
-          <View style={styles.emptyContainer}>
-            <Text style={styles.emptyText}>
+          <View style={commonStyles.emptyContainer}>
+            <Text style={commonStyles.emptyText}>
               {activeTab === '0' ? 'Không có thông báo chưa đọc' : 'Không có thông báo đã đọc'}
             </Text>
           </View>
         )}
 
         {/* Bottom Spacing */}
-        <View style={styles.bottomSpacing} />
+        <View style={commonStyles.bottomSpacing} />
       </ScrollView>
     </View>
   );
@@ -168,38 +168,6 @@ const styles = StyleSheet.create({
   },
   scrollView: {
     flex: 1,
-  },
-  backIcon: {
-    fontSize: 28,
-    color: COLORS.white,
-    fontWeight: '400',
-  },
-
-  // Tabs
-  tabsContainer: {
-    flexDirection: 'row',
-    backgroundColor: COLORS.white,
-    paddingHorizontal: SPACING.lg,
-    paddingTop: SPACING.sm,
-    ...SHADOWS.sm,
-  },
-  tab: {
-    flex: 1,
-    paddingVertical: SPACING.md,
-    alignItems: 'center',
-    borderBottomWidth: 2,
-    borderBottomColor: 'transparent',
-  },
-  tabActive: {
-    borderBottomColor: COLORS.primary,
-  },
-  tabText: {
-    fontSize: 15,
-    fontWeight: '600',
-    color: COLORS.textSecondary,
-  },
-  tabTextActive: {
-    color: COLORS.primary,
   },
 
   // Notification List
@@ -227,23 +195,6 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: COLORS.textSecondary,
     fontWeight: '500',
-  },
-
-  // Empty State
-  emptyContainer: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: SPACING.xl * 3,
-  },
-  emptyText: {
-    fontSize: 15,
-    color: COLORS.textSecondary,
-    textAlign: 'center',
-  },
-
-  bottomSpacing: {
-    height: SPACING.xl,
   },
 });
 

@@ -69,7 +69,6 @@ const Avatar: React.FC<AvatarProps> = ({ uri, size = 40, style }) => {
           ]}
           resizeMode="cover"
           onError={() => {
-            console.log('Avatar image failed to load:', uri);
             setImageError(true);
           }}
         />

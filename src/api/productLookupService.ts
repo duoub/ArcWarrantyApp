@@ -47,8 +47,6 @@ export const productLookupService = {
         getjson: 1,
       });
 
-      console.log('🔍 Checking product:', url);
-
       const response = await fetch(url, {
         method: 'GET',
         headers: {
@@ -58,17 +56,9 @@ export const productLookupService = {
 
       const result = await response.json();
 
-      console.log('🔍 Product check response:', {
-        resultType: typeof result,
-        hasCode: result?.code ? 'yes' : 'no',
-        data: result,
-      });
-
       // Check if we got valid product data
       if (result && (result.code || result.name)) {
         const productInfo = parseProductInfo(result, imeiserial);
-
-        console.log('✅ Parsed product info:', productInfo);
 
         return {
           success: true,
@@ -83,7 +73,6 @@ export const productLookupService = {
         };
       }
     } catch (error) {
-      console.error('❌ Product check error:', error);
       return {
         success: false,
         data: null,

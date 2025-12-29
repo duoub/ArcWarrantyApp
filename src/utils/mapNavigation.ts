@@ -43,7 +43,6 @@ export const openMapDirections = async (address: string, label?: string): Promis
           return;
         }
       } catch (error) {
-        console.log('Apple Maps not available, trying Google Maps');
       }
     }
 
@@ -56,7 +55,6 @@ export const openMapDirections = async (address: string, label?: string): Promis
           return;
         }
       } catch (error) {
-        console.log('Google Maps app not available, falling back to web');
       }
     }
 
@@ -65,7 +63,6 @@ export const openMapDirections = async (address: string, label?: string): Promis
       await Linking.openURL(googleMapsWebUrl);
       return;
     } catch (error) {
-      console.error('Failed to open web browser:', error);
     }
 
     // If nothing works, show error
@@ -74,7 +71,6 @@ export const openMapDirections = async (address: string, label?: string): Promis
       'Không thể mở ứng dụng bản đồ. Vui lòng kiểm tra kết nối internet.'
     );
   } catch (error) {
-    console.error('Error opening map:', error);
     Alert.alert('Lỗi', 'Không thể mở ứng dụng bản đồ. Vui lòng thử lại.');
   }
 };
@@ -121,7 +117,6 @@ export const openMapDirectionsByCoordinates = async (
           return;
         }
       } catch (error) {
-        console.log('Apple Maps not available, trying Google Maps');
       }
     }
 
@@ -134,7 +129,6 @@ export const openMapDirectionsByCoordinates = async (
           return;
         }
       } catch (error) {
-        console.log('Google Maps app not available, falling back to web');
       }
     }
 
@@ -143,7 +137,6 @@ export const openMapDirectionsByCoordinates = async (
       await Linking.openURL(googleMapsWebUrl);
       return;
     } catch (error) {
-      console.error('Failed to open web browser:', error);
     }
 
     // If nothing works, show error
@@ -152,7 +145,6 @@ export const openMapDirectionsByCoordinates = async (
       'Không thể mở ứng dụng bản đồ. Vui lòng kiểm tra kết nối internet.'
     );
   } catch (error) {
-    console.error('Error opening map:', error);
     Alert.alert('Lỗi', 'Không thể mở ứng dụng bản đồ. Vui lòng thử lại.');
   }
 };

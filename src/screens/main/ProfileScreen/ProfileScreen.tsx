@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -12,18 +12,17 @@ import {
   PermissionsAndroid,
   ActivityIndicator,
 } from 'react-native';
-import { useNavigation, useFocusEffect } from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import ImagePicker from 'react-native-image-crop-picker';
-import { COLORS, SPACING, BORDER_RADIUS, SHADOWS } from '../../../config/theme';
+import { COLORS, SPACING, BORDER_RADIUS } from '../../../config/theme';
+import { commonStyles } from '../../../styles/commonStyles';
 import CustomHeader from '../../../components/CustomHeader';
 import Avatar from '../../../components/Avatar';
 import { useAuthStore } from '../../../store/authStore';
 import { ProfileStackParamList } from '../../../navigation/MainNavigator';
 import { uploadService } from '../../../api/uploadService';
 import { profileService } from '../../../api/profileService';
-import { authService } from '../../../api/authService';
-import { API_CONFIG } from '../../../config/constants';
 import { Icon } from '../../../components/common';
 
 type ProfileScreenNavigationProp = StackNavigationProp<ProfileStackParamList, 'Profile'>;
@@ -64,7 +63,6 @@ const ProfileScreen = () => {
 
   // Log when user avatar changes to debug re-render
   useEffect(() => {
-    console.log('🔄 ProfileScreen - user.avatar changed:', user?.avatar);
     // Force Avatar component to re-render by changing key
     setAvatarKey(prev => prev + 1);
   }, [user?.avatar]);
@@ -83,8 +81,7 @@ const ProfileScreen = () => {
       Alert.alert('Thành công', 'Ảnh đại diện đã được cập nhật!');
     } catch (error: any) {
       Alert.alert('Lỗi', error.message || 'Không thể upload ảnh. Vui lòng thử lại.');
-      console.error('Upload error:', error);
-    } finally {
+    } finally{
       setIsUploading(false);
     }
   };
@@ -147,20 +144,12 @@ const ProfileScreen = () => {
         compressImageQuality: 0.8,
       });
 
-      console.log('📸 Image selected:', {
-        path: image.path,
-        size: image.size,
-        width: image.width,
-        height: image.height,
-        mime: image.mime,
-      });
 
       // Upload to server using react-native-blob-util
       await uploadImageToServer(image.path);
     } catch (error: any) {
       if (error.code !== 'E_PICKER_CANCELLED') {
         Alert.alert('Lỗi', 'Không thể chụp ảnh. Vui lòng thử lại.');
-        console.error('Camera error:', error);
       }
     }
   };
@@ -178,20 +167,12 @@ const ProfileScreen = () => {
         compressImageQuality: 0.8,
       });
 
-      console.log('📸 Image selected:', {
-        path: image.path,
-        size: image.size,
-        width: image.width,
-        height: image.height,
-        mime: image.mime,
-      });
 
       // Upload to server using react-native-blob-util
       await uploadImageToServer(image.path);
     } catch (error: any) {
       if (error.code !== 'E_PICKER_CANCELLED') {
         Alert.alert('Lỗi', 'Không thể chọn ảnh. Vui lòng thử lại.');
-        console.error('Image picker error:', error);
       }
     }
   };
@@ -213,7 +194,6 @@ const ProfileScreen = () => {
       // Revert on error
       setNotificationsEnabled(!value);
       Alert.alert('Lỗi', error.message || 'Không thể cập nhật cài đặt thông báo');
-      console.error('Toggle notification error:', error);
     }
   };
 
@@ -250,7 +230,7 @@ const ProfileScreen = () => {
         showsVerticalScrollIndicator={false}
       >
         {/* User Profile Card */}
-        <View style={styles.profileCard}>
+        <View style={commonStyles.cardWithMarginLarge}>
           <View style={styles.avatarWrapper}>
             <Avatar key={avatarKey} uri={user?.avatar} size={100} />
             <TouchableOpacity
@@ -282,106 +262,88 @@ const ProfileScreen = () => {
           >
             <View style={styles.sectionHeaderLeft}>
               <Icon name="profile-detail" size={20} color={COLORS.primary} />
-              <Text style={styles.sectionTitle}>Thông tin hồ sơ</Text>
+              <Text style={commonStyles.sectionTitle}>Thông tin hồ sơ</Text>
             </View>
-            <Text style={styles.chevronIcon}>{showProfileInfo ? '▼' : '▶'}</Text>
+            <Text style={commonStyles.chevronIcon}>{showProfileInfo ? '▼' : '▶'}</Text>
           </TouchableOpacity>
 
           {showProfileInfo && (
-            <View style={styles.infoCard}>
+            <View style={commonStyles.cardWithMarginLarge}>
               {/* Personal Information */}
-              <View style={styles.infoRow}>
-                <View style={styles.infoItem}>
-                  <View style={styles.infoLabelContainer}>
-                    <Icon name="phone" size={14} color={COLORS.textSecondary} />
-                    <Text style={styles.infoLabel}>Điện thoại</Text>
-                  </View>
-                  <Text style={styles.infoValue}>{user?.phone || 'Chưa cập nhật'}</Text>
+              <View style={commonStyles.infoRow}>
+                <View style={commonStyles.infoLabelContainer}>
+                  <Icon name="phone" size={14} color={COLORS.textSecondary} />
+                  <Text style={commonStyles.infoLabel}>Điện thoại</Text>
                 </View>
+                <Text style={commonStyles.infoValue}>{user?.phone || 'Chưa cập nhật'}</Text>
               </View>
 
-              <View style={styles.infoRow}>
-                <View style={styles.infoItem}>
-                  <View style={styles.infoLabelContainer}>
-                    <Icon name="mail" size={14} color={COLORS.textSecondary} />
-                    <Text style={styles.infoLabel}>Email</Text>
-                  </View>
-                  <Text style={styles.infoValue}>{user?.email || 'Chưa cập nhật'}</Text>
+              <View style={commonStyles.infoRow}>
+                <View style={commonStyles.infoLabelContainer}>
+                  <Icon name="mail" size={14} color={COLORS.textSecondary} />
+                  <Text style={commonStyles.infoLabel}>Email</Text>
                 </View>
+                <Text style={commonStyles.infoValue}>{user?.email || 'Chưa cập nhật'}</Text>
               </View>
 
-              <View style={styles.infoRow}>
-                <View style={styles.infoItem}>
-                  <View style={styles.infoLabelContainer}>
-                    <Icon name="location" size={14} color={COLORS.textSecondary} />
-                    <Text style={styles.infoLabel}>Địa chỉ</Text>
-                  </View>
-                  <Text style={styles.infoValue}>{user?.address || 'Chưa cập nhật'}</Text>
+              <View style={commonStyles.infoRow}>
+                <View style={commonStyles.infoLabelContainer}>
+                  <Icon name="location" size={14} color={COLORS.textSecondary} />
+                  <Text style={commonStyles.infoLabel}>Địa chỉ</Text>
                 </View>
+                <Text style={commonStyles.infoValue}>{user?.address || 'Chưa cập nhật'}</Text>
               </View>
 
-              <View style={styles.infoRow}>
-                <View style={styles.infoItem}>
-                  <View style={styles.infoLabelContainer}>
-                    <Icon name="city" size={14} color={COLORS.textSecondary} />
-                    <Text style={styles.infoLabel}>Tỉnh/Thành phố</Text>
-                  </View>
-                  <Text style={styles.infoValue}>{user?.tinhthanh || 'Chưa cập nhật'}</Text>
+              <View style={commonStyles.infoRow}>
+                <View style={commonStyles.infoLabelContainer}>
+                  <Icon name="city" size={14} color={COLORS.textSecondary} />
+                  <Text style={commonStyles.infoLabel}>Tỉnh/Thành phố</Text>
                 </View>
+                <Text style={commonStyles.infoValue}>{user?.tinhthanh || 'Chưa cập nhật'}</Text>
               </View>
 
-              <View style={styles.infoRow}>
-                <View style={styles.infoItem}>
-                  <View style={styles.infoLabelContainer}>
-                    <Icon name="profile" size={14} color={COLORS.textSecondary} />
-                    <Text style={styles.infoLabel}>Mã số thuế/CCCD</Text>
-                  </View>
-                  <Text style={styles.infoValue}>{user?.taxcode || 'Chưa cập nhật'}</Text>
+              <View style={commonStyles.infoRow}>
+                <View style={commonStyles.infoLabelContainer}>
+                  <Icon name="profile" size={14} color={COLORS.textSecondary} />
+                  <Text style={commonStyles.infoLabel}>Mã số thuế/CCCD</Text>
                 </View>
+                <Text style={commonStyles.infoValue}>{user?.taxcode || 'Chưa cập nhật'}</Text>
               </View>
 
               {/* Bank Information */}
               <View style={styles.divider} />
 
-              <View style={styles.infoRow}>
-                <View style={styles.infoItem}>
-                  <View style={styles.infoLabelContainer}>
-                    <Icon name="bank" size={14} color={COLORS.textSecondary} />
-                    <Text style={styles.infoLabel}>Ngân hàng</Text>
-                  </View>
-                  <Text style={styles.infoValue}>{user?.nganhang || 'Chưa cập nhật'}</Text>
+              <View style={commonStyles.infoRow}>
+                <View style={commonStyles.infoLabelContainer}>
+                  <Icon name="bank" size={14} color={COLORS.textSecondary} />
+                  <Text style={commonStyles.infoLabel}>Ngân hàng</Text>
                 </View>
+                <Text style={commonStyles.infoValue}>{user?.nganhang || 'Chưa cập nhật'}</Text>
               </View>
 
-              <View style={styles.infoRow}>
-                <View style={styles.infoItem}>
-                  <View style={styles.infoLabelContainer}>
-                    <Icon name="bank-account" size={14} color={COLORS.textSecondary} />
-                    <Text style={styles.infoLabel}>Số tài khoản</Text>
-                  </View>
-                  <Text style={styles.infoValue}>{user?.sotaikhoan || 'Chưa cập nhật'}</Text>
+              <View style={commonStyles.infoRow}>
+                <View style={commonStyles.infoLabelContainer}>
+                  <Icon name="bank-account" size={14} color={COLORS.textSecondary} />
+                  <Text style={commonStyles.infoLabel}>Số tài khoản</Text>
                 </View>
+                <Text style={commonStyles.infoValue}>{user?.sotaikhoan || 'Chưa cập nhật'}</Text>
               </View>
 
-              <View style={styles.infoRow}>
-                <View style={styles.infoItem}>
-                  <View style={styles.infoLabelContainer}>
-                    <Icon name="account-name" size={14} color={COLORS.textSecondary} />
-                    <Text style={styles.infoLabel}>Tên tài khoản</Text>
-                  </View>
-                  <Text style={styles.infoValue}>{user?.tentaikhoan || 'Chưa cập nhật'}</Text>
+              <View style={commonStyles.infoRow}>
+                <View style={commonStyles.infoLabelContainer}>
+                  <Icon name="account-name" size={14} color={COLORS.textSecondary} />
+                  <Text style={commonStyles.infoLabel}>Tên tài khoản</Text>
                 </View>
+                <Text style={commonStyles.infoValue}>{user?.tentaikhoan || 'Chưa cập nhật'}</Text>
               </View>
 
               <TouchableOpacity
-                style={styles.editSectionButton}
+                style={commonStyles.buttonPrimary}
                 onPress={handleEditProfile}
                 activeOpacity={0.7}
               >
-                <View style={styles.editButtonContent}>
-                  <Icon name="menu" size={16} color={COLORS.primary} />
-                  <Text style={styles.editSectionButtonText}>Chỉnh sửa</Text>
-                </View>
+                <Icon name="menu" size={16} color={COLORS.white} />
+                <Text style={[commonStyles.buttonPrimaryText, styles.editButtonText]}>Chỉnh sửa</Text>
               </TouchableOpacity>
             </View>
           )}
@@ -389,29 +351,29 @@ const ProfileScreen = () => {
 
         {/* Settings Section */}
         <View style={styles.section}>
-          <View style={styles.settingsCard}>
+          <View style={commonStyles.cardWithMarginLarge}>
             {/* Change Password */}
             <TouchableOpacity
-              style={styles.settingItem}
+              style={commonStyles.menuItem}
               onPress={handleChangePassword}
               activeOpacity={0.7}
             >
-              <View style={styles.settingLeft}>
-                <View style={styles.settingIconContainer}>
+              <View style={commonStyles.menuItemLeft}>
+                <View style={commonStyles.iconContainerSmall}>
                   <Icon name="lock" size={20} color={COLORS.primary} />
                 </View>
-                <Text style={styles.settingLabel}>Đổi mật khẩu</Text>
+                <Text style={commonStyles.menuItemLabel}>Đổi mật khẩu</Text>
               </View>
-              <Text style={styles.chevronIcon}>›</Text>
+              <Text style={commonStyles.chevronIcon}>›</Text>
             </TouchableOpacity>
 
             {/* Notifications Toggle */}
-            <View style={[styles.settingItem, styles.settingItemLast]}>
-              <View style={styles.settingLeft}>
-                <View style={styles.settingIconContainer}>
+            <View style={[commonStyles.menuItem, commonStyles.menuItemLast]}>
+              <View style={commonStyles.menuItemLeft}>
+                <View style={commonStyles.iconContainerSmall}>
                   <Icon name="notification" size={20} color={COLORS.primary} />
                 </View>
-                <Text style={styles.settingLabel}>Thông báo</Text>
+                <Text style={commonStyles.menuItemLabel}>Thông báo</Text>
               </View>
               <Switch
                 value={notificationsEnabled}
@@ -437,7 +399,7 @@ const ProfileScreen = () => {
         <Text style={styles.versionText}>Version 1.0.0</Text>
 
         {/* Bottom Spacing */}
-        <View style={styles.bottomSpacing} />
+        <View style={commonStyles.bottomSpacing} />
       </ScrollView>
     </View>
   );
@@ -451,20 +413,10 @@ const styles = StyleSheet.create({
   scrollView: {
     flex: 1,
   },
-
-  // Profile Card
-  profileCard: {
-    backgroundColor: COLORS.white,
-    marginHorizontal: SPACING.lg,
-    marginTop: SPACING.md,
-    padding: SPACING.lg,
-    borderRadius: BORDER_RADIUS.xl,
-    alignItems: 'center',
-    ...SHADOWS.md,
-  },
   avatarWrapper: {
     position: 'relative',
     marginBottom: SPACING.md,
+    alignSelf: 'center',
   },
   changeAvatarButton: {
     position: 'absolute',
@@ -478,7 +430,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     borderWidth: 3,
     borderColor: COLORS.white,
-    ...SHADOWS.md,
   },
   cameraIcon: {
     fontSize: 18,
@@ -488,10 +439,12 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: COLORS.textPrimary,
     marginBottom: SPACING.sm,
+    textAlign: 'center',
   },
   roleContainer: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
   },
   roleBadge: {
     backgroundColor: COLORS.primary + '15',
@@ -504,8 +457,6 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: COLORS.primary,
   },
-
-  // Section
   section: {
     marginTop: SPACING.md,
   },
@@ -517,7 +468,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    ...SHADOWS.sm,
   },
   sectionHeaderLeft: {
     flexDirection: 'row',
@@ -525,119 +475,19 @@ const styles = StyleSheet.create({
     flex: 1,
     gap: SPACING.sm,
   },
-  sectionTitle: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: COLORS.textPrimary,
-  },
-
-  // Info Card
-  infoCard: {
-    backgroundColor: COLORS.white,
-    marginHorizontal: SPACING.lg,
-    marginTop: SPACING.xs,
-    padding: SPACING.md,
-    borderRadius: BORDER_RADIUS.lg,
-    ...SHADOWS.sm,
-  },
-  infoRow: {
-    marginBottom: SPACING.md,
-  },
-  infoItem: {
-    flex: 1,
-  },
-  infoLabelContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-    marginBottom: SPACING.xs,
-  },
-  infoLabel: {
-    fontSize: 13,
-    color: COLORS.textSecondary,
-    fontWeight: '500',
-  },
-  infoValue: {
-    fontSize: 15,
-    color: COLORS.textPrimary,
-    fontWeight: '500',
-  },
   divider: {
     height: 1,
     backgroundColor: COLORS.gray200,
     marginVertical: SPACING.md,
   },
-  editSectionButton: {
-    backgroundColor: COLORS.primary,
-    paddingVertical: SPACING.sm,
-    paddingHorizontal: SPACING.md,
-    borderRadius: BORDER_RADIUS.md,
-    alignItems: 'center',
-    marginTop: SPACING.xs,
-  },
-  editButtonContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  editSectionButtonText: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: COLORS.white,
-  },
-
-  // Settings Section Title
-  settingsTitleContainer: {
-    marginHorizontal: SPACING.lg,
-    marginBottom: SPACING.sm,
-  },
-
-  // Settings Card
-  settingsCard: {
-    backgroundColor: COLORS.white,
-    marginHorizontal: SPACING.lg,
-    borderRadius: BORDER_RADIUS.lg,
-    overflow: 'hidden',
-    ...SHADOWS.md,
-  },
-  settingItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingVertical: SPACING.md,
-    paddingHorizontal: SPACING.md,
-    borderBottomWidth: 1,
-    borderBottomColor: COLORS.gray200,
-  },
-  settingItemLast: {
-    borderBottomWidth: 0,
-  },
-  settingLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    flex: 1,
-  },
-  settingIconContainer: {
-    width: 40,
-    height: 40,
-    borderRadius: BORDER_RADIUS.md,
-    backgroundColor: COLORS.gray50,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: SPACING.md,
-  },
-  settingLabel: {
-    fontSize: 15,
-    fontWeight: '500',
-    color: COLORS.textPrimary,
+  editButtonText: {
+    marginLeft: SPACING.xs,
   },
   chevronIcon: {
     fontSize: 20,
     color: COLORS.gray400,
     fontWeight: '600',
   },
-
-  // Logout Button
   logoutButton: {
     backgroundColor: COLORS.white,
     marginHorizontal: SPACING.lg,
@@ -649,7 +499,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     borderWidth: 1,
     borderColor: COLORS.error,
-    ...SHADOWS.sm,
     gap: SPACING.sm,
   },
   logoutButtonText: {
@@ -657,17 +506,11 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: COLORS.error,
   },
-
-  // Version
   versionText: {
     fontSize: 12,
     color: COLORS.textSecondary,
     textAlign: 'center',
     marginTop: SPACING.lg,
-  },
-
-  bottomSpacing: {
-    height: SPACING.xl,
   },
 });
 

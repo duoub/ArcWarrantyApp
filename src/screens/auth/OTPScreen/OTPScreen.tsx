@@ -58,7 +58,6 @@ const OTPScreen = () => {
 
   const handleVerify = () => {
     const otpCode = otp.join('');
-    console.log('Verify OTP:', otpCode);
   };
 
   const handleResend = () => {
@@ -67,7 +66,6 @@ const OTPScreen = () => {
       setCanResend(false);
       setOtp(['', '', '', '', '', '']);
       inputRefs.current[0]?.focus();
-      console.log('Resend OTP');
     }
   };
 

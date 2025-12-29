@@ -14,7 +14,6 @@ export class NotificationService {
             PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS,
           );
           if (granted !== PermissionsAndroid.RESULTS.GRANTED) {
-            console.log('Notification permission denied');
             return false;
           }
         }
@@ -26,13 +25,11 @@ export class NotificationService {
         authStatus === messaging.AuthorizationStatus.PROVISIONAL;
 
       if (enabled) {
-        console.log('Authorization status:', authStatus);
         return true;
       }
 
       return false;
     } catch (error) {
-      console.error('Error requesting notification permission:', error);
       return false;
     }
   }
@@ -43,10 +40,8 @@ export class NotificationService {
   static async getToken(): Promise<string | null> {
     try {
       const token = await messaging().getToken();
-      console.log('FCM Token:', token);
       return token;
     } catch (error) {
-      console.error('Error getting FCM token:', error);
       return null;
     }
   }
@@ -57,8 +52,6 @@ export class NotificationService {
   static setupNotificationListeners() {
     // Handle notification when app is in foreground
     const unsubscribeForeground = messaging().onMessage(async remoteMessage => {
-      console.log('Foreground notification received:', remoteMessage);
-
       // Show alert or custom notification UI
       if (remoteMessage.notification) {
         Alert.alert(
@@ -70,10 +63,6 @@ export class NotificationService {
 
     // Handle notification when app is opened from background state
     messaging().onNotificationOpenedApp(remoteMessage => {
-      console.log(
-        'Notification caused app to open from background state:',
-        remoteMessage,
-      );
       // Navigate to specific screen if needed based on remoteMessage.data
     });
 
@@ -82,17 +71,12 @@ export class NotificationService {
       .getInitialNotification()
       .then(remoteMessage => {
         if (remoteMessage) {
-          console.log(
-            'Notification caused app to open from quit state:',
-            remoteMessage,
-          );
           // Navigate to specific screen if needed based on remoteMessage.data
         }
       });
 
     // Handle background messages
     messaging().setBackgroundMessageHandler(async remoteMessage => {
-      console.log('Message handled in the background!', remoteMessage);
     });
 
     return unsubscribeForeground;
@@ -104,9 +88,7 @@ export class NotificationService {
   static async subscribeToTopic(topic: string): Promise<void> {
     try {
       await messaging().subscribeToTopic(topic);
-      console.log(`Subscribed to topic: ${topic}`);
     } catch (error) {
-      console.error(`Error subscribing to topic ${topic}:`, error);
     }
   }
 
@@ -116,9 +98,7 @@ export class NotificationService {
   static async unsubscribeFromTopic(topic: string): Promise<void> {
     try {
       await messaging().unsubscribeFromTopic(topic);
-      console.log(`Unsubscribed from topic: ${topic}`);
     } catch (error) {
-      console.error(`Error unsubscribing from topic ${topic}:`, error);
     }
   }
 }

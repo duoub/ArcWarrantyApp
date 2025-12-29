@@ -18,7 +18,7 @@ import { z } from 'zod';
 import { COLORS, SPACING, BORDER_RADIUS, SHADOWS } from '../../../config/theme';
 import CustomHeader from '../../../components/CustomHeader';
 import Avatar from '../../../components/Avatar';
-import BarcodeScanner from '../../../components/BarcodeScanner';
+import BarcodeScanner from '../../../components/BarcodeScanner/BarcodeScanner';
 import { useAuthStore } from '../../../store/authStore';
 import { InOutStackParamList } from '../../../navigation/MainNavigator';
 import { commonStyles } from '../../../styles/commonStyles';
@@ -52,25 +52,15 @@ const InOutScreen = () => {
   useEffect(() => {
     if (route.params?.selectedDealer) {
       setSelectedDealer(route.params.selectedDealer);
-      console.log('📍 Dealer selected:', route.params.selectedDealer);
     }
   }, [route.params?.selectedDealer]);
 
   // Log user info khi component mount để debug
   useEffect(() => {
-    console.log('📋 InOutScreen - Current User:', user);
-    if (user) {
-      console.log('  - ID:', user.id);
-      console.log('  - Name:', user.name);
-      console.log('  - Email:', user.email);
-      console.log('  - Phone:', user.phone);
-      console.log('  - Role:', user.role);
-    }
   }, [user]);
 
   // Log when user avatar changes to debug re-render
   useEffect(() => {
-    console.log('🔄 InOutScreen - user.avatar changed:', user?.avatar);
     // Force Avatar component to re-render by changing key
     setAvatarKey(prev => prev + 1);
   }, [user?.avatar]);
@@ -105,7 +95,6 @@ const InOutScreen = () => {
 
   const handleResetToSellIn = () => {
     setSelectedDealer(null);
-    console.log('🔄 Reset to sell-in mode');
   };
 
   // Check if we're in sell-out mode

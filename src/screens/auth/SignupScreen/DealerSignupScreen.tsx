@@ -21,7 +21,7 @@ import { z } from 'zod';
 import ImagePicker from 'react-native-image-crop-picker';
 import { COLORS, SPACING, BORDER_RADIUS } from '../../../config/theme';
 import { USER_TYPE } from '../../../config/constants';
-import { AuthStackParamList } from '../../../navigation/AuthNavigator';
+import { AuthStackParamList } from '../../../navigation/PreLoginRootNavigator';
 import CustomHeader from '../../../components/CustomHeader';
 import { Icon } from '../../../components/common';
 import ProvinceSelector from '../../../components/ProvinceSelector';
@@ -141,7 +141,6 @@ const DealerSignupScreen: React.FC = () => {
     } catch (error: any) {
       if (error.code !== 'E_PICKER_CANCELLED') {
         Alert.alert('Lỗi', 'Không thể chụp ảnh. Vui lòng thử lại.');
-        console.error('Camera error:', error);
       }
     }
   };
@@ -164,7 +163,6 @@ const DealerSignupScreen: React.FC = () => {
     } catch (error: any) {
       if (error.code !== 'E_PICKER_CANCELLED') {
         Alert.alert('Lỗi', 'Không thể chọn ảnh. Vui lòng thử lại.');
-        console.error('Image picker error:', error);
       }
     }
   };
@@ -193,15 +191,11 @@ const DealerSignupScreen: React.FC = () => {
       let uploadedFiles: UploadedFile[] = [];
 
       // Step 1: Upload images
-      console.log(`📤 Starting upload of ${images.length} images...`);
-
-      try {
+      try{
         // Extract URIs from ImageItem array
         const imagePaths = images.map((img) => img.uri);
         uploadedFiles = await uploadService.uploadMultipleImages(imagePaths);
-        console.log(`✅ All images uploaded:`, uploadedFiles);
       } catch (uploadError: any) {
-        console.error('❌ Image upload failed:', uploadError);
         Alert.alert(
           'Lỗi upload ảnh',
           uploadError.message || 'Không thể upload ảnh. Vui lòng thử lại.',
@@ -212,11 +206,6 @@ const DealerSignupScreen: React.FC = () => {
       }
 
       // Step 2: Submit dealer signup with uploaded image files
-      console.log('📋 Dealer Signup Data:', {
-        ...data,
-        files: uploadedFiles,
-      });
-
       // Prepare signup request data
       const signupData = {
         tendangnhap: data.tendangnhap,
@@ -235,12 +224,8 @@ const DealerSignupScreen: React.FC = () => {
         tentaikhoan: data.tentaikhoan,
       };
 
-      console.log('🚀 Calling signup API with data:', signupData);
-
       // Call signup API
       const response = await authService.signup(signupData);
-
-      console.log('✅ Signup successful:', response);
 
       Alert.alert(
         'Đăng ký thành công',
@@ -253,7 +238,6 @@ const DealerSignupScreen: React.FC = () => {
         ]
       );
     } catch (error: any) {
-      console.error('❌ Signup error:', error);
       Alert.alert(
         'Đăng ký thất bại',
         error.message || 'Đã có lỗi xảy ra. Vui lòng thử lại.',

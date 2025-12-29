@@ -40,11 +40,6 @@ export const passwordService = {
         newpass: newPassword,
       };
 
-      console.log('🔑 Updating password:', {
-        storeid: API_CONFIG.STORE_ID,
-        userid: credentials.userid,
-      });
-
       const response = await fetch(url, {
         method: 'POST',
         headers: {
@@ -54,8 +49,6 @@ export const passwordService = {
       });
 
       const result = await response.json();
-
-      console.log('🔑 Update password response:', result);
 
       // Check if update was successful
       if (result.status || result.status === 'true') {
@@ -67,7 +60,6 @@ export const passwordService = {
         throw new Error(result.message || 'Không thể cập nhật mật khẩu');
       }
     } catch (error) {
-      console.error('❌ Update password error:', error);
       if (error instanceof Error) {
         throw error;
       }

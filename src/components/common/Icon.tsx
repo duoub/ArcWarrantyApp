@@ -131,7 +131,6 @@ export const Icon: React.FC<IconProps> = ({ name, size = 24, color = '#000', sty
   const config = iconMap[name];
 
   if (!config) {
-    console.warn(`Icon "${name}" not found in iconMap`);
     return null;
   }
 

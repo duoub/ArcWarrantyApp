@@ -22,7 +22,6 @@ export const getUserCredentials = () => {
       userid: user.username,
     };
   } catch (error) {
-    console.error('Failed to get user credentials:', error);
     throw new Error('Failed to get user credentials');
   }
 };
@@ -87,7 +86,6 @@ export const apiFetch = async <T>(
     const result = await response.json();
     return result;
   } catch (error) {
-    console.error('API Fetch Error:', error);
     throw error;
   }
 };

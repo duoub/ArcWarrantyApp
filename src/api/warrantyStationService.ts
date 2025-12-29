@@ -45,8 +45,6 @@ export const warrantyStationService = {
         keyword: keyword,
       });
 
-      console.log('🏢 Fetching warranty stations:', url);
-
       const response = await fetch(url, {
         method: 'GET',
         headers: {
@@ -55,13 +53,6 @@ export const warrantyStationService = {
       });
 
       const result = await response.json();
-
-      console.log('🏢 Warranty stations response:', {
-        count: result.count,
-        nextpage: result.nextpage,
-        listLength: result.list?.length,
-        firstItem: result.list?.[0],
-      });
 
       // API doesn't return status field, check if we have data
       const hasData = result.list !== undefined;
@@ -75,8 +66,6 @@ export const warrantyStationService = {
         parseWarrantyStation
       );
 
-      console.log('✅ Parsed first station:', parsedList[0]);
-
       return {
         status: true,
         list: parsedList,
@@ -85,7 +74,6 @@ export const warrantyStationService = {
         message: result.message,
       };
     } catch (error) {
-      console.error('❌ Warranty stations fetch error:', error);
       if (error instanceof Error) {
         throw error;
       }

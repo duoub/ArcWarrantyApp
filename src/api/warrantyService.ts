@@ -37,11 +37,6 @@ export const warrantyService = {
         userid: credentials.userid,
       };
 
-      console.log('🔐 Activating warranty:', {
-        serial: data.serial,
-        customer: data.customerName,
-      });
-
       const response = await fetch(url, {
         method: 'POST',
         headers: {
@@ -51,11 +46,6 @@ export const warrantyService = {
       });
 
       const result = await response.json();
-
-      console.log('🔐 Warranty activation response:', {
-        status: result.status,
-        message: result.message,
-      });
 
       if (!result.status) {
         throw new Error(result.message || 'Kích hoạt bảo hành thất bại');
@@ -67,7 +57,6 @@ export const warrantyService = {
         data: result.data,
       };
     } catch (error) {
-      console.error('❌ Warranty activation error:', error);
       if (error instanceof Error) {
         throw error;
       }
@@ -100,12 +89,6 @@ export const warrantyService = {
         xaphuong: data.xaphuong,
       };
 
-      console.log('🔧 Reporting warranty issue:', {
-        serial: data.serial,
-        customer: data.customerName,
-        images: data.images?.length || 0,
-      });
-
       const response = await fetch(url, {
         method: 'POST',
         headers: {
@@ -115,11 +98,6 @@ export const warrantyService = {
       });
 
       const result = await response.json();
-
-      console.log('🔧 Warranty report response:', {
-        status: result.status,
-        message: result.message,
-      });
 
       if (!result.status) {
         throw new Error(result.message || 'Gửi báo cáo bảo hành thất bại');
@@ -131,7 +109,6 @@ export const warrantyService = {
         data: result.data,
       };
     } catch (error) {
-      console.error('❌ Warranty report error:', error);
       if (error instanceof Error) {
         throw error;
       }

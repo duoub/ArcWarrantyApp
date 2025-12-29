@@ -14,6 +14,7 @@ import { useNavigation } from '@react-navigation/native';
 import { COLORS, SPACING, BORDER_RADIUS, SHADOWS } from '../../../config/theme';
 import CustomHeader from '../../../components/CustomHeader';
 import { Icon } from '../../../components/common';
+import { commonStyles } from '../../../styles/commonStyles';
 
 interface NewsArticle {
   id: string;
@@ -106,7 +107,6 @@ const NewsScreen = () => {
   };
 
   const handleArticlePress = (article: NewsArticle) => {
-    console.log('Article pressed:', article.id);
   };
 
   const renderArticleCard = (article: NewsArticle, index: number) => (
@@ -142,15 +142,15 @@ const NewsScreen = () => {
 
       <CustomHeader
         title="Tin tức"
-        leftIcon={<Text style={styles.backIcon}>‹</Text>}
+        leftIcon={<Text style={commonStyles.backIconMedium}>‹</Text>}
         onLeftPress={handleBackPress}
       />
 
-      <View style={styles.searchContainer}>
-        <View style={styles.searchInputWrapper}>
-          <Icon name="search" size={18} color={COLORS.gray500} style={styles.searchIcon} />
+      <View style={commonStyles.searchContainer}>
+        <View style={commonStyles.searchInputWrapper}>
+          <Icon name="search" size={18} color={COLORS.gray500} style={commonStyles.searchIcon} />
           <TextInput
-            style={styles.searchInput}
+            style={commonStyles.searchInput}
             placeholder="Tìm kiếm tin tức"
             placeholderTextColor={COLORS.gray400}
             value={keyword}
@@ -173,12 +173,12 @@ const NewsScreen = () => {
             )}
           </View>
         ) : (
-          <View style={styles.emptyContainer}>
-            <Text style={styles.emptyText}>Không tìm thấy tin tức phù hợp</Text>
+          <View style={commonStyles.emptyContainer}>
+            <Text style={commonStyles.emptyText}>Không tìm thấy tin tức phù hợp</Text>
           </View>
         )}
 
-        <View style={styles.bottomSpacing} />
+        <View style={commonStyles.bottomSpacing} />
       </ScrollView>
     </View>
   );
@@ -192,40 +192,6 @@ const styles = StyleSheet.create({
   scrollView: {
     flex: 1,
   },
-  backIcon: {
-    fontSize: 28,
-    color: COLORS.white,
-    fontWeight: '400',
-  },
-
-  // Search
-  searchContainer: {
-    backgroundColor: COLORS.white,
-    paddingHorizontal: SPACING.lg,
-    paddingTop: SPACING.md,
-    paddingBottom: SPACING.md,
-    ...SHADOWS.sm,
-  },
-  searchInputWrapper: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: COLORS.gray50,
-    borderRadius: BORDER_RADIUS.md,
-    borderWidth: 1,
-    borderColor: COLORS.gray200,
-    paddingHorizontal: SPACING.md,
-    height: 48,
-  },
-  searchIcon: {
-    fontSize: 20,
-    marginRight: SPACING.sm,
-  },
-  searchInput: {
-    flex: 1,
-    fontSize: 15,
-    color: COLORS.textPrimary,
-    paddingVertical: 0,
-  },
 
   // Article List
   articleList: {
@@ -238,29 +204,6 @@ const styles = StyleSheet.create({
     borderRadius: BORDER_RADIUS.lg,
     overflow: 'hidden',
     ...SHADOWS.md,
-  },
-
-  // Thumbnail
-  thumbnailContainer: {
-    width: '100%',
-    height: 180,
-    backgroundColor: COLORS.gray100,
-    position: 'relative',
-  },
-  thumbnail: {
-    width: '100%',
-    height: '100%',
-  },
-  placeholderContainer: {
-    width: '100%',
-    height: '100%',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: COLORS.gray100,
-  },
-  placeholderIcon: {
-    fontSize: 48,
-    opacity: 0.5,
   },
 
   // Article Content
@@ -303,23 +246,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: COLORS.primary,
     fontWeight: '600',
-  },
-
-  // Empty State
-  emptyContainer: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: SPACING.xl * 3,
-  },
-  emptyText: {
-    fontSize: 15,
-    color: COLORS.textSecondary,
-    textAlign: 'center',
-  },
-
-  // Bottom Spacing - EXACT COPY from NotificationScreen
-  bottomSpacing: {
-    height: SPACING.xl,
   },
 });
 

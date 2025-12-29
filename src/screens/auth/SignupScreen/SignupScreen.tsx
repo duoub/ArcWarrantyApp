@@ -11,7 +11,7 @@ import {
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { COLORS, SPACING, BORDER_RADIUS, SHADOWS } from '../../../config/theme';
-import { AuthStackParamList } from '../../../navigation/AuthNavigator';
+import { AuthStackParamList } from '../../../navigation/PreLoginRootNavigator';
 import CustomHeader from '../../../components/CustomHeader';
 import { commonStyles } from '../../../styles/commonStyles';
 import { Icon } from '../../../components/common';
