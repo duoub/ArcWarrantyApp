@@ -1,4 +1,4 @@
-package com.akitowarrantyapp
+package vn.qbis.akito
 
 import com.facebook.react.ReactActivity
 import com.facebook.react.ReactActivityDelegate

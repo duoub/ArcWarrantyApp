@@ -68,7 +68,7 @@ const MenuScreen = () => {
         },
         {
           icon: 'warranty-lookup',
-          label: 'Tra cứu bảo hành',
+          label: 'Tra cứu lịch sử bảo hành',
           onPress: () => navigation.navigate('WarrantyLookup'),
         },
         {

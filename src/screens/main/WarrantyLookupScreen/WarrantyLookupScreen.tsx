@@ -140,7 +140,7 @@ const WarrantyLookupScreen = () => {
       <StatusBar barStyle="light-content" backgroundColor={COLORS.primary} />
 
       <CustomHeader
-        title="Tra cứu bảo hành"
+        title="Tra cứu lịch sử bảo hành"
         leftIcon={<Text style={styles.backIcon}>‹</Text>}
         onLeftPress={() => navigation.goBack()}
       />

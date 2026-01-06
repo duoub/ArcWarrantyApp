@@ -1,4 +1,4 @@
-package com.akitowarrantyapp
+package vn.qbis.akito
 
 import android.app.NotificationChannel
 import android.app.NotificationManager

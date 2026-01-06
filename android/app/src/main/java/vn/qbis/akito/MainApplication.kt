@@ -1,4 +1,4 @@
-package com.akitowarrantyapp
+package vn.qbis.akito
 
 import android.app.Application
 import com.facebook.react.PackageList

@@ -23,6 +23,11 @@ target 'AkitoWarrantyApp' do
     :app_path => "#{Pod::Config.instance.installation_root}/.."
   )
 
+  # Firebase iOS SDK
+  pod 'Firebase/Messaging', :modular_headers => true
+  pod 'FirebaseCore', :modular_headers => true
+  pod 'GoogleUtilities', :modular_headers => true
+
   post_install do |installer|
     react_native_post_install(
       installer,

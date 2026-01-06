@@ -1,5 +1,10 @@
 import messaging from '@react-native-firebase/messaging';
-import { Platform, PermissionsAndroid, Alert } from 'react-native';
+import { Platform, PermissionsAndroid, Alert, NativeModules } from 'react-native';
+
+// Register background handler at module level (must be outside of any function)
+messaging().setBackgroundMessageHandler(async remoteMessage => {
+  console.log('Message handled in the background!', remoteMessage);
+});
 
 export class NotificationService {
   /**
@@ -8,13 +13,26 @@ export class NotificationService {
    */
   static async requestUserPermission(): Promise<boolean> {
     try {
+      // iOS Simulator check
+      if (Platform.OS === 'ios') {
+        const { PlatformConstants } = NativeModules;
+        const isSimulator = PlatformConstants?.interfaceIdiom === 'pad' ||
+                           PlatformConstants?.interfaceIdiom === 'phone';
+
+        if (isSimulator) {
+          console.log('⚠️ Running on iOS Simulator - Skipping FCM setup');
+          console.log('📱 Push notifications require a real iOS device');
+          return false;
+        }
+      }
+
       if (Platform.OS === 'android') {
         if (Platform.Version >= 33) {
           const granted = await PermissionsAndroid.request(
             PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS,
           );
           if (granted !== PermissionsAndroid.RESULTS.GRANTED) {
-            console.log('Notification permission denied');
+            console.log('❌ Notification permission denied');
             return false;
           }
         }
@@ -26,13 +44,14 @@ export class NotificationService {
         authStatus === messaging.AuthorizationStatus.PROVISIONAL;
 
       if (enabled) {
-        console.log('Authorization status:', authStatus);
+        console.log('✅ Notification permission granted:', authStatus);
         return true;
       }
 
+      console.log('❌ Notification permission not granted');
       return false;
     } catch (error) {
-      console.error('Error requesting notification permission:', error);
+      console.error('❌ Error requesting notification permission:', error);
       return false;
     }
   }
@@ -42,11 +61,29 @@ export class NotificationService {
    */
   static async getToken(): Promise<string | null> {
     try {
+      // iOS Simulator doesn't support push notifications
+      if (Platform.OS === 'ios') {
+        const { PlatformConstants } = NativeModules;
+        const isSimulator = PlatformConstants?.interfaceIdiom === 'pad' ||
+                           PlatformConstants?.interfaceIdiom === 'phone';
+
+        if (isSimulator) {
+          console.log('⚠️ Running on iOS Simulator - Push notifications not supported');
+          console.log('📱 Please test on a real iOS device for FCM token');
+          return null;
+        }
+
+        // On real iOS device, register for remote messages first
+        if (!messaging().isDeviceRegisteredForRemoteMessages) {
+          await messaging().registerDeviceForRemoteMessages();
+        }
+      }
+
       const token = await messaging().getToken();
-      console.log('FCM Token:', token);
+      console.log('✅ FCM Token:', token);
       return token;
     } catch (error) {
-      console.error('Error getting FCM token:', error);
+      console.error('❌ Error getting FCM token:', error);
       return null;
     }
   }
@@ -89,11 +126,6 @@ export class NotificationService {
           // Navigate to specific screen if needed based on remoteMessage.data
         }
       });
-
-    // Handle background messages
-    messaging().setBackgroundMessageHandler(async remoteMessage => {
-      console.log('Message handled in the background!', remoteMessage);
-    });
 
     return unsubscribeForeground;
   }
