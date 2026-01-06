@@ -22,6 +22,7 @@ import { HomeStackParamList } from '../../../navigation/MainNavigator';
 import { profileService } from '../../../api/profileService';
 import { ProfileData } from '../../../types/profile';
 import { NotificationService } from '../../../utils/notificationService';
+import { commonStyles } from '../../../styles/commonStyles';
 
 type HomeScreenNavigationProp = StackNavigationProp<HomeStackParamList, 'Home'>;
 
@@ -58,8 +59,6 @@ const HomeScreen = () => {
 
         if (token) {
           // You can send this token to your backend server to store it
-          console.log('FCM Token obtained:', token);
-
           // Optional: Subscribe to a topic
           // await NotificationService.subscribeToTopic('warranty_updates');
         }
@@ -91,7 +90,6 @@ const HomeScreen = () => {
 
   // Log when user avatar changes to debug re-render
   useEffect(() => {
-    console.log('🔄 HomeScreen - user.avatar changed:', user?.avatar);
   }, [user?.avatar]);
 
   const loadProfileData = async () => {
@@ -106,7 +104,6 @@ const HomeScreen = () => {
         setProfileData(response.data);
       }
     } catch (error) {
-      console.error('Failed to load profile data:', error);
       // Keep using default banners and zero rewards on error
     } finally {
       setIsLoading(false);
@@ -183,13 +180,13 @@ const HomeScreen = () => {
           />
 
           {/* Pagination Dots */}
-          <View style={styles.paginationContainer}>
+          <View style={commonStyles.paginationContainer}>
             {banners.map((_, index) => (
               <View
                 key={`dot-${index}`}
                 style={[
-                  styles.paginationDot,
-                  index === currentBannerIndex && styles.paginationDotActive,
+                  commonStyles.paginationDot,
+                  index === currentBannerIndex && commonStyles.paginationDotActive,
                 ]}
               />
             ))}
@@ -214,7 +211,7 @@ const HomeScreen = () => {
               <Text style={styles.programButtonText}>
                 Gói chương trình sale
               </Text>
-              <Text style={styles.chevronIcon}>›</Text>
+              <Text style={commonStyles.chevronIcon}>›</Text>
             </TouchableOpacity>
           </View>
         )}
@@ -227,58 +224,58 @@ const HomeScreen = () => {
             activeOpacity={0.7}
           >
             <View style={styles.actionLeft}>
-              <View style={styles.actionIconContainer}>
+              <View style={commonStyles.iconContainerSmall}>
                 <Text style={styles.actionIcon}>📦</Text>
               </View>
               <Text style={styles.actionLabel}>Kho hàng</Text>
             </View>
-            <Text style={styles.chevronIcon}>›</Text>
+            <Text style={commonStyles.chevronIcon}>›</Text>
           </TouchableOpacity>
         )}
 
         {/* Reward Summary Table */}
         {isAuthenticated && (
           <View style={styles.rewardSection}>
-            <Text style={styles.sectionTitle}>Tiền thưởng</Text>
+            <Text style={commonStyles.sectionTitleWithMargin}>Tiền thưởng</Text>
 
-            <View style={styles.tableCard}>
+            <View style={[commonStyles.tableCard, styles.tableCardWrapper]}>
               {/* Table Header */}
-              <View style={styles.tableHeader}>
-                <Text style={[styles.tableHeaderText, styles.tableColLeft]}>
+              <View style={commonStyles.tableHeader}>
+                <Text style={[commonStyles.tableHeaderText, styles.tableColLeft]}>
                   Mục thưởng
                 </Text>
-                <Text style={[styles.tableHeaderText, styles.tableColRight]}>
+                <Text style={[commonStyles.tableHeaderText, styles.tableColRight]}>
                   Tiền thưởng
                 </Text>
               </View>
 
               {/* Table Rows */}
-              <View style={styles.tableRow}>
-                <Text style={styles.tableLabel}>Chương trình sell in/out</Text>
-                <Text style={styles.tableValue}>
+              <View style={commonStyles.tableRow}>
+                <Text style={commonStyles.tableLabel}>Chương trình sell in/out</Text>
+                <Text style={commonStyles.tableValue}>
                   {profileData?.salesProgram || '0'}
                 </Text>
               </View>
 
-              <View style={styles.tableRow}>
-                <Text style={styles.tableLabel}>Hoa hồng kích hoạt bảo hành</Text>
-                <Text style={styles.tableValue}>
+              <View style={commonStyles.tableRow}>
+                <Text style={commonStyles.tableLabel}>Hoa hồng kích hoạt bảo hành</Text>
+                <Text style={commonStyles.tableValue}>
                   {profileData?.warrantyCommission || '0'}
                 </Text>
               </View>
 
               {/* Table Footer - Total */}
-              <View style={[styles.tableRow, styles.tableFooter]}>
-                <Text style={styles.tableFooterLabel}>Tổng cộng</Text>
-                <Text style={styles.tableFooterValue}>
+              <View style={[commonStyles.tableRow, commonStyles.tableFooter]}>
+                <Text style={commonStyles.tableFooterLabel}>Tổng cộng</Text>
+                <Text style={commonStyles.tableFooterValue}>
                   {profileData?.total || '0'}
                 </Text>
               </View>
 
               {/* Table Footer - Paid */}
-              <View style={[styles.tableRow, styles.tableFooter]}>
-                <Text style={styles.tableFooterLabel}>Đã thanh toán</Text>
-                <Text style={styles.tableFooterValue}>
+              <View style={[commonStyles.tableRow, commonStyles.tableFooter]}>
+                <Text style={commonStyles.tableFooterLabel}>Đã thanh toán</Text>
+                <Text style={commonStyles.tableFooterValue}>
                   {profileData?.paid || '0'}
                 </Text>
               </View>
@@ -287,7 +284,7 @@ const HomeScreen = () => {
         )}
 
         {/* Bottom Spacing */}
-        <View style={styles.bottomSpacing} />
+        <View style={commonStyles.bottomSpacing} />
       </ScrollView>
     </View>
   );
@@ -316,23 +313,6 @@ const styles = StyleSheet.create({
   bannerImage: {
     width: '100%',
     height: '100%',
-  },
-  paginationContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginTop: SPACING.md,
-  },
-  paginationDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: COLORS.gray300,
-    marginHorizontal: 4,
-  },
-  paginationDotActive: {
-    backgroundColor: COLORS.primary,
-    width: 24,
   },
 
   // User Profile Card
@@ -380,11 +360,6 @@ const styles = StyleSheet.create({
     color: COLORS.primary,
     flex: 1,
   },
-  chevronIcon: {
-    fontSize: 24,
-    color: COLORS.gray400,
-    fontWeight: '300',
-  },
 
   // Action Card
   actionCard: {
@@ -403,15 +378,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     flex: 1,
   },
-  actionIconContainer: {
-    width: 40,
-    height: 40,
-    borderRadius: BORDER_RADIUS.md,
-    backgroundColor: COLORS.gray50,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: SPACING.md,
-  },
   actionIcon: {
     fontSize: 20,
   },
@@ -423,33 +389,11 @@ const styles = StyleSheet.create({
 
   // Reward Section
   rewardSection: {
+    marginBottom: SPACING.md,
+  },
+  tableCardWrapper: {
     marginHorizontal: SPACING.lg,
-    marginBottom: SPACING.md,
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: COLORS.textPrimary,
-    marginBottom: SPACING.md,
-  },
-  tableCard: {
-    backgroundColor: COLORS.white,
-    borderRadius: BORDER_RADIUS.lg,
-    overflow: 'hidden',
     ...SHADOWS.md,
-  },
-
-  // Table Header
-  tableHeader: {
-    flexDirection: 'row',
-    backgroundColor: COLORS.primary,
-    paddingVertical: SPACING.md,
-    paddingHorizontal: SPACING.md,
-  },
-  tableHeaderText: {
-    fontSize: 14,
-    fontWeight: '700',
-    color: COLORS.white,
   },
   tableColLeft: {
     flex: 1,
@@ -457,50 +401,6 @@ const styles = StyleSheet.create({
   tableColRight: {
     width: 120,
     textAlign: 'right',
-  },
-
-  // Table Row
-  tableRow: {
-    flexDirection: 'row',
-    paddingVertical: SPACING.md,
-    paddingHorizontal: SPACING.md,
-    borderBottomWidth: 1,
-    borderBottomColor: COLORS.gray200,
-  },
-  tableLabel: {
-    flex: 1,
-    fontSize: 14,
-    color: COLORS.textPrimary,
-  },
-  tableValue: {
-    width: 120,
-    fontSize: 14,
-    fontWeight: '600',
-    color: COLORS.textPrimary,
-    textAlign: 'right',
-  },
-
-  // Table Footer
-  tableFooter: {
-    backgroundColor: COLORS.gray50,
-    borderBottomWidth: 0,
-  },
-  tableFooterLabel: {
-    flex: 1,
-    fontSize: 14,
-    fontWeight: '700',
-    color: COLORS.textPrimary,
-  },
-  tableFooterValue: {
-    width: 120,
-    fontSize: 15,
-    fontWeight: '700',
-    color: COLORS.primary,
-    textAlign: 'right',
-  },
-
-  bottomSpacing: {
-    height: SPACING.xl,
   },
 });
 

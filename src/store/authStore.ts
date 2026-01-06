@@ -84,7 +84,6 @@ export const useAuthStore = create<AuthState>((set) => ({
         });
       }
     } catch (error) {
-      console.error('Failed to initialize auth:', error);
       // Clear invalid storage
       storage.remove(StorageKeys.AUTH_TOKEN);
       storage.remove(StorageKeys.USER_DATA);
@@ -96,17 +95,11 @@ export const useAuthStore = create<AuthState>((set) => ({
     const currentState = useAuthStore.getState();
 
     if (!currentState.user) {
-      console.warn('⚠️ Cannot update avatar: no user logged in');
       return;
     }
 
     const updatedUser = { ...currentState.user, avatar: avatarUri };
     storage.set(StorageKeys.USER_DATA, JSON.stringify(updatedUser));
-
-    console.log('✅ Avatar updated in store:', {
-      old: currentState.user.avatar,
-      new: avatarUri,
-    });
 
     // Force state update with new user object reference
     set({ user: updatedUser });

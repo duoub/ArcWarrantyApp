@@ -16,6 +16,7 @@ import { COLORS, SPACING, BORDER_RADIUS, SHADOWS } from '../../../config/theme';
 import CustomHeader from '../../../components/CustomHeader';
 import { MenuStackParamList, MainTabParamList } from '../../../navigation/MainNavigator';
 import { Icon, IconName } from '../../../components/common';
+import { commonStyles } from '../../../styles/commonStyles';
 
 type MenuScreenNavigationProp = CompositeNavigationProp<
   StackNavigationProp<MenuStackParamList, 'Menu'>,
@@ -118,23 +119,23 @@ const MenuScreen = () => {
   const renderMenuItem = (item: MenuItem, isLast: boolean) => (
     <TouchableOpacity
       key={item.label}
-      style={[styles.menuItem, isLast && styles.menuItemLast]}
+      style={[commonStyles.menuItem, isLast && commonStyles.menuItemLast]}
       onPress={item.onPress}
       activeOpacity={0.7}
     >
-      <View style={styles.menuItemLeft}>
-        <View style={styles.iconContainer}>
+      <View style={commonStyles.menuItemLeft}>
+        <View style={commonStyles.iconContainerSmall}>
           <Icon name={item.icon} size={22} color={COLORS.primary} />
         </View>
-        <Text style={styles.menuItemLabel}>{item.label}</Text>
+        <Text style={commonStyles.menuItemLabel}>{item.label}</Text>
       </View>
-      <Text style={styles.chevronIcon}>›</Text>
+      <Text style={commonStyles.chevronIcon}>›</Text>
     </TouchableOpacity>
   );
 
   const renderSection = (section: MenuSection, index: number) => (
     <View key={section.title} style={styles.section}>
-      <Text style={styles.sectionTitle}>{section.title}</Text>
+      <Text style={commonStyles.sectionTitleWithMargin}>{section.title}</Text>
       <View style={styles.sectionCard}>
         {section.items.map((item, itemIndex) =>
           renderMenuItem(item, itemIndex === section.items.length - 1)
@@ -156,7 +157,7 @@ const MenuScreen = () => {
         {menuSections.map((section, index) => renderSection(section, index))}
 
         {/* Bottom Spacing */}
-        <View style={styles.bottomSpacing} />
+        <View style={commonStyles.bottomSpacing} />
       </ScrollView>
     </View>
   );
@@ -175,62 +176,12 @@ const styles = StyleSheet.create({
   section: {
     marginTop: SPACING.md,
   },
-  sectionTitle: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: COLORS.textPrimary,
-    marginBottom: SPACING.sm,
-    marginHorizontal: SPACING.lg,
-  },
   sectionCard: {
     backgroundColor: COLORS.white,
     marginHorizontal: SPACING.lg,
     borderRadius: BORDER_RADIUS.lg,
     overflow: 'hidden',
     ...SHADOWS.md,
-  },
-
-  // Menu Item
-  menuItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingVertical: SPACING.md,
-    paddingHorizontal: SPACING.md,
-    borderBottomWidth: 1,
-    borderBottomColor: COLORS.gray200,
-  },
-  menuItemLast: {
-    borderBottomWidth: 0,
-  },
-  menuItemLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    flex: 1,
-  },
-  iconContainer: {
-    width: 40,
-    height: 40,
-    borderRadius: BORDER_RADIUS.md,
-    backgroundColor: COLORS.gray50,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: SPACING.md,
-  },
-  menuItemLabel: {
-    fontSize: 15,
-    fontWeight: '500',
-    color: COLORS.textPrimary,
-    flex: 1,
-  },
-  chevronIcon: {
-    fontSize: 28,
-    color: COLORS.gray400,
-    fontWeight: '300',
-  },
-
-  bottomSpacing: {
-    height: SPACING.xl,
   },
 });
 

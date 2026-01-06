@@ -70,7 +70,7 @@ const ContactScreen = () => {
             Alert.alert('Lỗi', `Không thể mở: ${item.link}`);
           }
         })
-        .catch((err) => console.error('Error opening URL:', err));
+        .catch((err) => {});
     }
   };
 

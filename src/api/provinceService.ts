@@ -116,7 +116,6 @@ export const provinceService = {
     try {
       memoryCache = null;
       await AsyncStorage.removeItem(PROVINCE_CACHE_KEY);
-      console.log('🗑️ Province cache cleared');
     } catch (error) {
       // Silently fail on clear
     }

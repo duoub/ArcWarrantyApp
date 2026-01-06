@@ -18,10 +18,10 @@ import { useNavigation } from '@react-navigation/native';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { COLORS, SPACING, BORDER_RADIUS, SHADOWS } from '../../../config/theme';
+import { COLORS, SPACING } from '../../../config/theme';
 import { warrantyService } from '../../../api/warrantyService';
 import CustomHeader from '../../../components/CustomHeader';
-import BarcodeScanner from '../../../components/BarcodeScanner';
+import BarcodeScanner from '../../../components/BarcodeScanner/BarcodeScanner';
 import LocationSelector from '../../../components/LocationSelector';
 import { commonStyles } from '../../../styles/commonStyles';
 import { Location } from '../../../types/province';
@@ -168,16 +168,16 @@ const WarrantyActivationScreen = () => {
         >
 
           {/* Form Card */}
-          <View style={styles.formCard}>
+          <View style={commonStyles.cardWithMarginLarge}>
             {/* Serial Number */}
             <Controller
               control={control}
               name="serial"
               render={({ field: { onChange, onBlur, value } }) => (
-                <View style={styles.inputContainer}>
+                <View style={commonStyles.inputContainer}>
                   <View style={styles.labelRow}>
-                    <Text style={styles.inputLabel}>
-                      Số serial <Text style={styles.required}>*</Text>
+                    <Text style={commonStyles.inputLabel}>
+                      Số serial <Text style={commonStyles.required}>*</Text>
                     </Text>
                     <TouchableOpacity
                       style={styles.infoButton}
@@ -189,13 +189,13 @@ const WarrantyActivationScreen = () => {
                   </View>
                   <View
                     style={[
-                      styles.inputWrapper,
-                      errors.serial && styles.inputWrapperError,
+                      commonStyles.inputWrapper,
+                      errors.serial && commonStyles.inputWrapperError,
                     ]}
                   >
-                    <Icon name="search" size={18} color={COLORS.gray500} style={styles.inputIcon} />
+                    <Icon name="search" size={18} color={COLORS.gray500} style={commonStyles.inputIcon} />
                     <TextInput
-                      style={styles.input}
+                      style={commonStyles.input}
                       placeholder="Nhập số serial"
                       placeholderTextColor={COLORS.gray400}
                       value={value}
@@ -206,19 +206,19 @@ const WarrantyActivationScreen = () => {
                       numberOfLines={2}
                     />
                     <TouchableOpacity
-                      style={styles.scanButton}
+                      style={commonStyles.scanButton}
                       onPress={handleScanQR}
                       disabled={isLoading}
                     >
                       <Image
                         source={require('../../../assets/images/scan_me.png')}
-                        style={styles.scanImage}
+                        style={commonStyles.scanImage}
                         resizeMode="contain"
                       />
                     </TouchableOpacity>
                   </View>
                   {errors.serial && (
-                    <Text style={styles.errorText}>{errors.serial.message}</Text>
+                    <Text style={commonStyles.errorText}>{errors.serial.message}</Text>
                   )}
                 </View>
               )}
@@ -229,19 +229,19 @@ const WarrantyActivationScreen = () => {
               control={control}
               name="customerName"
               render={({ field: { onChange, onBlur, value } }) => (
-                <View style={styles.inputContainer}>
-                  <Text style={styles.inputLabel}>
-                    Tên khách hàng <Text style={styles.required}>*</Text>
+                <View style={commonStyles.inputContainer}>
+                  <Text style={commonStyles.inputLabel}>
+                    Tên khách hàng <Text style={commonStyles.required}>*</Text>
                   </Text>
                   <View
                     style={[
-                      styles.inputWrapper,
-                      errors.customerName && styles.inputWrapperError,
+                      commonStyles.inputWrapper,
+                      errors.customerName && commonStyles.inputWrapperError,
                     ]}
                   >
-                    <Icon name="user" size={20} color={COLORS.gray400} style={styles.inputIcon} />
+                    <Icon name="user" size={20} color={COLORS.gray400} style={commonStyles.inputIcon} />
                     <TextInput
-                      style={styles.input}
+                      style={commonStyles.input}
                       placeholder="Nhập họ tên"
                       placeholderTextColor={COLORS.gray400}
                       value={value}
@@ -251,7 +251,7 @@ const WarrantyActivationScreen = () => {
                     />
                   </View>
                   {errors.customerName && (
-                    <Text style={styles.errorText}>
+                    <Text style={commonStyles.errorText}>
                       {errors.customerName.message}
                     </Text>
                   )}
@@ -264,19 +264,19 @@ const WarrantyActivationScreen = () => {
               control={control}
               name="phone"
               render={({ field: { onChange, onBlur, value } }) => (
-                <View style={styles.inputContainer}>
-                  <Text style={styles.inputLabel}>
-                    Số điện thoại <Text style={styles.required}>*</Text>
+                <View style={commonStyles.inputContainer}>
+                  <Text style={commonStyles.inputLabel}>
+                    Số điện thoại <Text style={commonStyles.required}>*</Text>
                   </Text>
                   <View
                     style={[
-                      styles.inputWrapper,
-                      errors.phone && styles.inputWrapperError,
+                      commonStyles.inputWrapper,
+                      errors.phone && commonStyles.inputWrapperError,
                     ]}
                   >
-                    <Icon name="phone" size={20} color={COLORS.gray400} style={styles.inputIcon} />
+                    <Icon name="phone" size={20} color={COLORS.gray400} style={commonStyles.inputIcon} />
                     <TextInput
-                      style={styles.input}
+                      style={commonStyles.input}
                       placeholder="Nhập số điện thoại"
                       placeholderTextColor={COLORS.gray400}
                       value={value}
@@ -287,16 +287,16 @@ const WarrantyActivationScreen = () => {
                     />
                   </View>
                   {errors.phone && (
-                    <Text style={styles.errorText}>{errors.phone.message}</Text>
+                    <Text style={commonStyles.errorText}>{errors.phone.message}</Text>
                   )}
                 </View>
               )}
             />
 
             {/* Province */}
-            <View style={styles.inputContainer}>
-              <Text style={styles.inputLabel}>
-                Tỉnh thành <Text style={styles.required}>*</Text>
+            <View style={commonStyles.inputContainer}>
+              <Text style={commonStyles.inputLabel}>
+                Tỉnh thành <Text style={commonStyles.required}>*</Text>
               </Text>
               <LocationSelector
                 parentCode=""
@@ -312,14 +312,14 @@ const WarrantyActivationScreen = () => {
                 placeholder="Chọn tỉnh thành"
               />
               {errors.tinhthanh && (
-                <Text style={styles.errorText}>{errors.tinhthanh.message}</Text>
+                <Text style={commonStyles.errorText}>{errors.tinhthanh.message}</Text>
               )}
             </View>
 
             {/* District */}
-            <View style={styles.inputContainer}>
-              <Text style={styles.inputLabel}>
-                Quận huyện <Text style={styles.required}>*</Text>
+            <View style={commonStyles.inputContainer}>
+              <Text style={commonStyles.inputLabel}>
+                Quận huyện <Text style={commonStyles.required}>*</Text>
               </Text>
               <LocationSelector
                 parentCode={province?.MaDiaBan || ''}
@@ -334,14 +334,14 @@ const WarrantyActivationScreen = () => {
                 disabled={!province}
               />
               {errors.quanhuyen && (
-                <Text style={styles.errorText}>{errors.quanhuyen.message}</Text>
+                <Text style={commonStyles.errorText}>{errors.quanhuyen.message}</Text>
               )}
             </View>
 
             {/* Ward */}
-            <View style={styles.inputContainer}>
-              <Text style={styles.inputLabel}>
-                Xã phường <Text style={styles.required}>*</Text>
+            <View style={commonStyles.inputContainer}>
+              <Text style={commonStyles.inputLabel}>
+                Xã phường <Text style={commonStyles.required}>*</Text>
               </Text>
               <LocationSelector
                 parentCode={district?.MaDiaBan || ''}
@@ -354,7 +354,7 @@ const WarrantyActivationScreen = () => {
                 disabled={!district}
               />
               {errors.xaphuong && (
-                <Text style={styles.errorText}>{errors.xaphuong.message}</Text>
+                <Text style={commonStyles.errorText}>{errors.xaphuong.message}</Text>
               )}
             </View>
 
@@ -363,19 +363,19 @@ const WarrantyActivationScreen = () => {
               control={control}
               name="address"
               render={({ field: { onChange, onBlur, value } }) => (
-                <View style={styles.inputContainer}>
-                  <Text style={styles.inputLabel}>
-                    Địa chỉ <Text style={styles.required}>*</Text>
+                <View style={commonStyles.inputContainer}>
+                  <Text style={commonStyles.inputLabel}>
+                    Địa chỉ <Text style={commonStyles.required}>*</Text>
                   </Text>
                   <View
                     style={[
-                      styles.inputWrapper,
-                      errors.address && styles.inputWrapperError,
+                      commonStyles.inputWrapper,
+                      errors.address && commonStyles.inputWrapperError,
                     ]}
                   >
-                    <Icon name="location" size={18} color={COLORS.gray500} style={styles.inputIcon} />
+                    <Icon name="location" size={18} color={COLORS.gray500} style={commonStyles.inputIcon} />
                     <TextInput
-                      style={styles.input}
+                      style={commonStyles.input}
                       placeholder="Nhập địa chỉ"
                       placeholderTextColor={COLORS.gray400}
                       value={value}
@@ -387,7 +387,7 @@ const WarrantyActivationScreen = () => {
                     />
                   </View>
                   {errors.address && (
-                    <Text style={styles.errorText}>{errors.address.message}</Text>
+                    <Text style={commonStyles.errorText}>{errors.address.message}</Text>
                   )}
                 </View>
               )}
@@ -398,17 +398,17 @@ const WarrantyActivationScreen = () => {
               control={control}
               name="email"
               render={({ field: { onChange, onBlur, value } }) => (
-                <View style={styles.inputContainer}>
-                  <Text style={styles.inputLabel}>Email</Text>
+                <View style={commonStyles.inputContainer}>
+                  <Text style={commonStyles.inputLabel}>Email</Text>
                   <View
                     style={[
-                      styles.inputWrapper,
-                      errors.email && styles.inputWrapperError,
+                      commonStyles.inputWrapper,
+                      errors.email && commonStyles.inputWrapperError,
                     ]}
                   >
-                    <Icon name="mail" size={18} color={COLORS.gray500} style={styles.inputIcon} />
+                    <Icon name="mail" size={18} color={COLORS.gray500} style={commonStyles.inputIcon} />
                     <TextInput
-                      style={styles.input}
+                      style={commonStyles.input}
                       placeholder="Nhập email (không bắt buộc)"
                       placeholderTextColor={COLORS.gray400}
                       value={value}
@@ -420,7 +420,7 @@ const WarrantyActivationScreen = () => {
                     />
                   </View>
                   {errors.email && (
-                    <Text style={styles.errorText}>{errors.email.message}</Text>
+                    <Text style={commonStyles.errorText}>{errors.email.message}</Text>
                   )}
                 </View>
               )}
@@ -440,8 +440,8 @@ const WarrantyActivationScreen = () => {
             {/* Activate Button */}
             <TouchableOpacity
               style={[
-                styles.activateButton,
-                isLoading && styles.activateButtonDisabled,
+                commonStyles.buttonPrimary,
+                isLoading && commonStyles.buttonPrimaryDisabled,
               ]}
               onPress={handleSubmit(handleActivate)}
               activeOpacity={0.8}
@@ -450,13 +450,13 @@ const WarrantyActivationScreen = () => {
               {isLoading ? (
                 <ActivityIndicator color={COLORS.white} size="small" />
               ) : (
-                <Text style={styles.activateButtonText}>Kích hoạt</Text>
+                <Text style={commonStyles.buttonPrimaryText}>Kích hoạt</Text>
               )}
             </TouchableOpacity>
           </View>
 
           {/* Bottom Spacing */}
-          <View style={styles.bottomSpacing} />
+          <View style={commonStyles.bottomSpacing} />
         </ScrollView>
       </KeyboardAvoidingView>
 
@@ -482,105 +482,14 @@ const styles = StyleSheet.create({
   scrollView: {
     flex: 1,
   },
-
-  // Help Icon
-  helpIcon: {
-    fontSize: 20,
-    color: COLORS.white,
-  },
-
-  // Form Card
-  formCard: {
-    backgroundColor: COLORS.white,
-    marginHorizontal: SPACING.lg,
-    marginTop: SPACING.md,
-    padding: SPACING.lg,
-    borderRadius: BORDER_RADIUS.xl,
-    ...SHADOWS.md,
-  },
-
-  // Input Fields
-  inputContainer: {
-    marginBottom: SPACING.md,
-  },
   labelRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     marginBottom: SPACING.xs,
   },
-  inputLabel: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: COLORS.textPrimary,
-  },
   infoButton: {
     padding: 4,
-  },
-  infoIcon: {
-    fontSize: 18,
-  },
-  required: {
-    color: COLORS.error,
-  },
-  inputWrapper: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: COLORS.gray50,
-    borderRadius: BORDER_RADIUS.md,
-    borderWidth: 2,
-    borderColor: COLORS.gray200,
-    paddingHorizontal: SPACING.md,
-    minHeight: 52,
-  },
-  inputWrapperError: {
-    borderColor: COLORS.error,
-  },
-  inputIcon: {
-    marginRight: SPACING.sm,
-  },
-  input: {
-    flex: 1,
-    fontSize: 15,
-    color: COLORS.textPrimary,
-    paddingVertical: SPACING.sm,
-  },
-  scanButton: {
-    padding: SPACING.xs,
-    marginLeft: SPACING.xs,
-  },
-  scanImage: {
-    width: 32,
-    height: 32,
-  },
-  errorText: {
-    fontSize: 12,
-    color: COLORS.error,
-    marginTop: SPACING.xs,
-  },
-
-  // Activate Button
-  activateButton: {
-    backgroundColor: COLORS.primary,
-    paddingVertical: 0,
-    alignItems: 'center',
-    justifyContent: 'center',
-    height: 52,
-    borderRadius: BORDER_RADIUS.md,
-    ...SHADOWS.md,
-  },
-  activateButtonText: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: COLORS.white,
-    letterSpacing: 0.5,
-  },
-  activateButtonDisabled: {
-    opacity: 0.6,
-  },
-
-  bottomSpacing: {
-    height: SPACING.xl,
   },
 });
 

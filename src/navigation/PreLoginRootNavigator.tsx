@@ -20,6 +20,9 @@ export type PreLoginRootStackParamList = {
   DistributionSystem: undefined;
 };
 
+// Alias for backwards compatibility with screens using AuthStackParamList
+export type AuthStackParamList = PreLoginRootStackParamList;
+
 const Stack = createStackNavigator<PreLoginRootStackParamList>();
 
 const PreLoginRootNavigator = () => {

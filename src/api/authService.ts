@@ -37,8 +37,6 @@ export const authService = {
 
       const url = buildApiUrl('/getprofile', apiParams);
 
-      console.log('👤 Fetching user profile:', { userid, storeid });
-
       const response = await fetch(url, {
         method: 'GET',
         headers: {
@@ -47,8 +45,6 @@ export const authService = {
       });
 
       const result: UserProfileRaw = await response.json();
-
-      console.log('👤 Profile response:', result);
 
       // Transform API response to User interface
       return {
@@ -63,7 +59,6 @@ export const authService = {
         countThongBaoChuaDoc: result.countThongBaoChuaDoc || '0',
       };
     } catch (error) {
-      console.error('❌ Get profile error:', error);
       throw new Error('Không thể lấy thông tin người dùng');
     }
   },
@@ -91,8 +86,6 @@ export const authService = {
       if (!result.status) {
         throw new Error(result.message || 'Đăng nhập thất bại');
       }
-
-      console.log('✅ Login successful, fetching profile...');
 
       // Fetch user profile after successful login
       const userProfile = await authService.getProfile(result.username, API_CONFIG.STORE_ID);

@@ -42,7 +42,6 @@ const SalesProgramScreen = () => {
         setPrograms(response.data);
       }
     } catch (error) {
-      console.error('Failed to load sales programs:', error);
       Alert.alert('Lỗi', 'Không thể tải danh sách chương trình bán hàng');
     } finally {
       setIsLoading(false);
@@ -93,7 +92,6 @@ const SalesProgramScreen = () => {
                 );
               }
             } catch (error) {
-              console.error('Failed to register program:', error);
               Alert.alert(
                 'Lỗi',
                 error instanceof Error

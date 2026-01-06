@@ -43,8 +43,6 @@ export const distributionSystemService = {
         keyword: keyword,
       });
 
-      console.log('🏢 Fetching distributors:', url);
-
       const response = await fetch(url, {
         method: 'GET',
         headers: {
@@ -53,12 +51,6 @@ export const distributionSystemService = {
       });
 
       const result = await response.json();
-
-      console.log('🏢 Distributors response:', {
-        nextpage: result.nextpage,
-        listLength: result.list?.length,
-        firstItem: result.list?.[0],
-      });
 
       // API doesn't return status field, check if we have data
       const hasData = result.list !== undefined;
@@ -72,8 +64,6 @@ export const distributionSystemService = {
         parseDistributor
       );
 
-      console.log('✅ Parsed first distributor:', parsedList[0]);
-
       return {
         status: true,
         list: parsedList,
@@ -81,7 +71,6 @@ export const distributionSystemService = {
         message: result.message,
       };
     } catch (error) {
-      console.error('❌ Distributors fetch error:', error);
       if (error instanceof Error) {
         throw error;
       }

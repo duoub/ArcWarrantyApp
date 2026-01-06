@@ -44,8 +44,6 @@ export const profileService = {
         typeget: typeget,
       });
 
-      console.log('👤 Fetching profile:', url);
-
       const response = await fetch(url, {
         method: 'GET',
         headers: {
@@ -55,16 +53,9 @@ export const profileService = {
 
       const result = await response.json();
 
-      console.log('👤 Profile response:', {
-        resultType: typeof result,
-        data: result,
-      });
-
       // Check if we got valid data
       if (result) {
         const profileData = parseProfileData(result);
-
-        console.log('✅ Parsed profile data:', profileData);
 
         return {
           status: true,
@@ -74,7 +65,6 @@ export const profileService = {
         throw new Error('Không thể tải thông tin người dùng');
       }
     } catch (error) {
-      console.error('❌ Profile fetch error:', error);
       if (error instanceof Error) {
         throw error;
       }
@@ -100,8 +90,6 @@ export const profileService = {
       // Build API URL
       const url = buildApiUrl('/editnotification');
 
-      console.log('🔔 Updating notification settings:', url, body);
-
       const response = await fetch(url, {
         method: 'POST',
         headers: {
@@ -110,15 +98,12 @@ export const profileService = {
         body: JSON.stringify(body),
       });
 
-      const result = await response.json();
-
-      console.log('🔔 Notification update response:', result);
+      await response.json();
 
       return {
         status: true,
       };
     } catch (error) {
-      console.error('❌ Edit notification error:', error);
       if (error instanceof Error) {
         throw error;
       }
@@ -161,8 +146,6 @@ export const profileService = {
 
       const url = buildApiUrl('/updateprofile');
 
-      console.log('📝 Updating personal info:', body);
-
       const response = await fetch(url, {
         method: 'POST',
         headers: {
@@ -173,8 +156,6 @@ export const profileService = {
 
       const result = await response.json();
 
-      console.log('📝 Update personal info response:', result);
-
       if (result.status || result.status === 'true') {
         return {
           status: true,
@@ -184,7 +165,6 @@ export const profileService = {
         throw new Error(result.message || 'Không thể cập nhật thông tin');
       }
     } catch (error) {
-      console.error('❌ Update personal info error:', error);
       if (error instanceof Error) {
         throw error;
       }

@@ -15,7 +15,7 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { COLORS, SPACING, BORDER_RADIUS } from '../../../config/theme';
-import { AuthStackParamList } from '../../../navigation/AuthNavigator';
+import { AuthStackParamList } from '../../../navigation/PreLoginRootNavigator';
 import { forgotPasswordSchema, ForgotPasswordFormData } from '../../../utils/validation';
 import { authService } from '../../../api/authService';
 import { commonStyles } from '../../../styles/commonStyles';

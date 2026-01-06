@@ -47,7 +47,6 @@ const EditProfileScreen = () => {
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    console.log('User updated:', user);
   }, [user]);
 
   // Combined Profile Form
@@ -90,18 +89,15 @@ const EditProfileScreen = () => {
         nganhang: data.bankName
       });
 
-      console.log('user before refresh', user);
       // Refresh user profile data from server
       if (user?.id) {
         const updatedProfile = await authService.getProfile(user.id, API_CONFIG.STORE_ID);
 
-        console.log('updatedProfile', updatedProfile);
         // Update user in store with new data (merge with existing user data)
         setUser({
           ...user,
           ...updatedProfile,
         });
-        console.log('👤 Profile updated successfully');
       }
 
       Alert.alert(

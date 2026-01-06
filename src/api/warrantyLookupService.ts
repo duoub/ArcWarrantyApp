@@ -182,8 +182,6 @@ export const warrantyLookupService = {
 
       const url = buildTrackingApiUrl('/warranty', apiParams);
 
-      console.log('🔍 Fetching warranty info:', url);
-
       const response = await fetch(url, {
         method: 'GET',
         headers: {
@@ -193,12 +191,6 @@ export const warrantyLookupService = {
 
       const result = await response.json();
 
-      console.log('🔍 Warranty lookup response:', {
-        resultType: Array.isArray(result) ? 'array' : typeof result,
-        count: Array.isArray(result) ? result.length : 0,
-        firstItem: Array.isArray(result) && result.length > 0 ? result[0] : null,
-      });
-
       // API returns array directly
       if (!Array.isArray(result)) {
         throw new Error('Invalid response format');
@@ -207,14 +199,11 @@ export const warrantyLookupService = {
       // Parse raw data to clean format
       const parsedData: WarrantyInfo[] = result.map(parseWarrantyInfo);
 
-      console.log('✅ Parsed warranty info:', parsedData);
-
       return {
         success: true,
         data: parsedData,
       };
     } catch (error) {
-      console.error('❌ Warranty lookup error:', error);
       if (error instanceof Error) {
         throw error;
       }
@@ -241,8 +230,6 @@ export const warrantyLookupService = {
 
       const url = buildTrackingApiUrl('/repair', apiParams);
 
-      console.log('🔧 Fetching repair info:', url);
-
       const response = await fetch(url, {
         method: 'GET',
         headers: {
@@ -252,12 +239,6 @@ export const warrantyLookupService = {
 
       const result = await response.json();
 
-      console.log('🔧 Repair lookup response:', {
-        resultType: Array.isArray(result) ? 'array' : typeof result,
-        count: Array.isArray(result) ? result.length : 0,
-        firstItem: Array.isArray(result) && result.length > 0 ? result[0] : null,
-      });
-
       // API returns array directly
       if (!Array.isArray(result)) {
         throw new Error('Invalid response format');
@@ -266,14 +247,11 @@ export const warrantyLookupService = {
       // Parse raw data to clean format
       const parsedData: RepairInfo[] = result.map(parseRepairInfo);
 
-      console.log('✅ Parsed repair info:', parsedData);
-
       return {
         success: true,
         data: parsedData,
       };
     } catch (error) {
-      console.error('❌ Repair lookup error:', error);
       if (error instanceof Error) {
         throw error;
       }

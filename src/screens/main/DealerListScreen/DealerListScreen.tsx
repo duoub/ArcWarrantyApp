@@ -12,7 +12,8 @@ import {
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
-import { COLORS, SPACING, BORDER_RADIUS, SHADOWS } from '../../../config/theme';
+import { COLORS, SPACING } from '../../../config/theme';
+import { commonStyles } from '../../../styles/commonStyles';
 import CustomHeader from '../../../components/CustomHeader';
 import Avatar from '../../../components/Avatar';
 import { dealerService } from '../../../api/dealerService';
@@ -67,7 +68,6 @@ const DealerListScreen = () => {
   }, [searchQuery, dealers]);
 
   const handleSelectDealer = (dealer: DealerInfo) => {
-    console.log('Selected dealer:', dealer);
     navigation.navigate('InOut', {
       selectedDealer: {
         id: dealer.id,
@@ -103,16 +103,16 @@ const DealerListScreen = () => {
 
       <CustomHeader
         title="Chọn đại lý"
-        leftIcon={<Text style={styles.backIcon}>‹</Text>}
+        leftIcon={<Icon name="back" size={24} color={COLORS.white} />}
         onLeftPress={() => navigation.goBack()}
       />
 
       {/* Search Bar */}
-      <View style={styles.searchContainer}>
-        <View style={styles.searchBar}>
-          <Icon name="search" size={18} color={COLORS.gray500} style={styles.searchIcon} />
+      <View style={commonStyles.searchContainer}>
+        <View style={commonStyles.searchInputWrapper}>
+          <Icon name="search" size={18} color={COLORS.gray500} style={commonStyles.searchIcon} />
           <TextInput
-            style={styles.searchInput}
+            style={commonStyles.searchInput}
             placeholder="Tên / SĐT / Email"
             placeholderTextColor={COLORS.gray400}
             value={searchQuery}
@@ -132,9 +132,9 @@ const DealerListScreen = () => {
 
       {/* Dealer List */}
       {isLoading ? (
-        <View style={styles.loadingContainer}>
+        <View style={commonStyles.loadingContainer}>
           <ActivityIndicator size="large" color={COLORS.primary} />
-          <Text style={styles.loadingText}>Đang tải danh sách đại lý...</Text>
+          <Text style={commonStyles.loadingText}>Đang tải danh sách đại lý...</Text>
         </View>
       ) : (
         <FlatList
@@ -144,8 +144,8 @@ const DealerListScreen = () => {
           contentContainerStyle={styles.listContainer}
           showsVerticalScrollIndicator={false}
           ListEmptyComponent={
-            <View style={styles.emptyContainer}>
-              <Text style={styles.emptyText}>Không tìm thấy đại lý</Text>
+            <View style={commonStyles.emptyContainer}>
+              <Text style={commonStyles.emptyText}>Không tìm thấy đại lý</Text>
             </View>
           }
         />
@@ -159,40 +159,6 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: COLORS.background,
   },
-  backIcon: {
-    fontSize: 32,
-    color: COLORS.white,
-    fontWeight: '300',
-  },
-
-  // Search Bar
-  searchContainer: {
-    backgroundColor: COLORS.white,
-    paddingHorizontal: SPACING.lg,
-    paddingVertical: SPACING.md,
-    borderBottomWidth: 1,
-    borderBottomColor: COLORS.gray200,
-    ...SHADOWS.sm,
-  },
-  searchBar: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: COLORS.gray50,
-    borderRadius: BORDER_RADIUS.md,
-    borderWidth: 2,
-    borderColor: COLORS.gray200,
-    paddingHorizontal: SPACING.md,
-    height: 48,
-  },
-  searchIcon: {
-    fontSize: 20,
-    marginRight: SPACING.sm,
-  },
-  searchInput: {
-    flex: 1,
-    fontSize: 15,
-    color: COLORS.textPrimary,
-  },
   clearButton: {
     padding: SPACING.xs,
   },
@@ -200,8 +166,6 @@ const styles = StyleSheet.create({
     fontSize: 18,
     color: COLORS.gray400,
   },
-
-  // Dealer List
   listContainer: {
     padding: SPACING.md,
   },
@@ -210,8 +174,7 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.white,
     marginBottom: SPACING.md,
     padding: SPACING.md,
-    borderRadius: BORDER_RADIUS.lg,
-    ...SHADOWS.md,
+    borderRadius: 12,
   },
   dealerAvatar: {
     marginRight: SPACING.md,
@@ -235,30 +198,6 @@ const styles = StyleSheet.create({
   detailLabel: {
     fontWeight: '600',
     color: COLORS.textPrimary,
-  },
-
-  // Loading State
-  loadingContainer: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: SPACING.xl * 2,
-  },
-  loadingText: {
-    fontSize: 15,
-    color: COLORS.textSecondary,
-    marginTop: SPACING.md,
-  },
-
-  // Empty State
-  emptyContainer: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: SPACING.xl * 2,
-  },
-  emptyText: {
-    fontSize: 15,
-    color: COLORS.textSecondary,
   },
 });
 

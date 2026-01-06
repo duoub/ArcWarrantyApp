@@ -12,9 +12,9 @@ import {
   Image,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { COLORS, SPACING, BORDER_RADIUS, SHADOWS } from '../../../config/theme';
+import { COLORS, SPACING } from '../../../config/theme';
 import CustomHeader from '../../../components/CustomHeader';
-import BarcodeScanner from '../../../components/BarcodeScanner';
+import BarcodeScanner from '../../../components/BarcodeScanner/BarcodeScanner';
 import { commonStyles } from '../../../styles/commonStyles';
 import { productLookupService } from '../../../api/productLookupService';
 import { ProductInfo } from '../../../types/productLookup';
@@ -97,7 +97,7 @@ const ProductLookupScreen = () => {
 
       <CustomHeader
         title="Kiểm tra sản phẩm"
-        leftIcon={<Text style={styles.backIcon}>‹</Text>}
+        leftIcon={<Icon name="back" size={24} color={COLORS.white} />}
         onLeftPress={() => navigation.goBack()}
       />
 
@@ -107,21 +107,21 @@ const ProductLookupScreen = () => {
         keyboardShouldPersistTaps="handled"
       >
         {/* Page Title */}
-        <View style={styles.pageHeader}>
-          <Text style={styles.pageTitle}>
+        <View style={commonStyles.pageHeader}>
+          <Text style={commonStyles.pageTitle}>
             Kiểm tra sản phẩm chính hãng
           </Text>
         </View>
 
         {/* Search Card */}
-        <View style={styles.searchCard}>
-          <Text style={styles.searchLabel}>
+        <View style={commonStyles.cardWithMarginLarge}>
+          <Text style={commonStyles.inputLabel}>
             Nhập số serial sản phẩm
           </Text>
-          <View style={styles.searchWrapper}>
-            <Icon name="search" size={18} color={COLORS.gray500} style={styles.searchIcon} />
+          <View style={commonStyles.inputWrapper}>
+            <Icon name="search" size={18} color={COLORS.gray500} style={commonStyles.inputIcon} />
             <TextInput
-              style={styles.searchInput}
+              style={commonStyles.input}
               placeholder="Serial"
               placeholderTextColor={COLORS.gray400}
               value={serial}
@@ -132,19 +132,19 @@ const ProductLookupScreen = () => {
             />
             <TouchableOpacity
               onPress={handleScanQR}
-              style={styles.scanButton}
+              style={commonStyles.scanButton}
               disabled={isLoading}
             >
               <Image
                 source={require('../../../assets/images/scan_me.png')}
-                style={styles.scanImage}
+                style={commonStyles.scanImage}
                 resizeMode="contain"
               />
             </TouchableOpacity>
           </View>
 
           <TouchableOpacity
-            style={[styles.searchButton, isLoading && styles.searchButtonDisabled]}
+            style={[commonStyles.buttonPrimary, isLoading && commonStyles.buttonPrimaryDisabled]}
             onPress={handleSearch}
             activeOpacity={0.8}
             disabled={isLoading}
@@ -152,14 +152,14 @@ const ProductLookupScreen = () => {
             {isLoading ? (
               <ActivityIndicator color={COLORS.white} size="small" />
             ) : (
-              <Text style={styles.searchButtonText}>Kiểm tra</Text>
+              <Text style={commonStyles.buttonPrimaryText}>Kiểm tra</Text>
             )}
           </TouchableOpacity>
         </View>
 
         {/* Result Card */}
         {result && (
-          <View style={styles.resultCard}>
+          <View style={commonStyles.cardWithMarginLarge}>
             {/* Status Header */}
             <View
               style={[
@@ -185,49 +185,49 @@ const ProductLookupScreen = () => {
             {/* Product Details */}
             {result.isAuthentic && (
               <View style={styles.resultBody}>
-                <Text style={styles.sectionTitle}>Thông tin sản phẩm</Text>
+                <Text style={commonStyles.sectionTitle}>Thông tin sản phẩm</Text>
 
                 {/* Serial */}
-                <View style={styles.infoRow}>
-                  <Text style={styles.infoLabel}>Số serial:</Text>
-                  <Text style={styles.infoValue}>{result.serial}</Text>
+                <View style={commonStyles.infoRowHorizontal}>
+                  <Text style={commonStyles.infoLabelFixed}>Số serial:</Text>
+                  <Text style={commonStyles.infoValueFlex}>{result.serial}</Text>
                 </View>
 
                 {/* Product Code */}
                 {result.code && (
-                  <View style={styles.infoRow}>
-                    <Text style={styles.infoLabel}>Mã sản phẩm:</Text>
-                    <Text style={styles.infoValue}>{result.code}</Text>
+                  <View style={commonStyles.infoRowHorizontal}>
+                    <Text style={commonStyles.infoLabelFixed}>Mã sản phẩm:</Text>
+                    <Text style={commonStyles.infoValueFlex}>{result.code}</Text>
                   </View>
                 )}
 
                 {/* Product Name */}
-                <View style={styles.infoRow}>
-                  <Text style={styles.infoLabel}>Tên sản phẩm:</Text>
-                  <Text style={styles.infoValue}>{result.name}</Text>
+                <View style={commonStyles.infoRowHorizontal}>
+                  <Text style={commonStyles.infoLabelFixed}>Tên sản phẩm:</Text>
+                  <Text style={commonStyles.infoValueFlex}>{result.name}</Text>
                 </View>
 
                 {/* Warranty Time */}
                 {result.warrantyTime && (
-                  <View style={styles.infoRow}>
-                    <Text style={styles.infoLabel}>Thời gian BH:</Text>
-                    <Text style={styles.infoValue}>{result.warrantyTime}</Text>
+                  <View style={commonStyles.infoRowHorizontal}>
+                    <Text style={commonStyles.infoLabelFixed}>Thời gian BH:</Text>
+                    <Text style={commonStyles.infoValueFlex}>{result.warrantyTime}</Text>
                   </View>
                 )}
 
                 {/* Export Date */}
                 {result.exportDate && (
-                  <View style={styles.infoRow}>
-                    <Text style={styles.infoLabel}>Ngày xuất kho:</Text>
-                    <Text style={styles.infoValue}>{result.exportDate}</Text>
+                  <View style={commonStyles.infoRowHorizontal}>
+                    <Text style={commonStyles.infoLabelFixed}>Ngày xuất kho:</Text>
+                    <Text style={commonStyles.infoValueFlex}>{result.exportDate}</Text>
                   </View>
                 )}
 
                 {/* Seller */}
                 {result.seller && (
-                  <View style={styles.infoRow}>
-                    <Text style={styles.infoLabel}>Nơi bán:</Text>
-                    <Text style={styles.infoValue}>{result.seller}</Text>
+                  <View style={commonStyles.infoRowHorizontal}>
+                    <Text style={commonStyles.infoLabelFixed}>Nơi bán:</Text>
+                    <Text style={commonStyles.infoValueFlex}>{result.seller}</Text>
                   </View>
                 )}
 
@@ -258,7 +258,7 @@ const ProductLookupScreen = () => {
           </View>
         </View>
 
-        <View style={styles.bottomSpacing} />
+        <View style={commonStyles.bottomSpacing} />
       </ScrollView>
 
       {/* Barcode Scanner Modal */}
@@ -280,102 +280,6 @@ const styles = StyleSheet.create({
   scrollView: {
     flex: 1,
   },
-  backIcon: {
-    fontSize: 32,
-    color: COLORS.white,
-    fontWeight: '300',
-  },
-
-  // Page Header
-  pageHeader: {
-    backgroundColor: COLORS.white,
-    marginHorizontal: SPACING.lg,
-    marginTop: SPACING.md,
-    padding: SPACING.md,
-    borderRadius: BORDER_RADIUS.lg,
-    ...SHADOWS.sm,
-  },
-  pageTitle: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: COLORS.textPrimary,
-    textAlign: 'center',
-  },
-
-  // Search Card
-  searchCard: {
-    backgroundColor: COLORS.white,
-    marginHorizontal: SPACING.lg,
-    marginTop: SPACING.md,
-    padding: SPACING.lg,
-    borderRadius: BORDER_RADIUS.xl,
-    ...SHADOWS.md,
-  },
-  searchLabel: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: COLORS.textPrimary,
-    marginBottom: SPACING.sm,
-  },
-  searchWrapper: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: COLORS.gray50,
-    borderRadius: BORDER_RADIUS.md,
-    borderWidth: 1,
-    borderColor: COLORS.gray200,
-    paddingHorizontal: SPACING.md,
-    marginBottom: SPACING.md,
-  },
-  searchIcon: {
-    fontSize: 20,
-    marginRight: SPACING.sm,
-  },
-  searchInput: {
-    flex: 1,
-    fontSize: 15,
-    color: COLORS.textPrimary,
-    paddingVertical: SPACING.md,
-  },
-  scanButton: {
-    padding: SPACING.xs,
-    marginLeft: SPACING.xs,
-  },
-  scanIcon: {
-    fontSize: 24,
-  },
-  scanImage: {
-    width: 32,
-    height: 32,
-  },
-  searchButton: {
-    backgroundColor: COLORS.primary,
-    paddingVertical: 0,
-    alignItems: 'center',
-    justifyContent: 'center',
-    height: 48,
-    borderRadius: BORDER_RADIUS.md,
-    ...SHADOWS.sm,
-  },
-  searchButtonText: {
-    fontSize: 15,
-    fontWeight: '700',
-    color: COLORS.white,
-    letterSpacing: 0.5,
-  },
-  searchButtonDisabled: {
-    opacity: 0.6,
-  },
-
-  // Result Card
-  resultCard: {
-    backgroundColor: COLORS.white,
-    marginHorizontal: SPACING.lg,
-    marginTop: SPACING.md,
-    borderRadius: BORDER_RADIUS.xl,
-    overflow: 'hidden',
-    ...SHADOWS.md,
-  },
   statusHeader: {
     alignItems: 'center',
     paddingVertical: SPACING.xl,
@@ -389,7 +293,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: SPACING.md,
-    ...SHADOWS.md,
   },
   statusIconLarge: {
     fontSize: 48,
@@ -402,40 +305,16 @@ const styles = StyleSheet.create({
   resultBody: {
     padding: SPACING.lg,
   },
-  sectionTitle: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: COLORS.textPrimary,
-    marginBottom: SPACING.md,
-  },
-  infoRow: {
-    flexDirection: 'row',
-    marginBottom: SPACING.sm,
-  },
-  infoLabel: {
-    fontSize: 14,
-    color: COLORS.textSecondary,
-    fontWeight: '600',
-    width: 120,
-  },
-  infoValue: {
-    flex: 1,
-    fontSize: 14,
-    color: COLORS.textPrimary,
-    fontWeight: '500',
-  },
   divider: {
     height: 1,
     backgroundColor: COLORS.gray200,
     marginVertical: SPACING.md,
   },
-
-  // Authentic Note
   authenticNote: {
     flexDirection: 'row',
     alignItems: 'flex-start',
     backgroundColor: '#E8F5E9',
-    borderRadius: BORDER_RADIUS.md,
+    borderRadius: 12,
     padding: SPACING.md,
     borderLeftWidth: 4,
     borderLeftColor: COLORS.success,
@@ -452,38 +331,9 @@ const styles = StyleSheet.create({
     lineHeight: 18,
     fontWeight: '500',
   },
-
-  // Warning Box
-  warningBox: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    backgroundColor: '#FFEBEE',
-    borderRadius: BORDER_RADIUS.md,
-    padding: SPACING.md,
-    borderLeftWidth: 4,
-    borderLeftColor: COLORS.error,
-  },
-  warningIcon: {
-    fontSize: 20,
-    marginRight: SPACING.sm,
-    marginTop: 2,
-  },
-  warningText: {
-    flex: 1,
-    fontSize: 13,
-    color: COLORS.error,
-    lineHeight: 18,
-    fontWeight: '500',
-  },
-
-  // Info Box
   infoBoxMargin: {
     marginHorizontal: SPACING.lg,
     marginTop: SPACING.md,
-  },
-
-  bottomSpacing: {
-    height: SPACING.xl,
   },
 });
 

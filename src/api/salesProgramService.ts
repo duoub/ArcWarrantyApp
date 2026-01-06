@@ -52,8 +52,6 @@ export const salesProgramService = {
         typeget: typeget,
       });
 
-      console.log('📊 Fetching sales programs:', url);
-
       const response = await fetch(url, {
         method: 'GET',
         headers: {
@@ -63,17 +61,9 @@ export const salesProgramService = {
 
       const result: SalesProgramDataRaw = await response.json();
 
-      console.log('📊 Sales programs response:', {
-        resultType: typeof result,
-        programsCount: result.listchuongtrinhsale?.length || 0,
-        data: result,
-      });
-
       // Check if we got valid data
       if (result && Array.isArray(result.listchuongtrinhsale)) {
         const programs = result.listchuongtrinhsale.map(parseSalesProgramItem);
-
-        console.log('✅ Parsed sales programs:', programs);
 
         return {
           status: true,
@@ -83,7 +73,6 @@ export const salesProgramService = {
         throw new Error('Không thể tải danh sách chương trình bán hàng');
       }
     } catch (error) {
-      console.error('❌ Sales programs fetch error:', error);
       if (error instanceof Error) {
         throw error;
       }
@@ -108,8 +97,6 @@ export const salesProgramService = {
         userid: credentials.username,
       };
 
-      console.log('📝 Registering for program:', requestData);
-
       const response = await fetch(url, {
         method: 'POST',
         headers: {
@@ -120,8 +107,6 @@ export const salesProgramService = {
 
       const result = await response.json();
 
-      console.log('📝 Program registration response:', result);
-
       if (!result.status) {
         throw new Error(result.message || 'Không thể đăng ký chương trình');
       }
@@ -131,7 +116,6 @@ export const salesProgramService = {
         message: result.message || 'Đăng ký chương trình thành công',
       };
     } catch (error) {
-      console.error('❌ Program registration error:', error);
       if (error instanceof Error) {
         throw error;
       }

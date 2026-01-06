@@ -46,8 +46,6 @@ export const dealerService = {
 
       const url = buildApiUrl('/getlistdaily', apiParams);
 
-      console.log('🏪 Fetching dealer list:', url);
-
       const response = await fetch(url, {
         method: 'GET',
         headers: {
@@ -57,12 +55,6 @@ export const dealerService = {
 
       const result = await response.json();
 
-      console.log('🏪 Dealer list response:', {
-        nextpage: result.nextpage,
-        count: Array.isArray(result.list) ? result.list.length : 0,
-        firstItem: Array.isArray(result.list) && result.list.length > 0 ? result.list[0] : null,
-      });
-
       // Validate response
       if (!result.list || !Array.isArray(result.list)) {
         throw new Error('Invalid response format');
@@ -71,14 +63,11 @@ export const dealerService = {
       // Parse raw data to clean format
       const parsedData: DealerInfo[] = result.list.map(parseDealerInfo);
 
-      console.log('✅ Parsed dealer list:', parsedData);
-
       return {
         nextpage: result.nextpage || false,
         list: parsedData,
       };
     } catch (error) {
-      console.error('❌ Dealer list error:', error);
       if (error instanceof Error) {
         throw error;
       }
