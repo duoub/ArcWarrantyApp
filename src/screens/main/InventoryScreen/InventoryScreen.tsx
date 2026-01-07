@@ -7,7 +7,6 @@ import {
   ScrollView,
   TouchableOpacity,
   StatusBar,
-  RefreshControl,
   ActivityIndicator,
   Alert,
   Image,
@@ -33,7 +32,6 @@ const InventoryScreen = () => {
   const [searchKeyword, setSearchKeyword] = useState(''); // Debounced keyword
   const [showScanner, setShowScanner] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [isRefreshing, setIsRefreshing] = useState(false);
   const [inventoryList, setInventoryList] = useState<InventoryItem[]>([]);
   const [totalCount, setTotalCount] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
@@ -88,12 +86,6 @@ const InventoryScreen = () => {
       setIsLoading(false);
       setIsLoadingMore(false);
     }
-  };
-
-  const handleRefresh = async () => {
-    setIsRefreshing(true);
-    await loadInventory(1, true);
-    setIsRefreshing(false);
   };
 
   const handleLoadMore = () => {
@@ -276,14 +268,6 @@ const InventoryScreen = () => {
       <ScrollView
         style={styles.scrollView}
         showsVerticalScrollIndicator={false}
-        refreshControl={
-          <RefreshControl
-            refreshing={isRefreshing}
-            onRefresh={handleRefresh}
-            colors={[COLORS.primary]}
-            tintColor={COLORS.primary}
-          />
-        }
         onScroll={({ nativeEvent }) => {
           const { layoutMeasurement, contentOffset, contentSize } = nativeEvent;
           const isCloseToBottom = layoutMeasurement.height + contentOffset.y >= contentSize.height - 100;
@@ -301,7 +285,7 @@ const InventoryScreen = () => {
         </View>
 
         {/* Loading State */}
-        {isLoading && !isRefreshing && (
+        {isLoading && (
           <View style={commonStyles.loadingContainer}>
             <ActivityIndicator size="large" color={COLORS.primary} />
             <Text style={commonStyles.loadingText}>Đang tải...</Text>

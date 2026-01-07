@@ -10,11 +10,10 @@ import {
   Linking,
   Alert,
   ActivityIndicator,
-  RefreshControl,
   NativeSyntheticEvent,
   NativeScrollEvent,
 } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { COLORS, SPACING, BORDER_RADIUS, SHADOWS } from '../../../config/theme';
 import CustomHeader from '../../../components/CustomHeader';
 import ProvinceSelector from '../../../components/ProvinceSelector';
@@ -22,9 +21,14 @@ import { distributionSystemService } from '../../../api/distributionSystemServic
 import { Distributor } from '../../../types/distributionSystem';
 import { openMapDirections } from '../../../utils/mapNavigation';
 import { Icon } from '../../../components/common';
+import { MenuStackParamList } from '../../../navigation/MainNavigator';
+
+type DistributionSystemScreenRouteProp = RouteProp<MenuStackParamList, 'DistributionSystem'>;
 
 const DistributionSystemScreen = () => {
   const navigation = useNavigation<any>();
+  const route = useRoute<DistributionSystemScreenRouteProp>();
+  const type = route.params?.type;
 
   // Handle back button press
   const handleBack = () => {
@@ -39,7 +43,6 @@ const DistributionSystemScreen = () => {
   const [selectedProvince, setSelectedProvince] = useState<string>('Tỉnh thành');
   const [isLoading, setIsLoading] = useState(false);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
-  const [isRefreshing, setIsRefreshing] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [hasNextPage, setHasNextPage] = useState(false);
 
@@ -60,6 +63,7 @@ const DistributionSystemScreen = () => {
         page,
         tentinhthanh: selectedProvince,
         keyword: searchKeyword,
+        type,
       });
 
       if (reset) {
@@ -78,7 +82,6 @@ const DistributionSystemScreen = () => {
     } finally {
       setIsLoading(false);
       setIsLoadingMore(false);
-      setIsRefreshing(false);
     }
   };
 
@@ -104,13 +107,6 @@ const DistributionSystemScreen = () => {
       }
     };
   }, [keyword]);
-
-  // Pull to refresh handler
-  const handleRefresh = useCallback(() => {
-    setIsRefreshing(true);
-    loadDistributors(1, true);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   // Load more when scrolling near bottom
   const handleScroll = useCallback(
@@ -207,7 +203,7 @@ const DistributionSystemScreen = () => {
       <StatusBar barStyle="light-content" backgroundColor={COLORS.primary} />
 
       <CustomHeader
-        title="Hệ thống phân phối"
+        title={type === 'dl' ? 'Hệ thống đại lý' : 'Hệ thống phân phối'}
         leftIcon={<Icon name="back" size={24} color={COLORS.white} />}
         onLeftPress={handleBack}
       />
@@ -238,14 +234,6 @@ const DistributionSystemScreen = () => {
         <ScrollView
           style={styles.scrollView}
           showsVerticalScrollIndicator={true}
-          refreshControl={
-            <RefreshControl
-              refreshing={isRefreshing}
-              onRefresh={handleRefresh}
-              colors={[COLORS.primary]}
-              tintColor={COLORS.primary}
-            />
-          }
           onScroll={handleScroll}
           scrollEventThrottle={400}
         >

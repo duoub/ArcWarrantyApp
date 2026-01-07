@@ -10,7 +10,6 @@ import {
   Linking,
   Alert,
   ActivityIndicator,
-  RefreshControl,
   NativeSyntheticEvent,
   NativeScrollEvent,
 } from 'react-native';
@@ -39,7 +38,6 @@ const WarrantyStationListScreen = () => {
   const [selectedProvince, setSelectedProvince] = useState<string>('Tỉnh thành');
   const [isLoading, setIsLoading] = useState(false);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
-  const [isRefreshing, setIsRefreshing] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [hasNextPage, setHasNextPage] = useState(false);
 
@@ -78,7 +76,6 @@ const WarrantyStationListScreen = () => {
     } finally {
       setIsLoading(false);
       setIsLoadingMore(false);
-      setIsRefreshing(false);
     }
   };
 
@@ -104,13 +101,6 @@ const WarrantyStationListScreen = () => {
       }
     };
   }, [keyword]);
-
-  // Pull to refresh handler
-  const handleRefresh = useCallback(() => {
-    setIsRefreshing(true);
-    loadWarrantyStations(1, true);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   // Load more when scrolling near bottom
   const handleScroll = useCallback(
@@ -245,14 +235,6 @@ const WarrantyStationListScreen = () => {
         <ScrollView
           style={styles.scrollView}
           showsVerticalScrollIndicator={true}
-          refreshControl={
-            <RefreshControl
-              refreshing={isRefreshing}
-              onRefresh={handleRefresh}
-              colors={[COLORS.primary]}
-              tintColor={COLORS.primary}
-            />
-          }
           onScroll={handleScroll}
           scrollEventThrottle={400}
         >

@@ -33,7 +33,7 @@ export const distributionSystemService = {
     params: GetDistributorsRequest
   ): Promise<GetDistributorsResponse> => {
     try {
-      const { page, tentinhthanh, keyword = '' } = params;
+      const { page, tentinhthanh, keyword = '', type } = params;
 
       // Build API URL with query params
       const url = buildApiUrl('/getlistnhaphanphoi', {
@@ -41,6 +41,7 @@ export const distributionSystemService = {
         page: page,
         tentinhthanh: tentinhthanh,
         keyword: keyword,
+        ...(type && { type }),
       });
 
       const response = await fetch(url, {

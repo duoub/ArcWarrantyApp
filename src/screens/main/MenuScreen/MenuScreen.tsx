@@ -55,7 +55,12 @@ const MenuScreen = () => {
         {
           icon: 'distribution',
           label: 'Hệ thống phân phối',
-          onPress: () => navigation.navigate('DistributionSystem'),
+          onPress: () => navigation.navigate('DistributionSystem', { type: 'npp' }),
+        },
+        {
+          icon: 'dealer',
+          label: 'Hệ thống đại lý',
+          onPress: () => navigation.navigate('DistributionSystem', { type: 'dl' }),
         },
       ],
     },
@@ -78,6 +83,11 @@ const MenuScreen = () => {
           onPress: () => navigation.navigate('WarrantyReport'),
         },
         {
+          icon: 'warranty-report-list',
+          label: 'Tra cứu ca bảo hành',
+          onPress: () => navigation.navigate('WarrantyReport'),
+        },
+        {
           icon: 'product-lookup',
           label: 'Tra cứu sản phẩm chính hãng',
           onPress: () => navigation.navigate('ProductLookup'),
@@ -90,6 +100,11 @@ const MenuScreen = () => {
         {
           icon: 'warranty-station',
           label: 'Hệ thống điểm bảo hành',
+          onPress: () => navigation.navigate('WarrantyStationList'),
+        },
+        {
+          icon: 'error-code',
+          label: 'Tra cứu mã lỗi bảo hành',
           onPress: () => navigation.navigate('WarrantyStationList'),
         },
       ],

@@ -4,6 +4,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
 import { COLORS, SPACING, SHADOWS } from '../config/theme';
 import { Icon } from '../components/common';
+import { DistributorType } from '../types/distributionSystem';
 import HomeScreen from '../screens/main/HomeScreen/HomeScreen';
 import MenuScreen from '../screens/main/MenuScreen/MenuScreen';
 import WarrantyActivationScreen from '../screens/main/WarrantyActivationScreen/WarrantyActivationScreen';
@@ -46,7 +47,7 @@ export type MenuStackParamList = {
   WarrantyLookup: undefined;
   ProductLookup: undefined;
   Product: undefined;
-  DistributionSystem: undefined;
+  DistributionSystem: { type?: DistributorType } | undefined;
   Notification: undefined;
   News: undefined;
   Contact: undefined;

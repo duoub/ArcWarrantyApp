@@ -2,6 +2,9 @@
  * Distribution System Type Definitions
  */
 
+// Distributor type
+export type DistributorType = 'npp' | 'dl';
+
 // Raw API response from backend
 export interface DistributorRaw {
   MaTram: string;
@@ -23,6 +26,7 @@ export interface GetDistributorsRequest {
   page: number;
   tentinhthanh: string; // Province name, "Tỉnh thành" for all
   keyword?: string;
+  type?: DistributorType;
 }
 
 export interface GetDistributorsResponse {
