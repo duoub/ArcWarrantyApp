@@ -16,7 +16,9 @@ export type IconName =
   | 'product-info'
   | 'sales-policy'
   | 'distribution'
+  | 'dealer'
   | 'warranty-report'
+  | 'warranty-report-list'
   | 'warranty-lookup'
   | 'product-lookup'
   | 'warranty-policy'
@@ -50,6 +52,7 @@ export type IconName =
   | 'camera'
   | 'image'
   | 'info'
+  | 'error-code'
   | 'question'
   | 'warehouse'
   | 'bank'
@@ -76,12 +79,15 @@ const iconMap: Record<IconName, IconConfig> = {
   // Menu Icons - Thiết bị gia dụng
   'product-info': { provider: 'MaterialCommunityIcons', name: 'air-conditioner' },
   'sales-policy': { provider: 'MaterialCommunityIcons', name: 'file-document' },
-  'distribution': { provider: 'MaterialCommunityIcons', name: 'store-marker' },
+  'distribution': { provider: 'MaterialCommunityIcons', name: 'truck' },
+  'dealer': { provider: 'MaterialCommunityIcons', name: 'store-marker' },
   'warranty-report': { provider: 'MaterialCommunityIcons', name: 'tools' },
+  'warranty-report-list': { provider: 'MaterialCommunityIcons', name: 'toy-brick-search' },
   'warranty-lookup': { provider: 'MaterialCommunityIcons', name: 'shield-search' },
   'product-lookup': { provider: 'MaterialCommunityIcons', name: 'check-decagram' },
   'warranty-policy': { provider: 'MaterialCommunityIcons', name: 'shield-alert' },
   'warranty-station': { provider: 'MaterialCommunityIcons', name: 'map-marker-radius' },
+  'error-code': { provider: 'MaterialCommunityIcons', name: 'alert-octagon' },
 
   // Common Icons
   'notification': { provider: 'MaterialCommunityIcons', name: 'bell' },
@@ -96,7 +102,7 @@ const iconMap: Record<IconName, IconConfig> = {
   'city': { provider: 'MaterialCommunityIcons', name: 'city' },
   'mobile': { provider: 'Feather', name: 'smartphone' },
   'website': { provider: 'Feather', name: 'globe' },
-  'back': { provider: 'Feather', name: 'arrow-left' },
+  'back': { provider: 'Feather', name: 'chevron-left' },
   'lock': { provider: 'MaterialCommunityIcons', name: 'lock' },
   'checkbox-checked': { provider: 'Feather', name: 'check-square' },
   'checkbox-unchecked': { provider: 'Feather', name: 'square' },

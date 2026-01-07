@@ -33,6 +33,7 @@ const BarcodeScanner: React.FC<BarcodeScannerProps> = ({
 }) => {
   const [hasPermission, setHasPermission] = useState(false);
   const [isActive, setIsActive] = useState(false);
+  const [flashEnabled, setFlashEnabled] = useState(false);
   const device = useCameraDevice('back');
 
   useEffect(() => {
@@ -138,6 +139,7 @@ const BarcodeScanner: React.FC<BarcodeScannerProps> = ({
               isActive={isActive}
               codeScanner={codeScanner}
               enableZoomGesture
+              torch={flashEnabled ? 'on' : 'off'}
             />
 
             {/* Overlay with scanning frame */}
@@ -158,6 +160,20 @@ const BarcodeScanner: React.FC<BarcodeScannerProps> = ({
                 <Text style={styles.instructionText}>
                   Đưa mã vạch/QR code vào khung hình
                 </Text>
+
+                {/* Flash Toggle Button */}
+                <TouchableOpacity
+                  style={styles.flashButton}
+                  onPress={() => setFlashEnabled(!flashEnabled)}
+                  activeOpacity={0.7}
+                >
+                  <Text style={styles.flashIcon}>
+                    {flashEnabled ? '⚡' : '🔦'}
+                  </Text>
+                  <Text style={styles.flashText}>
+                    {flashEnabled ? 'Tắt đèn' : 'Bật đèn'}
+                  </Text>
+                </TouchableOpacity>
               </View>
             </View>
           </>
@@ -306,6 +322,27 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontWeight: '600',
     paddingHorizontal: SPACING.xl,
+  },
+
+  // Flash Button
+  flashButton: {
+    marginTop: SPACING.xl,
+    paddingHorizontal: SPACING.xl,
+    paddingVertical: SPACING.md,
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    borderRadius: BORDER_RADIUS.lg,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: SPACING.sm,
+  },
+  flashIcon: {
+    fontSize: 24,
+  },
+  flashText: {
+    fontSize: 16,
+    color: COLORS.white,
+    fontWeight: '600',
   },
 });
 
