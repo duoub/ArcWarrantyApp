@@ -18,12 +18,16 @@ import DealerListScreen from '../screens/main/DealerListScreen/DealerListScreen'
 import WarrantyStationListScreen from '../screens/main/WarrantyStationListScreen/WarrantyStationListScreen';
 import WarrantyReportScreen from '../screens/main/WarrantyReportScreen/WarrantyReportScreen';
 import WarrantyLookupScreen from '../screens/main/WarrantyLookupScreen/WarrantyLookupScreen';
+import WarrantyCaseListScreen from '../screens/main/WarrantyCaseListScreen/WarrantyCaseListScreen';
+import ErrorCodeListScreen from '../screens/main/ErrorCodeListScreen/ErrorCodeListScreen';
 import ProductLookupScreen from '../screens/main/ProductLookupScreen/ProductLookupScreen';
 import ProductScreen from '../screens/main/ProductScreen/ProductScreen';
 import DistributionSystemScreen from '../screens/main/DistributionSystemScreen/DistributionSystemScreen';
 import NotificationScreen from '../screens/main/NotificationScreen/NotificationScreen';
 import NewsScreen from '../screens/main/NewsScreen/NewsScreen';
 import ContactScreen from '../screens/main/ContactScreen/ContactScreen';
+import PaymentDetailScreen from '../screens/main/PaymentDetailScreen/PaymentDetailScreen';
+import RewardDetailScreen from '../screens/main/RewardDetailScreen/RewardDetailScreen';
 
 export type MainTabParamList = {
   HomeStack: undefined;
@@ -37,6 +41,8 @@ export type HomeStackParamList = {
   Home: undefined;
   SalesProgram: undefined;
   Inventory: undefined;
+  PaymentDetail: undefined;
+  RewardDetail: undefined;
 };
 
 export type MenuStackParamList = {
@@ -45,6 +51,8 @@ export type MenuStackParamList = {
   WarrantyStationList: undefined;
   WarrantyReport: undefined;
   WarrantyLookup: undefined;
+  WarrantyCaseList: undefined;
+  ErrorCodeList: undefined;
   ProductLookup: undefined;
   Product: undefined;
   DistributionSystem: { type?: DistributorType } | undefined;
@@ -97,6 +105,8 @@ const HomeStackNavigator = () => {
       <HomeStack.Screen name="Home" component={HomeScreen} />
       <HomeStack.Screen name="SalesProgram" component={SalesProgramScreen} />
       <HomeStack.Screen name="Inventory" component={InventoryScreen} />
+      <HomeStack.Screen name="PaymentDetail" component={PaymentDetailScreen} />
+      <HomeStack.Screen name="RewardDetail" component={RewardDetailScreen} />
     </HomeStack.Navigator>
   );
 };
@@ -110,6 +120,8 @@ const MenuStackNavigator = () => {
       <MenuStack.Screen name="WarrantyStationList" component={WarrantyStationListScreen} />
       <MenuStack.Screen name="WarrantyReport" component={WarrantyReportScreen} />
       <MenuStack.Screen name="WarrantyLookup" component={WarrantyLookupScreen} />
+      <MenuStack.Screen name="WarrantyCaseList" component={WarrantyCaseListScreen} />
+      <MenuStack.Screen name="ErrorCodeList" component={ErrorCodeListScreen} />
       <MenuStack.Screen name="ProductLookup" component={ProductLookupScreen} />
       <MenuStack.Screen name="Product" component={ProductScreen} />
       <MenuStack.Screen name="DistributionSystem" component={DistributionSystemScreen} />

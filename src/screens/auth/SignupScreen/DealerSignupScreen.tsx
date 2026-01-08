@@ -191,7 +191,7 @@ const DealerSignupScreen: React.FC = () => {
       let uploadedFiles: UploadedFile[] = [];
 
       // Step 1: Upload images
-      try{
+      try {
         // Extract URIs from ImageItem array
         const imagePaths = images.map((img) => img.uri);
         uploadedFiles = await uploadService.uploadMultipleImages(imagePaths);

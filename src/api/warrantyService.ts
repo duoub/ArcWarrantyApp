@@ -77,12 +77,12 @@ export const warrantyService = {
 
       const requestData = {
         storeid: API_CONFIG.STORE_ID,
+        userid: credentials.userid,
         keyword: data.serial,
         custask: data.issueDescription,
         cusname: data.customerName,
         cusmobile: data.phone,
         cusaddress: data.address,
-        dailyid: credentials.userid,
         imgs: data.images || [],
         tinhthanh: data.tinhthanh,
         quanhuyen: data.quanhuyen,

@@ -85,7 +85,7 @@ const MenuScreen = () => {
         {
           icon: 'warranty-report-list',
           label: 'Tra cứu ca bảo hành',
-          onPress: () => navigation.navigate('WarrantyReport'),
+          onPress: () => navigation.navigate('WarrantyCaseList'),
         },
         {
           icon: 'product-lookup',
@@ -105,7 +105,7 @@ const MenuScreen = () => {
         {
           icon: 'error-code',
           label: 'Tra cứu mã lỗi bảo hành',
-          onPress: () => navigation.navigate('WarrantyStationList'),
+          onPress: () => navigation.navigate('ErrorCodeList'),
         },
       ],
     },

@@ -139,6 +139,14 @@ const HomeScreen = () => {
     navigation.navigate('Inventory');
   };
 
+  const handlePaymentDetailPress = () => {
+    navigation.navigate('PaymentDetail');
+  };
+
+  const handleRewardDetailPress = () => {
+    navigation.navigate('RewardDetail');
+  };
+
   const renderBanner = ({ item, index }: { item: any; index: number }) => (
     <TouchableOpacity
       activeOpacity={0.9}
@@ -200,7 +208,9 @@ const HomeScreen = () => {
               <Avatar uri={user.avatar} size={48} />
               <View style={styles.userInfo}>
                 <Text style={styles.userName}>{user.name}</Text>
-                <Text style={styles.userEmail}>{user.email}</Text>
+                <Text style={styles.userEmail}>
+                  Điểm tích lũy: {profileData?.rewardPoints || 0}
+                </Text>
               </View>
             </View>
             <TouchableOpacity
@@ -251,9 +261,16 @@ const HomeScreen = () => {
 
               {/* Table Rows */}
               <View style={commonStyles.tableRow}>
-                <Text style={commonStyles.tableLabel}>Chương trình sell in/out</Text>
+                <Text style={commonStyles.tableLabel}>Chương trình sell in</Text>
                 <Text style={commonStyles.tableValue}>
-                  {profileData?.salesProgram || '0'}
+                  {profileData?.sellInCommission || '0'}
+                </Text>
+              </View>
+
+              <View style={commonStyles.tableRow}>
+                <Text style={commonStyles.tableLabel}>Chương trình sell out</Text>
+                <Text style={commonStyles.tableValue}>
+                  {profileData?.sellOutCommission || '0'}
                 </Text>
               </View>
 
@@ -272,6 +289,16 @@ const HomeScreen = () => {
                 </Text>
               </View>
 
+              {/* Reward Detail Button */}
+              <TouchableOpacity
+                style={styles.detailButton}
+                onPress={handleRewardDetailPress}
+                activeOpacity={0.7}
+              >
+                <Text style={styles.detailButtonText}>Xem chi tiết thưởng</Text>
+                <Text style={[commonStyles.chevronIcon, styles.detailChevron]}>›</Text>
+              </TouchableOpacity>
+
               {/* Table Footer - Paid */}
               <View style={[commonStyles.tableRow, commonStyles.tableFooter]}>
                 <Text style={commonStyles.tableFooterLabel}>Đã thanh toán</Text>
@@ -279,6 +306,16 @@ const HomeScreen = () => {
                   {profileData?.paid || '0'}
                 </Text>
               </View>
+
+              {/* Payment Detail Button */}
+              <TouchableOpacity
+                style={styles.detailButton}
+                onPress={handlePaymentDetailPress}
+                activeOpacity={0.7}
+              >
+                <Text style={styles.detailButtonText}>Xem chi tiết thanh toán</Text>
+                <Text style={[commonStyles.chevronIcon, styles.detailChevron]}>›</Text>
+              </TouchableOpacity>
             </View>
           </View>
         )}
@@ -401,6 +438,26 @@ const styles = StyleSheet.create({
   tableColRight: {
     width: 120,
     textAlign: 'right',
+  },
+
+  // Detail Button
+  detailButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingVertical: SPACING.sm,
+    paddingHorizontal: SPACING.md,
+    backgroundColor: COLORS.gray50,
+    borderTopWidth: 1,
+    borderTopColor: COLORS.gray200,
+  },
+  detailButtonText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: COLORS.primary,
+  },
+  detailChevron: {
+    color: COLORS.primary,
   },
 });
 

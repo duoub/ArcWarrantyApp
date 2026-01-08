@@ -19,8 +19,11 @@ const parseProfileData = (raw: ProfileDataRaw): ProfileData => {
   return {
     salesProgram: raw.thuongchuongtrinhsaleFormat || '0',
     warrantyCommission: raw.hoahongkichhoatFormat || '0',
+    sellInCommission: raw.hoahongsellinFormat || '0',
+    sellOutCommission: raw.hoahongselloutFormat || '0',
     total: raw.totalFormat || '0',
     paid: raw.paymentFormat || '0',
+    rewardPoints: raw.diemtichluy || 0,
     unreadCount: raw.countThongBaoChuaDoc || 0,
   };
 };

@@ -7,11 +7,17 @@ export interface ProfileDataRaw {
   // Reward/commission data (formatted as strings)
   thuongchuongtrinhsaleFormat?: string;
   hoahongkichhoatFormat?: string;
+  hoahongsellinFormat?: string;
+  hoahongselloutFormat?: string;
   totalFormat?: string;
   paymentFormat?: string;
+  diemtichluyFormat?: string;
 
   // Notification count
   countThongBaoChuaDoc?: number;
+
+  // Points
+  diemtichluy?: number;
 
   // Any other fields from the API
   [key: string]: any;
@@ -22,8 +28,13 @@ export interface ProfileData {
   // Reward/commission data
   salesProgram: string;
   warrantyCommission: string;
+  sellInCommission: string;
+  sellOutCommission: string;
   total: string;
   paid: string;
+
+  // Points
+  rewardPoints: number;
 
   // Notification count
   unreadCount: number;
