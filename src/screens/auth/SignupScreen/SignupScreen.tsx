@@ -80,20 +80,20 @@ const SignupScreen: React.FC = () => {
           {/* Thợ */}
           <TouchableOpacity
             style={styles.memberCard}
-            onPress={() => handleNotBuildForNow('Chức năng đăng ký cho Thợ đang được phát triển')}
+            onPress={() => navigation.navigate('TechnicianSignup')}
             activeOpacity={0.8}
           >
             <View style={styles.iconContainer}>
               <Text style={styles.memberIcon}>👷</Text>
             </View>
-            <Text style={styles.memberLabel}>Thợ</Text>
+            <Text style={styles.memberLabel}>Kỹ thuật viên</Text>
             <Text style={styles.memberDescription}>Kỹ thuật viên sửa chữa</Text>
           </TouchableOpacity>
 
           {/* Người tiêu dùng */}
           <TouchableOpacity
             style={styles.memberCard}
-            onPress={() => handleNotBuildForNow('Chức năng đăng ký cho Người tiêu dùng đang được phát triển')}
+            onPress={() => navigation.navigate('CustomerSignup')}
             activeOpacity={0.8}
           >
             <View style={styles.iconContainer}>

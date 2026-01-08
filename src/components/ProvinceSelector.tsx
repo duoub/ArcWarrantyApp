@@ -23,7 +23,7 @@ import { Icon } from './common';
 
 interface ProvinceSelectorProps {
   selectedProvince: string;
-  onProvinceChange: (provinceName: string) => void;
+  onProvinceChange: (provinceName: string, provinceCode: string) => void;
   label?: string;
   placeholder?: string;
 }
@@ -65,7 +65,7 @@ const ProvinceSelector: React.FC<ProvinceSelectorProps> = ({
   );
 
   const handleSelectProvince = (province: Province) => {
-    onProvinceChange(province.TenDiaBan);
+    onProvinceChange(province.TenDiaBan, province.MaDiaBan);
     setShowModal(false);
     setSearchKeyword('');
   };

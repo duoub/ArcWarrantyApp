@@ -4,7 +4,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
 import { COLORS, SPACING, SHADOWS } from '../config/theme';
 import { Icon } from '../components/common';
-import { DistributorType } from '../types/distributionSystem';
+// import { DistributorType } from '../types/distributionSystem';
 import HomeScreen from '../screens/main/HomeScreen/HomeScreen';
 import MenuScreen from '../screens/main/MenuScreen/MenuScreen';
 import WarrantyActivationScreen from '../screens/main/WarrantyActivationScreen/WarrantyActivationScreen';
@@ -28,6 +28,7 @@ import NewsScreen from '../screens/main/NewsScreen/NewsScreen';
 import ContactScreen from '../screens/main/ContactScreen/ContactScreen';
 import PaymentDetailScreen from '../screens/main/PaymentDetailScreen/PaymentDetailScreen';
 import RewardDetailScreen from '../screens/main/RewardDetailScreen/RewardDetailScreen';
+import { UserType } from '../types/user';
 
 export type MainTabParamList = {
   HomeStack: undefined;
@@ -55,7 +56,7 @@ export type MenuStackParamList = {
   ErrorCodeList: undefined;
   ProductLookup: undefined;
   Product: undefined;
-  DistributionSystem: { type?: DistributorType } | undefined;
+  DistributionSystem: { type?: UserType } | undefined;
   Notification: undefined;
   News: undefined;
   Contact: undefined;

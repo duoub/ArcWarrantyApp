@@ -81,7 +81,7 @@ const ProfileScreen = () => {
       Alert.alert('Thành công', 'Ảnh đại diện đã được cập nhật!');
     } catch (error: any) {
       Alert.alert('Lỗi', error.message || 'Không thể upload ảnh. Vui lòng thử lại.');
-    } finally{
+    } finally {
       setIsUploading(false);
     }
   };
@@ -342,7 +342,7 @@ const ProfileScreen = () => {
                 onPress={handleEditProfile}
                 activeOpacity={0.7}
               >
-                <Icon name="menu" size={16} color={COLORS.white} />
+                {/* <Icon name="menu" size={16} color={COLORS.white} /> */}
                 <Text style={[commonStyles.buttonPrimaryText, styles.editButtonText]}>Chỉnh sửa</Text>
               </TouchableOpacity>
             </View>

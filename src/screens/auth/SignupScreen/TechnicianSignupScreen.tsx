@@ -9,43 +9,29 @@ import {
   Alert,
   ScrollView,
   StatusBar,
-  Image,
-  Platform,
-  PermissionsAndroid,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import ImagePicker from 'react-native-image-crop-picker';
 import { COLORS, SPACING, BORDER_RADIUS } from '../../../config/theme';
-import { USER_TYPE } from '../../../config/constants';
 import { AuthStackParamList } from '../../../navigation/PreLoginRootNavigator';
 import CustomHeader from '../../../components/CustomHeader';
 import { Icon } from '../../../components/common';
 import ProvinceSelector from '../../../components/ProvinceSelector';
-import { uploadService, UploadedFile } from '../../../api/uploadService';
 import { authService } from '../../../api/authService';
 import { USER_TYPES } from '../../../types/user';
 
-type DealerSignupScreenNavigationProp = StackNavigationProp<AuthStackParamList, 'DealerSignup'>;
+type TechnicianSignupScreenNavigationProp = StackNavigationProp<AuthStackParamList, 'TechnicianSignup'>;
 
-interface ImageItem {
-  src: string;
-  uri: string;
-}
-
-// Dealer Signup Validation Schema
-const dealerSignupSchema = z.object({
-  hoten: z.string().min(1, 'Tên đơn vị là bắt buộc'),
+// Technician Signup Validation Schema
+const technicianSignupSchema = z.object({
+  hoten: z.string().min(1, 'Họ và tên là bắt buộc'),
   phone: z.string().min(1, 'Số điện thoại là bắt buộc').regex(/^[0-9]{10}$/, 'Số điện thoại không hợp lệ'),
   email: z.string().email('Email không hợp lệ').optional().or(z.literal('')),
   address: z.string().min(1, 'Địa chỉ là bắt buộc'),
   city: z.string().min(1, 'Tỉnh thành là bắt buộc'),
-  sotaikhoan: z.string().min(1, 'Số tài khoản là bắt buộc'),
-  tentaikhoan: z.string().min(1, 'Tên tài khoản là bắt buộc'),
-  nganhang: z.string().min(1, 'Ngân hàng là bắt buộc'),
   tendangnhap: z.string().min(1, 'Tên đăng nhập là bắt buộc').regex(/^[a-z0-9]+$/, 'Tên đăng nhập viết liền không dấu'),
   password: z.string().min(6, 'Mật khẩu phải có ít nhất 6 ký tự'),
   repassword: z.string().min(1, 'Vui lòng nhập lại mật khẩu'),
@@ -54,14 +40,13 @@ const dealerSignupSchema = z.object({
   path: ['repassword'],
 });
 
-type DealerSignupFormData = z.infer<typeof dealerSignupSchema>;
+type TechnicianSignupFormData = z.infer<typeof technicianSignupSchema>;
 
-const DealerSignupScreen: React.FC = () => {
-  const navigation = useNavigation<DealerSignupScreenNavigationProp>();
+const TechnicianSignupScreen: React.FC = () => {
+  const navigation = useNavigation<TechnicianSignupScreenNavigationProp>();
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showRePassword, setShowRePassword] = useState(false);
-  const [images, setImages] = useState<ImageItem[]>([]);
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [provinceCode, setProvinceCode] = useState('');
 
@@ -69,118 +54,21 @@ const DealerSignupScreen: React.FC = () => {
     control,
     handleSubmit,
     formState: { errors },
-    setValue,
-  } = useForm<DealerSignupFormData>({
-    resolver: zodResolver(dealerSignupSchema),
+  } = useForm<TechnicianSignupFormData>({
+    resolver: zodResolver(technicianSignupSchema),
     defaultValues: {
       hoten: '',
       phone: '',
       email: '',
       address: '',
       city: '',
-      sotaikhoan: '',
-      tentaikhoan: '',
-      nganhang: '',
       tendangnhap: '',
       password: '',
       repassword: '',
     },
   });
 
-  const handleAddImage = () => {
-    Alert.alert(
-      'Thêm ảnh',
-      'Chọn nguồn ảnh',
-      [
-        {
-          text: 'Chụp ảnh',
-          onPress: () => handleTakePhoto(),
-        },
-        {
-          text: 'Thư viện',
-          onPress: () => handlePickFromLibrary(),
-        },
-        {
-          text: 'Hủy',
-          style: 'cancel',
-        },
-      ],
-      { cancelable: true }
-    );
-  };
-
-  const handleTakePhoto = async () => {
-    try {
-      // Request camera permission for Android
-      if (Platform.OS === 'android') {
-        const granted = await PermissionsAndroid.request(
-          PermissionsAndroid.PERMISSIONS.CAMERA,
-          {
-            title: 'Quyền truy cập Camera',
-            message: 'Ứng dụng cần quyền truy cập camera để chụp ảnh.',
-            buttonNeutral: 'Hỏi sau',
-            buttonNegative: 'Từ chối',
-            buttonPositive: 'Đồng ý',
-          }
-        );
-        if (granted !== PermissionsAndroid.RESULTS.GRANTED) {
-          Alert.alert('Lỗi', 'Bạn cần cấp quyền truy cập camera để tiếp tục.');
-          return;
-        }
-      }
-
-      const image = await ImagePicker.openCamera({
-        mediaType: 'photo',
-        compressImageQuality: 0.8,
-      });
-
-      const newImage: ImageItem = {
-        src: image.path,
-        uri: image.path,
-      };
-
-      setImages([...images, newImage]);
-    } catch (error: any) {
-      if (error.code !== 'E_PICKER_CANCELLED') {
-        Alert.alert('Lỗi', 'Không thể chụp ảnh. Vui lòng thử lại.');
-      }
-    }
-  };
-
-  const handlePickFromLibrary = async () => {
-    try {
-      const selectedImages = await ImagePicker.openPicker({
-        multiple: true,
-        mediaType: 'photo',
-        compressImageQuality: 0.8,
-      });
-
-      // Add all selected images to the images array
-      const newImages: ImageItem[] = selectedImages.map((img) => ({
-        src: img.path,
-        uri: img.path,
-      }));
-
-      setImages([...images, ...newImages]);
-    } catch (error: any) {
-      if (error.code !== 'E_PICKER_CANCELLED') {
-        Alert.alert('Lỗi', 'Không thể chọn ảnh. Vui lòng thử lại.');
-      }
-    }
-  };
-
-  const handleRemoveImage = (index: number) => {
-    const updatedImages = images.filter((_, i) => i !== index);
-    setImages(updatedImages);
-  };
-
-  const onSubmit = async (data: DealerSignupFormData) => {
-    // Validate images
-    if (images.length < 4) {
-      Alert.alert('Thông báo', 'Vui lòng tải lên ít nhất 4 hình ảnh');
-      return;
-    }
-
+  const onSubmit = async (data: TechnicianSignupFormData) => {
     // Validate terms
     if (!termsAccepted) {
       Alert.alert('Thông báo', 'Vui lòng đồng ý với điều khoản sử dụng');
@@ -190,24 +78,6 @@ const DealerSignupScreen: React.FC = () => {
     try {
       setIsLoading(true);
 
-      let uploadedFiles: UploadedFile[] = [];
-
-      // Step 1: Upload images
-      try {
-        // Extract URIs from ImageItem array
-        const imagePaths = images.map((img) => img.uri);
-        uploadedFiles = await uploadService.uploadMultipleImages(imagePaths);
-      } catch (uploadError: any) {
-        Alert.alert(
-          'Lỗi upload ảnh',
-          uploadError.message || 'Không thể upload ảnh. Vui lòng thử lại.',
-          [{ text: 'OK' }]
-        );
-        setIsLoading(false);
-        return;
-      }
-
-      // Step 2: Submit dealer signup with uploaded image files
       // Prepare signup request data
       const signupData = {
         tendangnhap: data.tendangnhap,
@@ -217,13 +87,13 @@ const DealerSignupScreen: React.FC = () => {
         email: data.email || '',
         repassword: data.repassword,
         address: data.address,
-        imgs: uploadedFiles,
+        imgs: [], // No images for technician
         tendiaban: data.city,
         madiaban: provinceCode,
-        sotaikhoan: data.sotaikhoan,
-        nganhang: data.nganhang,
-        tentaikhoan: data.tentaikhoan,
-        loai: USER_TYPES.DEALER
+        sotaikhoan: '', // No bank info for technician
+        nganhang: '',
+        tentaikhoan: '',
+        loai: USER_TYPES.TECHNICIAN
       };
 
       // Call signup API
@@ -231,7 +101,7 @@ const DealerSignupScreen: React.FC = () => {
 
       Alert.alert(
         'Đăng ký thành công',
-        response.message || 'Tài khoản đại lý của bạn đã được tạo thành công!',
+        response.message || 'Tài khoản kỹ thuật viên của bạn đã được tạo thành công!',
         [
           {
             text: 'OK',
@@ -256,7 +126,7 @@ const DealerSignupScreen: React.FC = () => {
 
       {/* Custom Header */}
       <CustomHeader
-        title="Đăng ký tài khoản đại lý"
+        title="Đăng ký tài khoản kỹ thuật viên"
         leftIcon={<Text style={styles.backIconHeader}>‹</Text>}
         onLeftPress={() => navigation.goBack()}
       />
@@ -266,20 +136,20 @@ const DealerSignupScreen: React.FC = () => {
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
       >
-        {/* Dealer Registration Form */}
+        {/* Technician Registration Form */}
         <View style={styles.registrationCard}>
-          {/* Tên đơn vị */}
+          {/* Họ và tên */}
           <Controller
             control={control}
             name="hoten"
             render={({ field: { onChange, onBlur, value } }) => (
               <View style={styles.inputContainer}>
                 <Text style={styles.inputLabel}>
-                  Tên đơn vị <Text style={styles.required}>*</Text>
+                  Họ và tên <Text style={styles.required}>*</Text>
                 </Text>
                 <TextInput
                   style={[styles.input, errors.hoten && styles.inputError]}
-                  placeholder="Nhập tên đơn vị"
+                  placeholder="Nhập họ và tên"
                   placeholderTextColor={COLORS.textSecondary}
                   value={value}
                   onChangeText={onChange}
@@ -384,79 +254,6 @@ const DealerSignupScreen: React.FC = () => {
                 />
                 {errors.city && (
                   <Text style={styles.errorText}>{errors.city.message}</Text>
-                )}
-              </View>
-            )}
-          />
-
-          {/* Số tài khoản */}
-          <Controller
-            control={control}
-            name="sotaikhoan"
-            render={({ field: { onChange, onBlur, value } }) => (
-              <View style={styles.inputContainer}>
-                <Text style={styles.inputLabel}>
-                  Số tài khoản ngân hàng<Text style={styles.required}>*</Text>
-                </Text>
-                <TextInput
-                  style={[styles.input, errors.sotaikhoan && styles.inputError]}
-                  placeholder="Nhập số tài khoản"
-                  placeholderTextColor={COLORS.textSecondary}
-                  value={value}
-                  onChangeText={onChange}
-                  onBlur={onBlur}
-                  keyboardType="number-pad"
-                />
-                {errors.sotaikhoan && (
-                  <Text style={styles.errorText}>{errors.sotaikhoan.message}</Text>
-                )}
-              </View>
-            )}
-          />
-
-          {/* Tên tài khoản */}
-          <Controller
-            control={control}
-            name="tentaikhoan"
-            render={({ field: { onChange, onBlur, value } }) => (
-              <View style={styles.inputContainer}>
-                <Text style={styles.inputLabel}>
-                  Tên tài khoản ngân hàng<Text style={styles.required}>*</Text>
-                </Text>
-                <TextInput
-                  style={[styles.input, errors.tentaikhoan && styles.inputError]}
-                  placeholder="Nhập tên tài khoản"
-                  placeholderTextColor={COLORS.textSecondary}
-                  value={value}
-                  onChangeText={onChange}
-                  onBlur={onBlur}
-                />
-                {errors.tentaikhoan && (
-                  <Text style={styles.errorText}>{errors.tentaikhoan.message}</Text>
-                )}
-              </View>
-            )}
-          />
-
-          {/* Ngân hàng */}
-          <Controller
-            control={control}
-            name="nganhang"
-            render={({ field: { onChange, onBlur, value } }) => (
-              <View style={styles.inputContainer}>
-                <Text style={styles.inputLabel}>
-                  Ngân hàng <Text style={styles.required}>*</Text>
-                </Text>
-                <TextInput
-                  style={[styles.input, errors.nganhang && styles.inputError]}
-                  placeholder="Nhập tên ngân hàng"
-                  placeholderTextColor={COLORS.textSecondary}
-                  value={value}
-                  onChangeText={onChange}
-                  onBlur={onBlur}
-                />
-                {errors.nganhang && (
-                  <Text style={styles.errorText}>{errors.nganhang.message}</Text>
                 )}
               </View>
             )}
@@ -568,39 +365,6 @@ const DealerSignupScreen: React.FC = () => {
               </View>
             )}
           />
-
-          {/* Image Upload */}
-          <View style={styles.imageUploadSection}>
-            <Text style={styles.sectionTitle}>
-              Hình ảnh <Text style={styles.required}>*</Text>
-            </Text>
-            <Text style={styles.sectionSubtitle}>Tối thiểu 4 hình ảnh gồm Giấy tờ doanh nghiệp và ảnh cửa hàng</Text>
-
-            <View style={styles.imageGrid}>
-              {images.map((image, index) => (
-                <View key={index} style={styles.imageItem}>
-                  <Image source={{ uri: image.uri }} style={styles.imagePreview} />
-                  <TouchableOpacity
-                    style={styles.removeImageButton}
-                    onPress={() => handleRemoveImage(index)}
-                  >
-                    <Text style={styles.removeImageText}>×</Text>
-                  </TouchableOpacity>
-                </View>
-              ))}
-
-              {images.length < 6 && (
-                <TouchableOpacity
-                  style={styles.addImageButton}
-                  onPress={handleAddImage}
-                  activeOpacity={0.7}
-                >
-                  <Text style={styles.addImageIcon}>📷</Text>
-                  <Text style={styles.addImageText}>Thêm ảnh</Text>
-                </TouchableOpacity>
-              )}
-            </View>
-          </View>
 
           {/* Terms and Conditions */}
           <TouchableOpacity
@@ -715,77 +479,12 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
 
-  // Image Upload
-  imageUploadSection: {
-    marginTop: SPACING.md,
-    marginBottom: SPACING.lg,
-  },
-  sectionTitle: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: COLORS.textPrimary,
-    marginBottom: SPACING.xs,
-  },
-  sectionSubtitle: {
-    fontSize: 12,
-    color: COLORS.textSecondary,
-    marginBottom: SPACING.md,
-  },
-  imageGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: SPACING.md,
-  },
-  imageItem: {
-    position: 'relative',
-    width: 100,
-    height: 100,
-  },
-  imagePreview: {
-    width: '100%',
-    height: '100%',
-    borderRadius: BORDER_RADIUS.md,
-  },
-  removeImageButton: {
-    position: 'absolute',
-    top: -8,
-    right: -8,
-    backgroundColor: COLORS.error,
-    width: 24,
-    height: 24,
-    borderRadius: 12,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  removeImageText: {
-    color: COLORS.white,
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-  addImageButton: {
-    width: 100,
-    height: 100,
-    borderWidth: 2,
-    borderStyle: 'dashed',
-    borderColor: COLORS.gray300,
-    borderRadius: BORDER_RADIUS.md,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  addImageIcon: {
-    fontSize: 32,
-    marginBottom: 4,
-  },
-  addImageText: {
-    fontSize: 12,
-    color: COLORS.textSecondary,
-  },
-
   // Terms
   termsContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: SPACING.lg,
+    marginTop: SPACING.sm,
   },
   checkbox: {
     width: 20,
@@ -835,4 +534,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default DealerSignupScreen;
+export default TechnicianSignupScreen;

@@ -17,6 +17,7 @@ import CustomHeader from '../../../components/CustomHeader';
 import { MenuStackParamList, MainTabParamList } from '../../../navigation/MainNavigator';
 import { Icon, IconName } from '../../../components/common';
 import { commonStyles } from '../../../styles/commonStyles';
+import { USER_TYPES } from '../../../types/user';
 
 type MenuScreenNavigationProp = CompositeNavigationProp<
   StackNavigationProp<MenuStackParamList, 'Menu'>,
@@ -55,12 +56,12 @@ const MenuScreen = () => {
         {
           icon: 'distribution',
           label: 'Hệ thống phân phối',
-          onPress: () => navigation.navigate('DistributionSystem', { type: 'npp' }),
+          onPress: () => navigation.navigate('DistributionSystem', { type: USER_TYPES.DISTRIBUTOR }),
         },
         {
           icon: 'dealer',
           label: 'Hệ thống đại lý',
-          onPress: () => navigation.navigate('DistributionSystem', { type: 'dl' }),
+          onPress: () => navigation.navigate('DistributionSystem', { type: USER_TYPES.DEALER }),
         },
       ],
     },

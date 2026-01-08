@@ -64,6 +64,16 @@ export const buildTrackingApiUrl = (
 };
 
 /**
+ * Build Store API URL with query parameters
+ */
+export const buildStoreApiUrl = (
+  endpoint: string,
+  params?: Record<string, string | number | boolean>
+): string => {
+  return buildApiUrl(endpoint, params, API_CONFIG.SSTORE_BASE_URL);
+};
+
+/**
  * Common fetch wrapper with error handling
  */
 export const apiFetch = async <T>(

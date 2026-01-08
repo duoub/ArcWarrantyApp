@@ -32,6 +32,7 @@ const LoginScreen = () => {
 
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isCustomerAccount, setIsCustomerAccount] = useState(false);
 
   const {
     control,
@@ -48,7 +49,18 @@ const LoginScreen = () => {
   const handleLogin = async (data: LoginFormData) => {
     try {
       setIsLoading(true);
-      const response = await authService.login(data);
+
+      let response;
+      if (isCustomerAccount) {
+        // Customer login using store API
+        response = await authService.customerLogin({
+          email: data.username,
+          pasword: data.password,
+        });
+      } else {
+        // Other user types (NPP, DL, KTV) using default API
+        response = await authService.login(data);
+      }
 
       login(response.token, response.user);
       Alert.alert('Đăng nhập thành công', response.message || 'Chào mừng bạn trở lại!');
@@ -86,118 +98,131 @@ const LoginScreen = () => {
 
             {/* Login Card */}
             <View style={styles.loginCard}>
-          {/* Card Header */}
-          <Text style={styles.welcomeText}>Đăng nhập</Text>
+              {/* Card Header */}
+              <Text style={styles.welcomeText}>Đăng nhập</Text>
 
-          {/* Username Input */}
-          <Controller
-            control={control}
-            name="username"
-            render={({ field: { onChange, onBlur, value } }) => (
-              <View style={styles.inputContainer}>
-                <Text style={styles.inputLabel}>Tên đăng nhập</Text>
-                <View
-                  style={[
-                    styles.inputWrapper,
-                    errors.username && styles.inputWrapperError,
-                  ]}
-                >
-                  <TextInput
-                    style={styles.input}
-                    placeholder="Nhập tên đăng nhập"
-                    placeholderTextColor={COLORS.gray400}
-                    value={value}
-                    onChangeText={onChange}
-                    onBlur={onBlur}
-                    autoCapitalize="none"
-                    autoCorrect={false}
-                    editable={!isLoading}
-                  />
+              {/* Customer Account Checkbox */}
+              <TouchableOpacity
+                style={styles.checkboxContainer}
+                onPress={() => setIsCustomerAccount(!isCustomerAccount)}
+                activeOpacity={0.7}
+                disabled={isLoading}
+              >
+                <View style={[styles.checkbox, isCustomerAccount && styles.checkboxChecked]}>
+                  {isCustomerAccount && <Text style={styles.checkmark}>✓</Text>}
                 </View>
-                {errors.username && (
-                  <Text style={styles.errorText}>{errors.username.message}</Text>
-                )}
-              </View>
-            )}
-          />
+                <Text style={styles.checkboxLabel}>Tài khoản khách hàng</Text>
+              </TouchableOpacity>
 
-          {/* Password Input */}
-          <Controller
-            control={control}
-            name="password"
-            render={({ field: { onChange, onBlur, value } }) => (
-              <View style={styles.inputContainer}>
-                <Text style={styles.inputLabel}>Mật khẩu</Text>
-                <View
-                  style={[
-                    styles.inputWrapper,
-                    errors.password && styles.inputWrapperError,
-                  ]}
+              {/* Username Input */}
+              <Controller
+                control={control}
+                name="username"
+                render={({ field: { onChange, onBlur, value } }) => (
+                  <View style={styles.inputContainer}>
+                    <Text style={styles.inputLabel}>Tên đăng nhập</Text>
+                    <View
+                      style={[
+                        styles.inputWrapper,
+                        errors.username && styles.inputWrapperError,
+                      ]}
+                    >
+                      <TextInput
+                        style={styles.input}
+                        placeholder="Nhập tên đăng nhập"
+                        placeholderTextColor={COLORS.gray400}
+                        value={value}
+                        onChangeText={onChange}
+                        onBlur={onBlur}
+                        autoCapitalize="none"
+                        autoCorrect={false}
+                        editable={!isLoading}
+                      />
+                    </View>
+                    {errors.username && (
+                      <Text style={styles.errorText}>{errors.username.message}</Text>
+                    )}
+                  </View>
+                )}
+              />
+
+              {/* Password Input */}
+              <Controller
+                control={control}
+                name="password"
+                render={({ field: { onChange, onBlur, value } }) => (
+                  <View style={styles.inputContainer}>
+                    <Text style={styles.inputLabel}>Mật khẩu</Text>
+                    <View
+                      style={[
+                        styles.inputWrapper,
+                        errors.password && styles.inputWrapperError,
+                      ]}
+                    >
+                      <TextInput
+                        style={styles.input}
+                        placeholder="Nhập mật khẩu"
+                        placeholderTextColor={COLORS.gray400}
+                        value={value}
+                        onChangeText={onChange}
+                        onBlur={onBlur}
+                        secureTextEntry={!showPassword}
+                        autoCapitalize="none"
+                        editable={!isLoading}
+                      />
+                      <TouchableOpacity
+                        style={styles.eyeIcon}
+                        onPress={() => setShowPassword(!showPassword)}
+                        disabled={isLoading}
+                      >
+                        <Icon
+                          name={showPassword ? 'eye-off' : 'eye'}
+                          size={20}
+                          color={COLORS.gray500}
+                        />
+                      </TouchableOpacity>
+                    </View>
+                    {errors.password && (
+                      <Text style={styles.errorText}>{errors.password.message}</Text>
+                    )}
+                  </View>
+                )}
+              />
+
+              {/* Forgot Password Link */}
+              <TouchableOpacity
+                style={styles.forgotPassword}
+                onPress={() => navigation.navigate('ForgotPassword')}
+                disabled={isLoading}
+              >
+                <Text style={styles.forgotPasswordText}>Quên mật khẩu?</Text>
+              </TouchableOpacity>
+
+              {/* Login Button */}
+              <TouchableOpacity
+                style={[styles.loginButton, isLoading && styles.loginButtonDisabled]}
+                onPress={handleSubmit(handleLogin)}
+                activeOpacity={0.8}
+                disabled={isLoading}
+              >
+                {isLoading ? (
+                  <ActivityIndicator color={COLORS.white} size="small" />
+                ) : (
+                  <Text style={styles.loginButtonText}>Đăng nhập</Text>
+                )}
+              </TouchableOpacity>
+
+              {/* Sign Up Link */}
+              <View style={styles.signupContainer}>
+                <Text style={styles.signupText}>Chưa có tài khoản? </Text>
+                <TouchableOpacity
+                  onPress={() => navigation.navigate('Signup')}
+                  disabled={isLoading}
                 >
-                  <TextInput
-                    style={styles.input}
-                    placeholder="Nhập mật khẩu"
-                    placeholderTextColor={COLORS.gray400}
-                    value={value}
-                    onChangeText={onChange}
-                    onBlur={onBlur}
-                    secureTextEntry={!showPassword}
-                    autoCapitalize="none"
-                    editable={!isLoading}
-                  />
-                  <TouchableOpacity
-                    style={styles.eyeIcon}
-                    onPress={() => setShowPassword(!showPassword)}
-                    disabled={isLoading}
-                  >
-                    <Icon
-                      name={showPassword ? 'eye-off' : 'eye'}
-                      size={20}
-                      color={COLORS.gray500}
-                    />
-                  </TouchableOpacity>
-                </View>
-                {errors.password && (
-                  <Text style={styles.errorText}>{errors.password.message}</Text>
-                )}
+                  <Text style={styles.signupLink}>Đăng ký ngay</Text>
+                </TouchableOpacity>
               </View>
-            )}
-          />
-
-          {/* Forgot Password Link */}
-          <TouchableOpacity
-            style={styles.forgotPassword}
-            onPress={() => navigation.navigate('ForgotPassword')}
-            disabled={isLoading}
-          >
-            <Text style={styles.forgotPasswordText}>Quên mật khẩu?</Text>
-          </TouchableOpacity>
-
-          {/* Login Button */}
-          <TouchableOpacity
-            style={[styles.loginButton, isLoading && styles.loginButtonDisabled]}
-            onPress={handleSubmit(handleLogin)}
-            activeOpacity={0.8}
-            disabled={isLoading}
-          >
-            {isLoading ? (
-              <ActivityIndicator color={COLORS.white} size="small" />
-            ) : (
-              <Text style={styles.loginButtonText}>Đăng nhập</Text>
-            )}
-          </TouchableOpacity>
-
-          {/* Sign Up Link */}
-          <View style={styles.signupContainer}>
-            <Text style={styles.signupText}>Chưa có tài khoản? </Text>
-            <TouchableOpacity
-              onPress={() => navigation.navigate('Signup')}
-              disabled={isLoading}
-            >
-              <Text style={styles.signupLink}>Đăng ký ngay</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
+            </View>
 
             {/* Footer */}
             <View style={styles.footer}>
@@ -272,6 +297,37 @@ const styles = StyleSheet.create({
     color: COLORS.textPrimary,
     marginBottom: SPACING.md,
     textAlign: 'center',
+  },
+
+  // Checkbox
+  checkboxContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: SPACING.md,
+  },
+  checkbox: {
+    width: 20,
+    height: 20,
+    borderWidth: 2,
+    borderColor: COLORS.gray300,
+    borderRadius: 4,
+    marginRight: SPACING.sm,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  checkboxChecked: {
+    backgroundColor: COLORS.primary,
+    borderColor: COLORS.primary,
+  },
+  checkmark: {
+    color: COLORS.white,
+    fontSize: 14,
+    fontWeight: 'bold',
+  },
+  checkboxLabel: {
+    fontSize: 14,
+    color: COLORS.textPrimary,
+    fontWeight: '500',
   },
 
   // Input Fields

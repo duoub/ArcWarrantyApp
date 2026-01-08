@@ -3,6 +3,8 @@ import { createStackNavigator, CardStyleInterpolators } from '@react-navigation/
 import LoginScreen from '../screens/auth/LoginScreen/LoginScreen';
 import SignupScreen from '../screens/auth/SignupScreen/SignupScreen';
 import DealerSignupScreen from '../screens/auth/SignupScreen/DealerSignupScreen';
+import TechnicianSignupScreen from '../screens/auth/SignupScreen/TechnicianSignupScreen';
+import CustomerSignupScreen from '../screens/auth/SignupScreen/CustomerSignupScreen';
 import OTPScreen from '../screens/auth/OTPScreen/OTPScreen';
 import ForgotPasswordScreen from '../screens/auth/ForgotPasswordScreen/ForgotPasswordScreen';
 import WarrantyStationListScreen from '../screens/main/WarrantyStationListScreen/WarrantyStationListScreen';
@@ -13,6 +15,8 @@ export type PreLoginRootStackParamList = {
   Login: undefined;
   Signup: undefined;
   DealerSignup: undefined;
+  TechnicianSignup: undefined;
+  CustomerSignup: undefined;
   OTP: { email: string; phone?: string };
   ForgotPassword: undefined;
   WarrantyStationList: undefined;
@@ -38,6 +42,8 @@ const PreLoginRootNavigator = () => {
       <Stack.Screen name="Login" component={LoginScreen} />
       <Stack.Screen name="Signup" component={SignupScreen} />
       <Stack.Screen name="DealerSignup" component={DealerSignupScreen} />
+      <Stack.Screen name="TechnicianSignup" component={TechnicianSignupScreen} />
+      <Stack.Screen name="CustomerSignup" component={CustomerSignupScreen} />
       <Stack.Screen name="OTP" component={OTPScreen} />
       <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen} />
       <Stack.Screen name="WarrantyStationList" component={WarrantyStationListScreen} />

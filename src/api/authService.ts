@@ -16,10 +16,14 @@ import {
   ForgotPasswordResponse,
   ResendOTPRequest,
   ResendOTPResponse,
+  CustomerSignupRequest,
+  CustomerSignupResponse,
+  CustomerLoginRequest,
+  CustomerLoginResponse,
   User,
   UserProfileRaw,
 } from '../types/auth';
-import { buildApiUrl } from '../utils/apiHelper';
+import { buildApiUrl, buildStoreApiUrl } from '../utils/apiHelper';
 import { SimultaneousGesture } from 'react-native-gesture-handler/lib/typescript/handlers/gestures/gestureComposition';
 
 export const authService = {
@@ -70,7 +74,8 @@ export const authService = {
    */
   login: async (data: LoginRequest): Promise<LoginResponse> => {
     try {
-      const response = await fetch(`${API_CONFIG.BASE_URL}/login?storeid=${API_CONFIG.STORE_ID}`, {
+      const url = buildApiUrl(`/login?storeid=${API_CONFIG.STORE_ID}`);
+      const response = await fetch(url, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -120,7 +125,8 @@ export const authService = {
    */
   signup: async (data: SignupRequest): Promise<SignupResponse> => {
     try {
-      const response = await fetch(`${API_CONFIG.BASE_URL}/signup?storeid=${API_CONFIG.STORE_ID}`, {
+      const url = buildApiUrl(`/signup?storeid=${API_CONFIG.STORE_ID}`);
+      const response = await fetch(url, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -187,5 +193,88 @@ export const authService = {
       method: 'POST',
       url: '/auth/logout',
     });
+  },
+
+  /**
+   * Register new customer
+   * API: /signup?storeid=xxx&storeidapp=xxx (using SSTORE_BASE_URL)
+   */
+  customerSignup: async (data: CustomerSignupRequest): Promise<CustomerSignupResponse> => {
+    try {
+      const url = buildStoreApiUrl('/signup', {
+        storeid: API_CONFIG.STORE_ID,
+        storeidapp: API_CONFIG.STORE_ID,
+      });
+
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      });
+
+      const result = await response.json();
+
+      if (!result.status) {
+        throw new Error(result.message || 'Đăng ký thất bại');
+      }
+
+      return {
+        status: result.status,
+        message: result.message || 'Đăng ký thành công',
+      };
+    } catch (error) {
+      if (error instanceof Error) {
+        throw error;
+      }
+      throw new Error('Đã có lỗi xảy ra. Vui lòng thử lại.');
+    }
+  },
+
+  /**
+   * Login customer
+   * API: /login?storeid=xxx (using SSTORE_BASE_URL)
+   */
+  customerLogin: async (data: CustomerLoginRequest): Promise<LoginResponse> => {
+    try {
+      const url = buildStoreApiUrl('/login', {
+        storeid: API_CONFIG.STORE_ID,
+      });
+
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      });
+
+      const result = await response.json();
+
+      if (!result.status) {
+        throw new Error(result.message || 'Đăng nhập thất bại');
+      }
+
+      // Transform API response to match our LoginResponse interface
+      return {
+        token: result.token || '',
+        user: {
+          id: result.username || result.email,
+          username: result.username || result.email,
+          name: result.name || result.hoten || '',
+          phone: result.phone || '',
+          email: result.email || '',
+          role: 'Khách hàng',
+          birthday: result.birthday || '',
+        },
+        message: result.message || 'Đăng nhập thành công',
+      };
+    } catch (error) {
+      if (error instanceof Error) {
+        throw error;
+      }
+      throw new Error('Đã có lỗi xảy ra. Vui lòng thử lại.');
+    }
   },
 };

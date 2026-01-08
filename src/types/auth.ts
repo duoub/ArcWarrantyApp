@@ -105,3 +105,30 @@ export interface ResendOTPRequest {
 export interface ResendOTPResponse {
   message: string;
 }
+
+export interface CustomerSignupRequest {
+  hoten: string; // Full name
+  birthday: string; // Date of birth
+  email?: string; // Email (optional)
+  phone: string; // Phone number (used as username)
+  pasword: string; // Password
+  repassword: string; // Confirm password
+  type: string; // User type: 'khách hàng'
+}
+
+export interface CustomerSignupResponse {
+  status: boolean;
+  message: string;
+}
+
+export interface CustomerLoginRequest {
+  email: string; // Email or phone number
+  pasword: string; // Password (typo from API)
+}
+
+export interface CustomerLoginResponse {
+  status: boolean;
+  message: string;
+  token?: string;
+  user?: User;
+}

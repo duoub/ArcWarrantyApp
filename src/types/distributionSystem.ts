@@ -2,8 +2,11 @@
  * Distribution System Type Definitions
  */
 
+import { UserType } from "./user";
+
 // Distributor type
-export type DistributorType = 'npp' | 'dl';
+// export type DistributorType = 'npp' | 'dl';
+
 
 // Raw API response from backend
 export interface DistributorRaw {
@@ -26,7 +29,7 @@ export interface GetDistributorsRequest {
   page: number;
   tentinhthanh: string; // Province name, "Tỉnh thành" for all
   keyword?: string;
-  type?: DistributorType;
+  type?: UserType;
 }
 
 export interface GetDistributorsResponse {
