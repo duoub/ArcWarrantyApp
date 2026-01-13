@@ -203,7 +203,7 @@ const DistributionSystemScreen = () => {
       <StatusBar barStyle="light-content" backgroundColor={COLORS.primary} />
 
       <CustomHeader
-        title={type === 'dl' ? 'Hệ thống đại lý' : 'Hệ thống phân phối'}
+        title={type === 'DL' ? 'Hệ thống đại lý' : 'Hệ thống phân phối'}
         leftIcon={<Icon name="back" size={24} color={COLORS.white} />}
         onLeftPress={handleBack}
       />

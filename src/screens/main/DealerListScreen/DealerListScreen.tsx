@@ -18,10 +18,10 @@ import CustomHeader from '../../../components/CustomHeader';
 import Avatar from '../../../components/Avatar';
 import { dealerService } from '../../../api/dealerService';
 import { DealerInfo } from '../../../types/dealer';
-import { InOutStackParamList } from '../../../navigation/MainNavigator';
+import { HomeStackParamList } from '../../../navigation/MainNavigator';
 import { Icon } from '../../../components/common';
 
-type DealerListNavigationProp = StackNavigationProp<InOutStackParamList, 'DealerList'>;
+type DealerListNavigationProp = StackNavigationProp<HomeStackParamList, 'DealerList'>;
 
 const DealerListScreen = () => {
   const navigation = useNavigation<DealerListNavigationProp>();
@@ -68,14 +68,12 @@ const DealerListScreen = () => {
   }, [searchQuery, dealers]);
 
   const handleSelectDealer = (dealer: DealerInfo) => {
-    navigation.navigate('InOut', {
-      selectedDealer: {
-        id: dealer.id,
-        name: dealer.name,
-        phone: dealer.phone,
-        address: dealer.address,
-      },
-    });
+    // Navigate to dealer details or other action
+    Alert.alert('Đại lý', `Bạn đã chọn: ${dealer.name}`);
+  };
+
+  const handleAddDealer = () => {
+    navigation.navigate('DealerSignup');
   };
 
   const renderDealer = ({ item }: { item: DealerInfo }) => (
@@ -102,7 +100,7 @@ const DealerListScreen = () => {
       <StatusBar barStyle="light-content" backgroundColor={COLORS.primary} />
 
       <CustomHeader
-        title="Chọn đại lý"
+        title="Danh sách đại lý"
         leftIcon={<Icon name="back" size={24} color={COLORS.white} />}
         onLeftPress={() => navigation.goBack()}
       />
@@ -150,6 +148,15 @@ const DealerListScreen = () => {
           }
         />
       )}
+
+      {/* Floating Action Button */}
+      <TouchableOpacity
+        style={commonStyles.fab}
+        onPress={handleAddDealer}
+        activeOpacity={0.8}
+      >
+        <Text style={commonStyles.fabIcon}>+</Text>
+      </TouchableOpacity>
     </View>
   );
 };

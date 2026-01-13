@@ -54,6 +54,7 @@ export const authService = {
       return {
         // name: result.name || '',
         // email: result.email || '',
+        codenpp: result.codenpp || 'codenpp',
         address: result.address || '',
         tinhthanh: result.tinhthanh || '',
         taxcode: result.taxcode || '',

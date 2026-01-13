@@ -2,6 +2,7 @@ import React from 'react';
 import { View, TouchableOpacity, StyleSheet } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
+import { CommonActions } from '@react-navigation/native';
 import { COLORS, SPACING, SHADOWS } from '../config/theme';
 import { Icon } from '../components/common';
 // import { DistributorType } from '../types/distributionSystem';
@@ -15,6 +16,7 @@ import ChangePasswordScreen from '../screens/main/ChangePasswordScreen/ChangePas
 import SalesProgramScreen from '../screens/main/SalesProgramScreen/SalesProgramScreen';
 import InventoryScreen from '../screens/main/InventoryScreen/InventoryScreen';
 import DealerListScreen from '../screens/main/DealerListScreen/DealerListScreen';
+import DealerSignupScreen from '../screens/auth/SignupScreen/DealerSignupScreen';
 import WarrantyStationListScreen from '../screens/main/WarrantyStationListScreen/WarrantyStationListScreen';
 import WarrantyReportScreen from '../screens/main/WarrantyReportScreen/WarrantyReportScreen';
 import WarrantyLookupScreen from '../screens/main/WarrantyLookupScreen/WarrantyLookupScreen';
@@ -44,6 +46,8 @@ export type HomeStackParamList = {
   Inventory: undefined;
   PaymentDetail: undefined;
   RewardDetail: undefined;
+  DealerList: undefined;
+  DealerSignup: undefined;
 };
 
 export type MenuStackParamList = {
@@ -108,6 +112,8 @@ const HomeStackNavigator = () => {
       <HomeStack.Screen name="Inventory" component={InventoryScreen} />
       <HomeStack.Screen name="PaymentDetail" component={PaymentDetailScreen} />
       <HomeStack.Screen name="RewardDetail" component={RewardDetailScreen} />
+      <HomeStack.Screen name="DealerList" component={DealerListScreen} />
+      <HomeStack.Screen name="DealerSignup" component={DealerSignupScreen} />
     </HomeStack.Navigator>
   );
 };
@@ -193,6 +199,17 @@ const MainNavigator = () => {
             <Icon name="home" size={24} color={color} />
           ),
         }}
+        listeners={({ navigation }) => ({
+          tabPress: (e) => {
+            e.preventDefault();
+            navigation.dispatch(
+              CommonActions.reset({
+                index: 0,
+                routes: [{ name: 'HomeStack' }],
+              })
+            );
+          },
+        })}
       />
       <Tab.Screen
         name="WarrantyActivation"
@@ -222,6 +239,17 @@ const MainNavigator = () => {
             />
           ),
         }}
+        listeners={({ navigation }) => ({
+          tabPress: (e) => {
+            e.preventDefault();
+            navigation.dispatch(
+              CommonActions.reset({
+                index: 0,
+                routes: [{ name: 'InOutStack' }],
+              })
+            );
+          },
+        })}
       />
       <Tab.Screen
         name="ProfileStack"
@@ -233,6 +261,17 @@ const MainNavigator = () => {
             <Icon name="profile" size={24} color={color} />
           ),
         }}
+        listeners={({ navigation }) => ({
+          tabPress: (e) => {
+            e.preventDefault();
+            navigation.dispatch(
+              CommonActions.reset({
+                index: 0,
+                routes: [{ name: 'ProfileStack' }],
+              })
+            );
+          },
+        })}
       />
       <Tab.Screen
         name="MenuStack"

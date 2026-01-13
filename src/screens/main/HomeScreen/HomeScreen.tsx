@@ -147,6 +147,10 @@ const HomeScreen = () => {
     navigation.navigate('RewardDetail');
   };
 
+  const handleDealerListPress = () => {
+    navigation.navigate('DealerList');
+  };
+
   const renderBanner = ({ item, index }: { item: any; index: number }) => (
     <TouchableOpacity
       activeOpacity={0.9}
@@ -220,6 +224,17 @@ const HomeScreen = () => {
             >
               <Text style={styles.programButtonText}>
                 Gói chương trình sale
+              </Text>
+              <Text style={commonStyles.chevronIcon}>›</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.programButton}
+              onPress={handleDealerListPress}
+              activeOpacity={0.7}
+            >
+              <Text style={styles.programButtonText}>
+                Đại lý cấp dưới
               </Text>
               <Text style={commonStyles.chevronIcon}>›</Text>
             </TouchableOpacity>

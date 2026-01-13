@@ -27,6 +27,7 @@ export interface User {
 
 export interface UserProfileRaw {
   // name: string;
+  codenpp: string;
   address: string;
   taxcode: string;
   // email: string;

@@ -22,6 +22,7 @@ import ImagePicker from 'react-native-image-crop-picker';
 import { COLORS, SPACING, BORDER_RADIUS } from '../../../config/theme';
 import { USER_TYPE } from '../../../config/constants';
 import { AuthStackParamList } from '../../../navigation/PreLoginRootNavigator';
+import { HomeStackParamList } from '../../../navigation/MainNavigator';
 import CustomHeader from '../../../components/CustomHeader';
 import { Icon } from '../../../components/common';
 import ProvinceSelector from '../../../components/ProvinceSelector';
@@ -29,7 +30,7 @@ import { uploadService, UploadedFile } from '../../../api/uploadService';
 import { authService } from '../../../api/authService';
 import { USER_TYPES } from '../../../types/user';
 
-type DealerSignupScreenNavigationProp = StackNavigationProp<AuthStackParamList, 'DealerSignup'>;
+type DealerSignupScreenNavigationProp = StackNavigationProp<HomeStackParamList | AuthStackParamList, 'DealerSignup'>;
 
 interface ImageItem {
   src: string;
@@ -235,7 +236,7 @@ const DealerSignupScreen: React.FC = () => {
         [
           {
             text: 'OK',
-            onPress: () => navigation.navigate('Login'),
+            onPress: () => navigation.goBack(),
           },
         ]
       );
@@ -256,7 +257,7 @@ const DealerSignupScreen: React.FC = () => {
 
       {/* Custom Header */}
       <CustomHeader
-        title="Đăng ký tài khoản đại lý"
+        title="Tạo mới tài khoản đại lý"
         leftIcon={<Text style={styles.backIconHeader}>‹</Text>}
         onLeftPress={() => navigation.goBack()}
       />
