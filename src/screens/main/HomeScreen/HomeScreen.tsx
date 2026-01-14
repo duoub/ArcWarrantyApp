@@ -23,6 +23,7 @@ import { profileService } from '../../../api/profileService';
 import { ProfileData } from '../../../types/profile';
 import { bannerService } from '../../../api/bannerService';
 import { BannerItem } from '../../../types/banner';
+import { Icon } from '../../../components/common';
 import { NotificationService } from '../../../utils/notificationService';
 import { commonStyles } from '../../../styles/commonStyles';
 
@@ -165,6 +166,10 @@ const HomeScreen = () => {
     navigation.navigate('DealerList');
   };
 
+  const handleRankingPress = () => {
+    navigation.navigate('Ranking');
+  };
+
   const renderBanner = ({ item }: { item: BannerItem }) => (
     <TouchableOpacity
       activeOpacity={0.9}
@@ -278,7 +283,17 @@ const HomeScreen = () => {
         {/* Reward Summary Table */}
         {isAuthenticated && (
           <View style={styles.rewardSection}>
-            <Text style={commonStyles.sectionTitleWithMargin}>Tiền thưởng</Text>
+            <View style={styles.rewardHeader}>
+              <Text style={styles.rewardTitle}>Tiền thưởng</Text>
+              <TouchableOpacity
+                style={styles.rankingButton}
+                onPress={handleRankingPress}
+                activeOpacity={0.7}
+              >
+                <Icon name="trophy" size={16} color={COLORS.warning} />
+                <Text style={styles.rankingButtonText}>Bảng xếp hạng</Text>
+              </TouchableOpacity>
+            </View>
 
             <View style={[commonStyles.tableCard, styles.tableCardWrapper]}>
               {/* Table Header */}
@@ -459,6 +474,34 @@ const styles = StyleSheet.create({
   // Reward Section
   rewardSection: {
     marginBottom: SPACING.md,
+  },
+  rewardHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginHorizontal: SPACING.lg,
+    marginBottom: SPACING.sm,
+  },
+  rankingButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: SPACING.xs,
+    paddingVertical: SPACING.xs,
+    paddingHorizontal: SPACING.sm,
+    backgroundColor: COLORS.white,
+    borderRadius: BORDER_RADIUS.md,
+    borderWidth: 1,
+    borderColor: COLORS.warning,
+  },
+  rankingButtonText: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: COLORS.warning,
+  },
+  rewardTitle: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: COLORS.textPrimary,
   },
   tableCardWrapper: {
     marginHorizontal: SPACING.lg,

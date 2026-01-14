@@ -60,7 +60,8 @@ export type IconName =
   | 'bank-account'
   | 'eye'
   | 'eye-off'
-  | 'copy';
+  | 'copy'
+  | 'trophy';
 
 interface IconConfig {
   provider: 'MaterialCommunityIcons' | 'Feather';
@@ -126,6 +127,7 @@ const iconMap: Record<IconName, IconConfig> = {
   'eye': { provider: 'MaterialCommunityIcons', name: 'eye-outline' },
   'eye-off': { provider: 'MaterialCommunityIcons', name: 'eye-off-outline' },
   'copy': { provider: 'MaterialCommunityIcons', name: 'content-copy' },
+  'trophy': { provider: 'MaterialCommunityIcons', name: 'trophy' },
 };
 
 interface IconProps {

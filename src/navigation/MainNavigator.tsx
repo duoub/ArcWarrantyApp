@@ -30,6 +30,7 @@ import NewsScreen from '../screens/main/NewsScreen/NewsScreen';
 import ContactScreen from '../screens/main/ContactScreen/ContactScreen';
 import PaymentDetailScreen from '../screens/main/PaymentDetailScreen/PaymentDetailScreen';
 import RewardDetailScreen from '../screens/main/RewardDetailScreen/RewardDetailScreen';
+import RankingScreen from '../screens/main/RankingScreen/RankingScreen';
 import { UserType } from '../types/user';
 
 export type MainTabParamList = {
@@ -48,6 +49,7 @@ export type HomeStackParamList = {
   RewardDetail: undefined;
   DealerList: undefined;
   DealerSignup: undefined;
+  Ranking: undefined;
 };
 
 export type MenuStackParamList = {
@@ -114,6 +116,7 @@ const HomeStackNavigator = () => {
       <HomeStack.Screen name="RewardDetail" component={RewardDetailScreen} />
       <HomeStack.Screen name="DealerList" component={DealerListScreen} />
       <HomeStack.Screen name="DealerSignup" component={DealerSignupScreen} />
+      <HomeStack.Screen name="Ranking" component={RankingScreen} />
     </HomeStack.Navigator>
   );
 };

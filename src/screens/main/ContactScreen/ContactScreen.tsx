@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -9,11 +9,15 @@ import {
   Image,
   Linking,
   Alert,
+  ActivityIndicator,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { COLORS, SPACING, BORDER_RADIUS, SHADOWS } from '../../../config/theme';
 import CustomHeader from '../../../components/CustomHeader';
 import { Icon } from '../../../components/common';
+import { appInfoService } from '../../../api/appInfoService';
+import { AppInfo } from '../../../types/appInfo';
+import { openMapDirections } from '../../../utils/mapNavigation';
 
 interface ContactInfo {
   icon: 'location' | 'phone' | 'mobile' | 'website';
@@ -25,42 +29,81 @@ interface ContactInfo {
 
 const ContactScreen = () => {
   const navigation = useNavigation();
+  const [appInfo, setAppInfo] = useState<AppInfo | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const contactInfos: ContactInfo[] = [
-    {
-      icon: 'location',
-      label: 'Địa chỉ:',
-      value: 'Khu Công Nghiệp Hapro, Lệ Chi, Gia Lâm, TP Hà Nội',
-      type: 'address',
-    },
-    {
-      icon: 'phone',
-      label: 'Điện thoại:',
-      value: '1800 646778',
-      link: 'tel:1800646778',
-      type: 'phone',
-    },
-    {
-      icon: 'mobile',
-      label: 'Hotline:',
-      value: '03592.33333',
-      link: 'tel:0359233333',
-      type: 'phone',
-    },
-    {
-      icon: 'website',
-      label: 'Website:',
-      value: 'https://akito.vn/',
-      link: 'https://akito.vn/',
-      type: 'website',
-    },
-  ];
+  useEffect(() => {
+    fetchAppInfo();
+  }, []);
+
+  const fetchAppInfo = async () => {
+    try {
+      setIsLoading(true);
+      const response = await appInfoService.getInfoApp();
+      if (response.status && response.info) {
+        setAppInfo(response.info);
+      }
+    } catch (error) {
+      // Keep default values on error
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const formatPhoneLink = (phone: string): string => {
+    return 'tel:' + phone.replace(/\s/g, '');
+  };
+
+  const contactInfos: ContactInfo[] = appInfo
+    ? [
+        {
+          icon: 'location',
+          label: 'Địa chỉ:',
+          value: appInfo.address,
+          link: 'map',
+          type: 'address',
+        },
+        {
+          icon: 'phone',
+          label: 'Điện thoại:',
+          value: appInfo.phone,
+          link: formatPhoneLink(appInfo.phone),
+          type: 'phone',
+        },
+        {
+          icon: 'mobile',
+          label: 'Hotline:',
+          value: appInfo.hotline,
+          link: formatPhoneLink(appInfo.hotline),
+          type: 'phone',
+        },
+        {
+          icon: 'website',
+          label: 'Website:',
+          value: appInfo.website,
+          link: appInfo.website,
+          type: 'website',
+        },
+      ]
+    : [];
 
   const handleBackPress = () => {
     navigation.goBack();
   };
 
   const handleContactPress = (item: ContactInfo) => {
+    if (item.type === 'address' && appInfo?.address) {
+      openMapDirections(appInfo.address, 'AKITO');
+      return;
+    }
+
+    if (item.type === 'phone' && item.link) {
+      Linking.openURL(item.link).catch(() => {
+        Alert.alert('Lỗi', 'Không thể thực hiện cuộc gọi');
+      });
+      return;
+    }
+
     if (item.link) {
       Linking.canOpenURL(item.link)
         .then((supported) => {
@@ -70,7 +113,7 @@ const ContactScreen = () => {
             Alert.alert('Lỗi', `Không thể mở: ${item.link}`);
           }
         })
-        .catch((err) => {});
+        .catch(() => { });
     }
   };
 
@@ -118,49 +161,41 @@ const ContactScreen = () => {
         onLeftPress={handleBackPress}
       />
 
-      <ScrollView
-        style={styles.scrollView}
-        showsVerticalScrollIndicator={false}
-      >
-        {/* Header Image */}
-        <View style={styles.headerImageContainer}>
-          <Image
-            source={require('../../../assets/images/logo.png')}
-            style={styles.headerImage}
-            resizeMode="contain"
-          />
+      {isLoading ? (
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color={COLORS.primary} />
+          <Text style={styles.loadingText}>Đang tải thông tin...</Text>
         </View>
+      ) : (
+        <ScrollView
+          style={styles.scrollView}
+          showsVerticalScrollIndicator={false}
+        >
+          {/* Header Image */}
+          <View style={styles.headerImageContainer}>
+            <Image
+              source={require('../../../assets/images/logo.png')}
+              style={styles.headerImage}
+              resizeMode="contain"
+            />
+          </View>
 
-        {/* Description */}
-        <View style={styles.descriptionContainer}>
-          <Text style={styles.descriptionText}>
-            AKITO APP là ứng dụng quản lý bảo hành và chăm sóc khách hàng của AKITO.
-          </Text>
-        </View>
+          {/* Description */}
+          <View style={styles.descriptionContainer}>
+            <Text style={styles.descriptionText}>
+              {appInfo?.titleApp || 'AKITO APP là ứng dụng quản lý bảo hành và chăm sóc khách hàng của AKITO.'}
+            </Text>
+          </View>
 
-        {/* Contact Information Card */}
-        <View style={styles.contactCard}>
-          {contactInfos.map((item, index) => renderContactItem(item, index))}
-        </View>
+          {/* Contact Information Card */}
+          <View style={styles.contactCard}>
+            {contactInfos.map((item, index) => renderContactItem(item, index))}
+          </View>
 
-        {/* Additional Info */}
-        <View style={styles.additionalInfoContainer}>
-          <Text style={styles.additionalInfoTitle}>Về AKITO</Text>
-          <Text style={styles.additionalInfoText}>
-            AKITO là thương hiệu điện máy gia dụng uy tín hàng đầu Việt Nam,
-            chuyên cung cấp các sản phẩm điều hòa, máy nước nóng, quạt và các
-            thiết bị điện gia dụng chất lượng cao.
-          </Text>
-          <Text style={styles.additionalInfoText}>
-            Với phương châm "Chất lượng - Uy tín - Bền vững", AKITO cam kết
-            mang đến cho khách hàng những sản phẩm tốt nhất với dịch vụ chăm
-            sóc khách hàng tận tâm.
-          </Text>
-        </View>
-
-        {/* Bottom Spacing */}
-        <View style={styles.bottomSpacing} />
-      </ScrollView>
+          {/* Bottom Spacing */}
+          <View style={styles.bottomSpacing} />
+        </ScrollView>
+      )}
     </View>
   );
 };
@@ -169,6 +204,16 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: COLORS.background,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  loadingText: {
+    marginTop: SPACING.md,
+    fontSize: 14,
+    color: COLORS.textSecondary,
   },
   scrollView: {
     flex: 1,
@@ -257,28 +302,6 @@ const styles = StyleSheet.create({
     color: COLORS.gray400,
     fontWeight: '300',
     marginLeft: SPACING.sm,
-  },
-
-  // Additional Info
-  additionalInfoContainer: {
-    backgroundColor: COLORS.white,
-    marginHorizontal: SPACING.lg,
-    marginTop: SPACING.md,
-    padding: SPACING.md,
-    borderRadius: BORDER_RADIUS.lg,
-    ...SHADOWS.md,
-  },
-  additionalInfoTitle: {
-    fontSize: 17,
-    fontWeight: '700',
-    color: COLORS.textPrimary,
-    marginBottom: SPACING.sm,
-  },
-  additionalInfoText: {
-    fontSize: 14,
-    color: COLORS.textSecondary,
-    lineHeight: 20,
-    marginBottom: SPACING.sm,
   },
 
   bottomSpacing: {

@@ -7,6 +7,7 @@ import {
   Alert,
   ScrollView,
   StatusBar,
+  Image,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -15,6 +16,12 @@ import { AuthStackParamList } from '../../../navigation/PreLoginRootNavigator';
 import CustomHeader from '../../../components/CustomHeader';
 import { commonStyles } from '../../../styles/commonStyles';
 import { Icon } from '../../../components/common';
+
+// Import images
+const distributorImage = require('../../../assets/images/distributor.png');
+const dealerImage = require('../../../assets/images/dealer.png');
+const technicianImage = require('../../../assets/images/technician.png');
+const customerImage = require('../../../assets/images/customer.png');
 
 type SignupScreenNavigationProp = StackNavigationProp<AuthStackParamList, 'Signup'>;
 
@@ -57,8 +64,8 @@ const SignupScreen: React.FC = () => {
             onPress={() => handleNotBuildForNow('Liên hệ chúng tôi để tạo tài khoản cho Nhà phân phối')}
             activeOpacity={0.8}
           >
-            <View style={styles.iconContainer}>
-              <Text style={styles.memberIcon}>🚚</Text>
+            <View style={styles.imageContainer}>
+              <Image source={distributorImage} style={styles.memberImage} resizeMode="contain" />
             </View>
             <Text style={styles.memberLabel}>Nhà phân phối</Text>
             <Text style={styles.memberDescription}>Phân phối sản phẩm Akito</Text>
@@ -70,8 +77,8 @@ const SignupScreen: React.FC = () => {
             onPress={() => navigation.navigate('DealerSignup')}
             activeOpacity={0.8}
           >
-            <View style={styles.iconContainer}>
-              <Text style={styles.memberIcon}>🏪</Text>
+            <View style={styles.imageContainer}>
+              <Image source={dealerImage} style={styles.memberImage} resizeMode="contain" />
             </View>
             <Text style={styles.memberLabel}>Đại lý</Text>
             <Text style={styles.memberDescription}>Kinh doanh sản phẩm Akito</Text>
@@ -83,8 +90,8 @@ const SignupScreen: React.FC = () => {
             onPress={() => navigation.navigate('TechnicianSignup')}
             activeOpacity={0.8}
           >
-            <View style={styles.iconContainer}>
-              <Text style={styles.memberIcon}>👷</Text>
+            <View style={styles.imageContainer}>
+              <Image source={technicianImage} style={styles.memberImage} resizeMode="contain" />
             </View>
             <Text style={styles.memberLabel}>Kỹ thuật viên</Text>
             <Text style={styles.memberDescription}>Kỹ thuật viên sửa chữa</Text>
@@ -96,8 +103,8 @@ const SignupScreen: React.FC = () => {
             onPress={() => navigation.navigate('CustomerSignup')}
             activeOpacity={0.8}
           >
-            <View style={styles.iconContainer}>
-              <Text style={styles.memberIcon}>👥</Text>
+            <View style={styles.imageContainer}>
+              <Image source={customerImage} style={styles.memberImage} resizeMode="contain" />
             </View>
             <Text style={styles.memberLabel}>Người tiêu dùng</Text>
             <Text style={styles.memberDescription}>Khách hàng sử dụng</Text>
@@ -174,20 +181,22 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: SPACING.md,
-    height: 150,
+    height: 160,
     ...SHADOWS.md,
   },
-  iconContainer: {
-    width: 64,
-    height: 64,
-    borderRadius: BORDER_RADIUS.lg,
+  imageContainer: {
+    width: 70,
+    height: 70,
+    borderRadius: 35,
     backgroundColor: COLORS.gray50,
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: SPACING.sm,
+    overflow: 'hidden',
   },
-  memberIcon: {
-    fontSize: 32,
+  memberImage: {
+    width: 50,
+    height: 50,
   },
   memberLabel: {
     fontSize: 15,
