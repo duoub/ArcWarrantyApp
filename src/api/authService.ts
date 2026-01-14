@@ -36,7 +36,7 @@ export const authService = {
       const apiParams: Record<string, string> = {
         userid,
         storeid,
-        typeget: '1',
+        typeget: '2',
       };
 
       const url = buildApiUrl('/getprofile', apiParams);
@@ -52,8 +52,10 @@ export const authService = {
 
       // Transform API response to User interface
       return {
-        // name: result.name || '',
-        // email: result.email || '',
+        name: result.name || '',
+        email: result.email || '',
+        phone: result.phone || '',
+        avatar: result.avatar || '',
         codenpp: result.codenpp || 'codenpp',
         address: result.address || '',
         tinhthanh: result.tinhthanh || '',
@@ -61,6 +63,7 @@ export const authService = {
         nganhang: result.nganhang || '',
         sotaikhoan: result.sotaikhoan || '',
         tentaikhoan: result.tentaikhoan || '',
+        birthday: result.birthday || '',
         countThongBaoChuaDoc: result.countThongBaoChuaDoc || '0',
       };
     } catch (error) {

@@ -18,7 +18,7 @@ import BarcodeScanner from '../../../components/BarcodeScanner/BarcodeScanner';
 import { commonStyles } from '../../../styles/commonStyles';
 import { productLookupService } from '../../../api/productLookupService';
 import { ProductInfo } from '../../../types/productLookup';
-import { Icon } from '../../../components/common';
+import { Icon, IconName } from '../../../components/common';
 
 const ProductLookupScreen = () => {
   const navigation = useNavigation();
@@ -77,7 +77,7 @@ const ProductLookupScreen = () => {
       case 'authentic':
         return {
           text: 'Sản phẩm chính hãng',
-          icon: '✓',
+          icon: 'product-lookup',
           color: COLORS.success,
           bgColor: '#E8F5E9',
         };
@@ -168,9 +168,10 @@ const ProductLookupScreen = () => {
               ]}
             >
               <View style={styles.statusIconContainer}>
-                <Text style={styles.statusIconLarge}>
+                {/* <Text style={styles.statusIconLarge}>
                   {getStatusInfo(result.status).icon}
-                </Text>
+                </Text> */}
+                <Icon name={getStatusInfo(result.status).icon as IconName} size={80} color={COLORS.success} />
               </View>
               <Text
                 style={[
@@ -236,7 +237,7 @@ const ProductLookupScreen = () => {
 
                 {/* Authenticity Note */}
                 <View style={styles.authenticNote}>
-                  <Text style={styles.authenticNoteIcon}>✓</Text>
+                  {/* <Icon name="product-lookup" size={22} color={COLORS.success} /> */}
                   <Text style={styles.authenticNoteText}>
                     Sản phẩm này đã được xác thực là hàng chính hãng của AKITO.
                     Quý khách được hưởng đầy đủ chính sách bảo hành theo quy định.

@@ -27,15 +27,18 @@ export interface User {
 }
 
 export interface UserProfileRaw {
-  // name: string;
+  name: string;
   codenpp: string;
+  phone: string;
+  avatar: string;
   address: string;
   taxcode: string;
-  // email: string;
+  email: string;
   tinhthanh: string;
   sotaikhoan: string;
   tentaikhoan: string;
   nganhang: string;
+  birthday: string;
   countThongBaoChuaDoc: string;
 }
 
