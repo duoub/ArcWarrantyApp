@@ -21,6 +21,8 @@ import Avatar from '../../../components/Avatar';
 import { HomeStackParamList } from '../../../navigation/MainNavigator';
 import { profileService } from '../../../api/profileService';
 import { ProfileData } from '../../../types/profile';
+import { bannerService } from '../../../api/bannerService';
+import { BannerItem } from '../../../types/banner';
 import { NotificationService } from '../../../utils/notificationService';
 import { commonStyles } from '../../../styles/commonStyles';
 
@@ -30,12 +32,8 @@ const { width } = Dimensions.get('window');
 const BANNER_WIDTH = width - SPACING.lg * 2;
 const BANNER_HEIGHT = BANNER_WIDTH * 0.5;
 
-// Default banners if API doesn't return any
-const DEFAULT_BANNERS = [
-  require('../../../assets/images/banner.jpg'),
-  require('../../../assets/images/banner.jpg'),
-  require('../../../assets/images/banner.jpg'),
-];
+// Default banner image if API doesn't return any
+const DEFAULT_BANNER_IMAGE = require('../../../assets/images/banner.jpg');
 
 const HomeScreen = () => {
   const navigation = useNavigation<HomeScreenNavigationProp>();
@@ -45,7 +43,7 @@ const HomeScreen = () => {
   const bannerListRef = useRef<FlatList>(null);
   const [profileData, setProfileData] = useState<ProfileData | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const banners = DEFAULT_BANNERS;
+  const [banners, setBanners] = useState<BannerItem[]>([]);
 
   // Initialize Firebase Cloud Messaging
   useEffect(() => {
@@ -88,6 +86,22 @@ const HomeScreen = () => {
     }
   }, [isAuthenticated]);
 
+  // Load banners from API
+  useEffect(() => {
+    loadBanners();
+  }, []);
+
+  const loadBanners = async () => {
+    try {
+      const response = await bannerService.getHomeBanner();
+      if (response.status && response.banners.length > 0) {
+        setBanners(response.banners);
+      }
+    } catch (error) {
+      // Keep empty banners on error
+    }
+  };
+
   // Log when user avatar changes to debug re-render
   useEffect(() => {
   }, [user?.avatar]);
@@ -126,8 +140,8 @@ const HomeScreen = () => {
     return () => clearInterval(interval);
   }, [banners.length]);
 
-  const handleBannerPress = (index: number) => {
-    Alert.alert('Banner', `Clicked banner ${index + 1}`);
+  const handleBannerPress = (banner: BannerItem) => {
+    Alert.alert('Banner', `${banner.id} - ${banner.title}`);
   };
 
   const handleSalesProgramPress = () => {
@@ -151,16 +165,17 @@ const HomeScreen = () => {
     navigation.navigate('DealerList');
   };
 
-  const renderBanner = ({ item, index }: { item: any; index: number }) => (
+  const renderBanner = ({ item }: { item: BannerItem }) => (
     <TouchableOpacity
       activeOpacity={0.9}
-      onPress={() => handleBannerPress(index)}
+      onPress={() => handleBannerPress(item)}
       style={styles.bannerItem}
     >
       <Image
-        source={item}
+        source={{ uri: item.bannerurl }}
         style={styles.bannerImage}
         resizeMode="cover"
+        defaultSource={DEFAULT_BANNER_IMAGE}
       />
     </TouchableOpacity>
   );
@@ -179,7 +194,7 @@ const HomeScreen = () => {
             ref={bannerListRef}
             data={banners}
             renderItem={renderBanner}
-            keyExtractor={(_, index) => `banner-${index}`}
+            keyExtractor={(item, index) => `banner-${item.id}-${index}`}
             horizontal
             pagingEnabled
             showsHorizontalScrollIndicator={false}
@@ -192,17 +207,19 @@ const HomeScreen = () => {
           />
 
           {/* Pagination Dots */}
-          <View style={commonStyles.paginationContainer}>
-            {banners.map((_, index) => (
-              <View
-                key={`dot-${index}`}
-                style={[
-                  commonStyles.paginationDot,
-                  index === currentBannerIndex && commonStyles.paginationDotActive,
-                ]}
-              />
-            ))}
-          </View>
+          {banners.length > 0 && (
+            <View style={commonStyles.paginationContainer}>
+              {banners.map((banner, index) => (
+                <View
+                  key={`dot-${banner.id}-${index}`}
+                  style={[
+                    commonStyles.paginationDot,
+                    index === currentBannerIndex && commonStyles.paginationDotActive,
+                  ]}
+                />
+              ))}
+            </View>
+          )}
         </View>
 
         {/* User Profile Section */}
