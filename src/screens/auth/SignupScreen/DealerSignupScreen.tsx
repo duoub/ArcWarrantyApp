@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -29,6 +29,7 @@ import ProvinceSelector from '../../../components/ProvinceSelector';
 import { uploadService, UploadedFile } from '../../../api/uploadService';
 import { authService } from '../../../api/authService';
 import { USER_TYPES } from '../../../types/user';
+import { useAuthStore } from '../../../store/authStore';
 
 type DealerSignupScreenNavigationProp = StackNavigationProp<HomeStackParamList | AuthStackParamList, 'DealerSignup'>;
 
@@ -39,6 +40,7 @@ interface ImageItem {
 
 // Dealer Signup Validation Schema
 const dealerSignupSchema = z.object({
+  codenpp: z.string().optional().or(z.literal('')),
   hoten: z.string().min(1, 'Tên đơn vị là bắt buộc'),
   phone: z.string().min(1, 'Số điện thoại là bắt buộc').regex(/^[0-9]{10}$/, 'Số điện thoại không hợp lệ'),
   email: z.string().email('Email không hợp lệ').optional().or(z.literal('')),
@@ -59,6 +61,7 @@ type DealerSignupFormData = z.infer<typeof dealerSignupSchema>;
 
 const DealerSignupScreen: React.FC = () => {
   const navigation = useNavigation<DealerSignupScreenNavigationProp>();
+  const { user } = useAuthStore();
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showRePassword, setShowRePassword] = useState(false);
@@ -74,6 +77,7 @@ const DealerSignupScreen: React.FC = () => {
   } = useForm<DealerSignupFormData>({
     resolver: zodResolver(dealerSignupSchema),
     defaultValues: {
+      codenpp: '',
       hoten: '',
       phone: '',
       email: '',
@@ -87,6 +91,13 @@ const DealerSignupScreen: React.FC = () => {
       repassword: '',
     },
   });
+
+  // Auto-fill codenpp from user if logged in (navigated from DealerListScreen)
+  useEffect(() => {
+    if (user?.codenpp) {
+      setValue('codenpp', user.codenpp);
+    }
+  }, [user, setValue]);
 
   const handleAddImage = () => {
     Alert.alert(
@@ -211,6 +222,7 @@ const DealerSignupScreen: React.FC = () => {
       // Step 2: Submit dealer signup with uploaded image files
       // Prepare signup request data
       const signupData = {
+        codenpp: data.codenpp || '',
         tendangnhap: data.tendangnhap,
         pasword: data.password, // Note: API uses 'pasword' typo
         hoten: data.hoten,
@@ -269,6 +281,28 @@ const DealerSignupScreen: React.FC = () => {
       >
         {/* Dealer Registration Form */}
         <View style={styles.registrationCard}>
+          {/* Mã đơn vị cha */}
+          <Controller
+            control={control}
+            name="codenpp"
+            render={({ field: { onChange, onBlur, value } }) => (
+              <View style={styles.inputContainer}>
+                <Text style={styles.inputLabel}>Mã đơn vị cha</Text>
+                <TextInput
+                  style={[styles.input, errors.codenpp && styles.inputError]}
+                  placeholder="Nhập mã đơn vị cha"
+                  placeholderTextColor={COLORS.textSecondary}
+                  value={value}
+                  onChangeText={onChange}
+                  onBlur={onBlur}
+                />
+                {errors.codenpp && (
+                  <Text style={styles.errorText}>{errors.codenpp.message}</Text>
+                )}
+              </View>
+            )}
+          />
+
           {/* Tên đơn vị */}
           <Controller
             control={control}

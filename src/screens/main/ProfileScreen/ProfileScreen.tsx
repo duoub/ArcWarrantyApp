@@ -14,6 +14,7 @@ import {
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
+import Clipboard from '@react-native-clipboard/clipboard';
 import ImagePicker from 'react-native-image-crop-picker';
 import { COLORS, SPACING, BORDER_RADIUS } from '../../../config/theme';
 import { commonStyles } from '../../../styles/commonStyles';
@@ -197,6 +198,13 @@ const ProfileScreen = () => {
     }
   };
 
+  const handleCopyCode = () => {
+    if (user?.codenpp) {
+      Clipboard.setString(user.codenpp);
+      Alert.alert('Thành công', 'Đã sao chép mã đơn vị');
+    }
+  };
+
   const handleLogout = () => {
     Alert.alert(
       'Đăng xuất',
@@ -251,6 +259,25 @@ const ProfileScreen = () => {
               </Text>
             </View>
           </View>
+
+          {/* Parent Unit Code - Prominent Display */}
+          {user?.codenpp && (
+            <View style={styles.codeContainer}>
+              <View style={styles.codeCard}>
+                <View style={styles.codeContent}>
+                  <Text style={styles.codeLabel}>Mã đơn vị</Text>
+                  <Text style={styles.codeValue}>{user.codenpp}</Text>
+                </View>
+                <TouchableOpacity
+                  style={styles.copyButton}
+                  onPress={handleCopyCode}
+                  activeOpacity={0.7}
+                >
+                  <Icon name="copy" size={20} color={COLORS.primary} />
+                </TouchableOpacity>
+              </View>
+            </View>
+          )}
         </View>
 
         {/* Profile Information Section */}
@@ -456,6 +483,52 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontWeight: '600',
     color: COLORS.primary,
+  },
+  codeContainer: {
+    marginTop: SPACING.lg,
+    paddingTop: SPACING.md,
+    borderTopWidth: 1,
+    borderTopColor: COLORS.gray200,
+    width: '100%',
+  },
+  codeCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: COLORS.primary + '08',
+    borderWidth: 2,
+    borderColor: COLORS.primary + '30',
+    borderRadius: BORDER_RADIUS.md,
+    padding: SPACING.md,
+    borderStyle: 'dashed',
+  },
+  codeContent: {
+    flex: 1,
+  },
+  codeLabel: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: COLORS.textSecondary,
+    marginBottom: SPACING.xs,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+  },
+  codeValue: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: COLORS.primary,
+    letterSpacing: 1,
+  },
+  copyButton: {
+    backgroundColor: COLORS.white,
+    width: 40,
+    height: 40,
+    borderRadius: BORDER_RADIUS.md,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginLeft: SPACING.md,
+    borderWidth: 1,
+    borderColor: COLORS.primary + '30',
   },
   section: {
     marginTop: SPACING.md,

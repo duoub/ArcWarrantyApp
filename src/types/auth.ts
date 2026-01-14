@@ -16,6 +16,7 @@ export interface User {
   tinhthanh?: string; // Tỉnh/Thành phố (tinhthanh)
   birthday?: string;
   // Business Information
+  codenpp?: string; // Mã đơn vị cha (codenpp)
   taxcode?: string; // Mã số thuế (taxcode)
   // Bank Information
   nganhang?: string; // Ngân hàng (nganhang)
@@ -56,6 +57,7 @@ export interface LoginResponse {
 }
 
 export interface SignupRequest {
+  codenpp?: string; // Parent unit code (optional)
   tendangnhap: string; // Username
   pasword: string; // Password (typo from API)
   hoten: string; // Full name
