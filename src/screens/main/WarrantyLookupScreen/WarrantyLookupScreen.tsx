@@ -5,12 +5,13 @@ import {
   TextInput,
   TouchableOpacity,
   StyleSheet,
-  ScrollView,
+  Platform,
   ActivityIndicator,
   Alert,
   StatusBar,
   Image,
 } from 'react-native';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { useNavigation } from '@react-navigation/native';
 import { COLORS, SPACING } from '../../../config/theme';
 import CustomHeader from '../../../components/CustomHeader';
@@ -121,10 +122,14 @@ const WarrantyLookupScreen = () => {
         onLeftPress={() => navigation.goBack()}
       />
 
-      <ScrollView
+      <KeyboardAwareScrollView
         style={styles.scrollView}
+        contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
+        enableOnAndroid={true}
+        extraScrollHeight={Platform.OS === 'ios' ? 20 : 100}
+        extraHeight={120}
       >
         {/* Page Title */}
         <View style={commonStyles.pageHeader}>
@@ -465,7 +470,7 @@ const WarrantyLookupScreen = () => {
         </View>
 
         <View style={commonStyles.bottomSpacing} />
-      </ScrollView>
+      </KeyboardAwareScrollView>
 
       {/* Barcode Scanner Modal */}
       <BarcodeScanner
@@ -485,6 +490,9 @@ const styles = StyleSheet.create({
   },
   scrollView: {
     flex: 1,
+  },
+  scrollContent: {
+    paddingBottom: SPACING.xl,
   },
   resultCountCard: {
     marginHorizontal: SPACING.lg,

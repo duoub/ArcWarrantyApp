@@ -5,15 +5,13 @@ import {
   TextInput,
   TouchableOpacity,
   StyleSheet,
-  ScrollView,
-  KeyboardAvoidingView,
   Platform,
   ActivityIndicator,
   Alert,
-  SafeAreaView,
   StatusBar,
   Image,
 } from 'react-native';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { useNavigation } from '@react-navigation/native';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -157,15 +155,15 @@ const WarrantyActivationScreen = () => {
         onLeftPress={handleBack}
       />
 
-      <KeyboardAvoidingView
-        style={styles.keyboardAvoidingView}
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      <KeyboardAwareScrollView
+        style={styles.scrollView}
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
+        enableOnAndroid={true}
+        extraScrollHeight={Platform.OS === 'ios' ? 20 : 100}
+        extraHeight={120}
       >
-        <ScrollView
-          style={styles.scrollView}
-          showsVerticalScrollIndicator={false}
-          keyboardShouldPersistTaps="handled"
-        >
 
           {/* Form Card */}
           <View style={commonStyles.cardWithMarginLarge}>
@@ -456,9 +454,8 @@ const WarrantyActivationScreen = () => {
           </View>
 
           {/* Bottom Spacing */}
-          <View style={commonStyles.bottomSpacing} />
-        </ScrollView>
-      </KeyboardAvoidingView>
+        <View style={commonStyles.bottomSpacing} />
+      </KeyboardAwareScrollView>
 
       {/* Barcode Scanner Modal */}
       <BarcodeScanner
@@ -476,11 +473,11 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: COLORS.background,
   },
-  keyboardAvoidingView: {
-    flex: 1,
-  },
   scrollView: {
     flex: 1,
+  },
+  scrollContent: {
+    paddingBottom: SPACING.xl,
   },
   labelRow: {
     flexDirection: 'row',

@@ -7,9 +7,10 @@ import {
   StyleSheet,
   ActivityIndicator,
   Alert,
-  ScrollView,
   StatusBar,
+  Platform,
 } from 'react-native';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { useForm, Controller } from 'react-hook-form';
@@ -131,10 +132,14 @@ const TechnicianSignupScreen: React.FC = () => {
         onLeftPress={() => navigation.goBack()}
       />
 
-      <ScrollView
+      <KeyboardAwareScrollView
         style={styles.scrollView}
+        contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
+        enableOnAndroid={true}
+        extraScrollHeight={Platform.OS === 'ios' ? 20 : 100}
+        extraHeight={120}
       >
         {/* Technician Registration Form */}
         <View style={styles.registrationCard}>
@@ -395,7 +400,7 @@ const TechnicianSignupScreen: React.FC = () => {
             )}
           </TouchableOpacity>
         </View>
-      </ScrollView>
+      </KeyboardAwareScrollView>
     </View>
   );
 };
@@ -412,6 +417,9 @@ const styles = StyleSheet.create({
   },
   scrollView: {
     flex: 1,
+  },
+  scrollContent: {
+    paddingBottom: SPACING.xl,
   },
 
   // Registration Card

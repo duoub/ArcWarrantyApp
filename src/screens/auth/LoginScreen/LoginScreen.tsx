@@ -6,12 +6,11 @@ import {
   TouchableOpacity,
   StyleSheet,
   Image,
-  KeyboardAvoidingView,
   Platform,
   ActivityIndicator,
   Alert,
-  ScrollView,
 } from 'react-native';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { useForm, Controller } from 'react-hook-form';
@@ -76,16 +75,16 @@ const LoginScreen = () => {
 
   return (
     <View style={styles.container}>
-      <KeyboardAvoidingView
-        style={styles.keyboardView}
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      <KeyboardAwareScrollView
+        style={styles.scrollView}
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
+        enableOnAndroid={true}
+        extraScrollHeight={Platform.OS === 'ios' ? 20 : 100}
+        extraHeight={120}
       >
-        <ScrollView
-          style={styles.scrollView}
-          contentContainerStyle={styles.scrollContent}
-          showsVerticalScrollIndicator={false}
-        >
-          <View style={styles.content}>
+        <View style={styles.content}>
             {/* Logo Section */}
             <View style={styles.logoSection}>
               <Image
@@ -224,13 +223,12 @@ const LoginScreen = () => {
               </View>
             </View>
 
-            {/* Footer */}
-            <View style={styles.footer}>
-              <Text style={styles.footerText}>Sản phẩm đẳng cấp từ <Text style={styles.signupLink}>MALAYSIA</Text></Text>
-            </View>
+          {/* Footer */}
+          <View style={styles.footer}>
+            <Text style={styles.footerText}>Sản phẩm đẳng cấp từ <Text style={styles.signupLink}>MALAYSIA</Text></Text>
           </View>
-        </ScrollView>
-      </KeyboardAvoidingView>
+        </View>
+      </KeyboardAwareScrollView>
 
       {/* Pre-Login Bottom Navigation */}
       <PreLoginNavigator />
@@ -242,9 +240,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: COLORS.white,
-  },
-  keyboardView: {
-    flex: 1,
   },
   scrollView: {
     flex: 1,

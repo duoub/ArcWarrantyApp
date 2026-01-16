@@ -7,11 +7,10 @@ import {
   TouchableOpacity,
   StatusBar,
   Alert,
-  ScrollView,
-  KeyboardAvoidingView,
   Platform,
   ActivityIndicator,
 } from 'react-native';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { useNavigation } from '@react-navigation/native';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -105,10 +104,7 @@ const ChangePasswordScreen = () => {
   };
 
   return (
-    <KeyboardAvoidingView
-      style={styles.container}
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-    >
+    <View style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor={COLORS.primary} />
 
       <CustomHeader
@@ -117,11 +113,14 @@ const ChangePasswordScreen = () => {
         onLeftPress={handleBackPress}
       />
 
-      <ScrollView
+      <KeyboardAwareScrollView
         style={styles.scrollView}
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
+        enableOnAndroid={true}
+        extraScrollHeight={Platform.OS === 'ios' ? 20 : 100}
+        extraHeight={120}
       >
         <View style={styles.formCard}>
           {/* Old Password */}
@@ -283,8 +282,8 @@ const ChangePasswordScreen = () => {
             )}
           </TouchableOpacity>
         </View>
-      </ScrollView>
-    </KeyboardAvoidingView>
+      </KeyboardAwareScrollView>
+    </View>
   );
 };
 

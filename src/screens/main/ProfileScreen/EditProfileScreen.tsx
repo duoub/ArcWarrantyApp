@@ -3,13 +3,14 @@ import {
   View,
   Text,
   StyleSheet,
-  ScrollView,
   TouchableOpacity,
   StatusBar,
   Alert,
   TextInput,
   ActivityIndicator,
+  Platform,
 } from 'react-native';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { useNavigation } from '@react-navigation/native';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -382,10 +383,14 @@ const EditProfileScreen = () => {
         onLeftPress={() => navigation.goBack()}
       />
 
-      <ScrollView
+      <KeyboardAwareScrollView
         style={styles.scrollView}
+        contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
+        enableOnAndroid={true}
+        extraScrollHeight={Platform.OS === 'ios' ? 20 : 100}
+        extraHeight={120}
       >
         {renderProfileForm()}
 
@@ -408,7 +413,7 @@ const EditProfileScreen = () => {
 
         {/* Bottom Spacing */}
         <View style={styles.bottomSpacing} />
-      </ScrollView>
+      </KeyboardAwareScrollView>
     </View>
   );
 };
@@ -420,6 +425,9 @@ const styles = StyleSheet.create({
   },
   scrollView: {
     flex: 1,
+  },
+  scrollContent: {
+    paddingBottom: SPACING.xl,
   },
   backIcon: {
     fontSize: 32,

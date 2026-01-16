@@ -29,6 +29,7 @@
     "react-native-gesture-handler": "^2.29.1",
     "react-native-image-crop-picker": "^0.51.1",
     "react-native-image-picker": "^8.2.1",
+    "react-native-keyboard-aware-scroll-view": "^0.9.5",
     "react-native-mmkv": "^4.1.0",
     "react-native-nitro-modules": "^0.31.10",
     "react-native-safe-area-context": "^5.5.2",

@@ -58,7 +58,7 @@ react {
 /**
  * Set this to true to Run Proguard on Release builds to minify the Java bytecode.
  */
-def enableProguardInReleaseBuilds = false
+def enableProguardInReleaseBuilds = true
 
 /**
  * The preferred build flavor of JavaScriptCore (JSC)
@@ -85,6 +85,10 @@ android {
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
         versionName "1.0"
+        // Chỉ build cho arm64-v8a để giảm size APK (hầu hết thiết bị hiện nay)
+        ndk {
+            abiFilters "arm64-v8a"
+        }
     }
     signingConfigs {
         debug {

@@ -5,11 +5,11 @@ import {
   TextInput,
   TouchableOpacity,
   StyleSheet,
-  KeyboardAvoidingView,
   Platform,
   ActivityIndicator,
   Alert,
 } from 'react-native';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { useForm, Controller } from 'react-hook-form';
@@ -67,9 +67,14 @@ const ForgotPasswordScreen = () => {
   // Success State
   if (otpSent) {
     return (
-      <KeyboardAvoidingView
+      <KeyboardAwareScrollView
         style={styles.container}
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        contentContainerStyle={styles.contentContainer}
+        showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
+        enableOnAndroid={true}
+        extraScrollHeight={Platform.OS === 'ios' ? 20 : 100}
+        extraHeight={120}
       >
         <View style={styles.content}>
           {/* Success Icon */}
@@ -98,15 +103,20 @@ const ForgotPasswordScreen = () => {
             </View>
           </TouchableOpacity>
         </View>
-      </KeyboardAvoidingView>
+      </KeyboardAwareScrollView>
     );
   }
 
   // Initial State
   return (
-    <KeyboardAvoidingView
+    <KeyboardAwareScrollView
       style={styles.container}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      contentContainerStyle={styles.contentContainer}
+      showsVerticalScrollIndicator={false}
+      keyboardShouldPersistTaps="handled"
+      enableOnAndroid={true}
+      extraScrollHeight={Platform.OS === 'ios' ? 20 : 100}
+      extraHeight={120}
     >
       <View style={styles.content}>
         {/* Back Button - Large and easy to tap */}
@@ -209,7 +219,7 @@ const ForgotPasswordScreen = () => {
           </Text>
         </View>
       </View>
-    </KeyboardAvoidingView>
+    </KeyboardAwareScrollView>
   );
 };
 
@@ -217,6 +227,9 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: COLORS.white,
+  },
+  contentContainer: {
+    flexGrow: 1,
   },
   content: {
     flex: 1,

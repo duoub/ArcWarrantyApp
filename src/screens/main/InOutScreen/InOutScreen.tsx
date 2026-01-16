@@ -9,10 +9,9 @@ import {
   Alert,
   StatusBar,
   Image,
-  ScrollView,
-  KeyboardAvoidingView,
   Platform,
 } from 'react-native';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { useForm, Controller } from 'react-hook-form';
@@ -212,17 +211,15 @@ const InOutScreen = () => {
 
       <CustomHeader title="Quét IN/OUT" />
 
-      <KeyboardAvoidingView
-        style={styles.contentContainer}
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-        keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 0}
+      <KeyboardAwareScrollView
+        style={styles.scrollView}
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
+        enableOnAndroid={true}
+        extraScrollHeight={Platform.OS === 'ios' ? 20 : 100}
+        extraHeight={120}
       >
-        <ScrollView
-          style={styles.scrollView}
-          contentContainerStyle={styles.scrollContent}
-          showsVerticalScrollIndicator={false}
-          keyboardShouldPersistTaps="handled"
-        >
           {/* Tab Switcher */}
           <View style={styles.tabContainer}>
             <TouchableOpacity
@@ -459,8 +456,7 @@ const InOutScreen = () => {
 
           {/* Bottom Spacing */}
           <View style={styles.bottomSpacing} />
-        </ScrollView>
-      </KeyboardAvoidingView>
+      </KeyboardAwareScrollView>
 
       {/* Barcode Scanner Modal */}
       <BarcodeScanner
@@ -477,9 +473,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: COLORS.background,
-  },
-  contentContainer: {
-    flex: 1,
   },
   scrollView: {
     flex: 1,
