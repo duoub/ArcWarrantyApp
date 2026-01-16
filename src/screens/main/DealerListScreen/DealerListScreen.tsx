@@ -10,7 +10,7 @@ import {
   ActivityIndicator,
   Alert,
 } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { COLORS, SPACING } from '../../../config/theme';
 import { commonStyles } from '../../../styles/commonStyles';
@@ -18,13 +18,16 @@ import CustomHeader from '../../../components/CustomHeader';
 import Avatar from '../../../components/Avatar';
 import { dealerService } from '../../../api/dealerService';
 import { DealerInfo } from '../../../types/dealer';
-import { HomeStackParamList } from '../../../navigation/MainNavigator';
+import { HomeStackParamList, InOutStackParamList } from '../../../navigation/MainNavigator';
 import { Icon } from '../../../components/common';
 
-type DealerListNavigationProp = StackNavigationProp<HomeStackParamList, 'DealerList'>;
+type DealerListNavigationProp = StackNavigationProp<HomeStackParamList & InOutStackParamList, 'DealerList'>;
+type DealerListRouteProp = RouteProp<InOutStackParamList, 'DealerList'>;
 
 const DealerListScreen = () => {
   const navigation = useNavigation<DealerListNavigationProp>();
+  const route = useRoute<DealerListRouteProp>();
+  const fromInOut = route.params?.fromInOut ?? false;
   const [searchQuery, setSearchQuery] = useState('');
   const [dealers, setDealers] = useState<DealerInfo[]>([]);
   const [filteredDealers, setFilteredDealers] = useState<DealerInfo[]>([]);
@@ -68,8 +71,20 @@ const DealerListScreen = () => {
   }, [searchQuery, dealers]);
 
   const handleSelectDealer = (dealer: DealerInfo) => {
-    // Navigate to dealer details or other action
-    Alert.alert('Đại lý', `Bạn đã chọn: ${dealer.name}`);
+    if (fromInOut) {
+      // Navigate back to InOutScreen with selected dealer info
+      navigation.navigate('InOut', {
+        selectedDealer: {
+          id: dealer.id,
+          name: dealer.name,
+          phone: dealer.phone,
+          address: dealer.address,
+        },
+      });
+    } else {
+      // Default behavior - show alert or navigate to dealer details
+      Alert.alert('Đại lý', `Bạn đã chọn: ${dealer.name}`);
+    }
   };
 
   const handleAddDealer = () => {

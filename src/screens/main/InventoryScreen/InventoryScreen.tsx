@@ -234,7 +234,7 @@ const InventoryScreen = () => {
           activeOpacity={0.7}
         >
           <Text style={[commonStyles.tabText, activeTab === '2' && commonStyles.tabTextActive]}>
-            Đã bán
+            Đã xuất kho
           </Text>
         </TouchableOpacity>
       </View>

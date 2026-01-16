@@ -23,6 +23,7 @@ import { useAuthStore } from '../../../store/authStore';
 import { InOutStackParamList } from '../../../navigation/MainNavigator';
 import { commonStyles } from '../../../styles/commonStyles';
 import { Icon } from '../../../components/common';
+import { inOutService } from '../../../api/inOutService';
 
 type InOutScreenNavigationProp = StackNavigationProp<InOutStackParamList, 'InOut'>;
 type InOutScreenRouteProp = RouteProp<InOutStackParamList, 'InOut'>;
@@ -90,7 +91,7 @@ const InOutScreen = () => {
   };
 
   const handleSelectDealer = () => {
-    navigation.navigate('DealerList');
+    navigation.navigate('DealerList', { fromInOut: true });
   };
 
   const handleResetToSellIn = () => {
@@ -100,25 +101,58 @@ const InOutScreen = () => {
   // Check if we're in sell-out mode
   const isSellOutMode = selectedDealer !== null;
 
-  const handleSaveInfo = async (data: InOutFormData) => {
+  const submitLead = async (data: InOutFormData) => {
     try {
       setIsLoading(true);
 
-      // TODO: Implement API call to save IN/OUT information
-      await new Promise((resolve) => setTimeout(resolve, 1500));
+      // Build customer info object
+      const customerInfo = isSellOutMode
+        ? {
+            id: selectedDealer!.id,
+            name: selectedDealer!.name,
+            phone: selectedDealer!.phone,
+            address: selectedDealer!.address,
+          }
+        : {
+            id: user?.id || '',
+            name: user?.name || '',
+            phone: user?.phone || '',
+            address: user?.address || '',
+          };
 
-      Alert.alert(
-        'Lưu thành công',
-        `Thông tin serial ${data.serial} đã được lưu thành công!`,
-        [
-          {
-            text: 'OK',
-            onPress: () => {
-              setValue('serial', '');
+      // Build lead info object
+      const leadInfo = {
+        title: data.serial,
+        mota: '',
+        step: { name: '', id: '' },
+        stepid: '',
+      };
+
+      const response = await inOutService.sendLead({
+        customer: customerInfo,
+        lead: leadInfo,
+        sellout: isSellOutMode ? 1 : 0,
+      });
+
+      if (response.status) {
+        Alert.alert(
+          'Lưu thành công',
+          response.message || `Thông tin serial đã được lưu thành công!`,
+          [
+            {
+              text: 'OK',
+              onPress: () => {
+                setValue('serial', '');
+              },
             },
-          },
-        ]
-      );
+          ]
+        );
+      } else {
+        Alert.alert(
+          'Lưu thất bại',
+          response.strError || response.message || 'Đã có lỗi xảy ra. Vui lòng thử lại.'
+        );
+      }
     } catch (error) {
       Alert.alert(
         'Lưu thất bại',
@@ -127,6 +161,26 @@ const InOutScreen = () => {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleSaveInfo = (data: InOutFormData) => {
+    const modeText = isSellOutMode ? 'Sell Out' : 'Sell In';
+    const customerName = isSellOutMode ? selectedDealer?.name : user?.name;
+
+    Alert.alert(
+      `Xác nhận ${modeText}`,
+      `Bạn có chắc chắn muốn ${modeText} cho "${customerName}"?\n\nSerial: ${data.serial}`,
+      [
+        {
+          text: 'Hủy',
+          style: 'cancel',
+        },
+        {
+          text: 'Xác nhận',
+          onPress: () => submitLead(data),
+        },
+      ]
+    );
   };
 
   return (
@@ -288,6 +342,7 @@ const InOutScreen = () => {
           <TouchableOpacity
             style={[
               styles.saveButton,
+              isSellOutMode && styles.saveButtonSellOut,
               isLoading && styles.saveButtonDisabled,
             ]}
             onPress={handleSubmit(handleSaveInfo)}
@@ -297,7 +352,9 @@ const InOutScreen = () => {
             {isLoading ? (
               <ActivityIndicator color={COLORS.white} size="small" />
             ) : (
-              <Text style={styles.saveButtonText}>Lưu thông tin</Text>
+              <Text style={styles.saveButtonText}>
+                {isSellOutMode ? 'Sell Out' : 'Sell In'}
+              </Text>
             )}
           </TouchableOpacity>
         </View>
@@ -335,12 +392,9 @@ const styles = StyleSheet.create({
     padding: SPACING.md,
     borderRadius: BORDER_RADIUS.lg,
     ...SHADOWS.md,
-    borderWidth: 2,
-    borderColor: COLORS.primary + '30',
   },
   customerCardSellOut: {
-    borderColor: COLORS.secondary + '50',
-    backgroundColor: COLORS.secondary + '05',
+    backgroundColor: '#FFF8F0',
   },
   customerHeader: {
     flexDirection: 'row',
@@ -413,16 +467,18 @@ const styles = StyleSheet.create({
     paddingHorizontal: SPACING.md,
     borderRadius: BORDER_RADIUS.md,
     alignItems: 'center',
+    justifyContent: 'center',
   },
   dealerActionButtonSecondary: {
     backgroundColor: COLORS.white,
-    borderWidth: 1.5,
+    borderWidth: 1,
     borderColor: COLORS.secondary,
   },
   dealerActionButtonText: {
     color: COLORS.white,
     fontSize: 13,
     fontWeight: '600',
+    textAlignVertical: 'center',
   },
   dealerActionButtonTextSecondary: {
     color: COLORS.secondary,
@@ -434,11 +490,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: SPACING.md,
     borderRadius: BORDER_RADIUS.md,
     alignItems: 'center',
+    justifyContent: 'center',
   },
   resetButtonText: {
     color: COLORS.white,
     fontSize: 13,
     fontWeight: '600',
+    textAlignVertical: 'center',
   },
 
   // Scan Card
@@ -513,6 +571,9 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: COLORS.white,
     letterSpacing: 0.5,
+  },
+  saveButtonSellOut: {
+    backgroundColor: COLORS.secondary,
   },
   saveButtonDisabled: {
     opacity: 0.6,

@@ -125,8 +125,12 @@ const HomeScreen = () => {
     }
   };
 
-  // Auto-slide banners
+  // Auto-slide banners - only run when there are banners
   useEffect(() => {
+    if (banners.length <= 1) {
+      return;
+    }
+
     const interval = setInterval(() => {
       setCurrentBannerIndex((prevIndex) => {
         const nextIndex = (prevIndex + 1) % banners.length;
@@ -193,39 +197,41 @@ const HomeScreen = () => {
       <CustomHeader title="Trang chủ" />
 
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
-        {/* Banner Slider */}
-        <View style={styles.bannerContainer}>
-          <FlatList
-            ref={bannerListRef}
-            data={banners}
-            renderItem={renderBanner}
-            keyExtractor={(item, index) => `banner-${item.id}-${index}`}
-            horizontal
-            pagingEnabled
-            showsHorizontalScrollIndicator={false}
-            onMomentumScrollEnd={(event) => {
-              const index = Math.round(
-                event.nativeEvent.contentOffset.x / BANNER_WIDTH
-              );
-              setCurrentBannerIndex(index);
-            }}
-          />
+        {/* Banner Slider - Only show when there are banners */}
+        {banners.length > 0 && (
+          <View style={styles.bannerContainer}>
+            <FlatList
+              ref={bannerListRef}
+              data={banners}
+              renderItem={renderBanner}
+              keyExtractor={(item, index) => `banner-${item.id}-${index}`}
+              horizontal
+              pagingEnabled
+              showsHorizontalScrollIndicator={false}
+              onMomentumScrollEnd={(event) => {
+                const index = Math.round(
+                  event.nativeEvent.contentOffset.x / BANNER_WIDTH
+                );
+                setCurrentBannerIndex(index);
+              }}
+            />
 
-          {/* Pagination Dots */}
-          {banners.length > 0 && (
-            <View style={commonStyles.paginationContainer}>
-              {banners.map((banner, index) => (
-                <View
-                  key={`dot-${banner.id}-${index}`}
-                  style={[
-                    commonStyles.paginationDot,
-                    index === currentBannerIndex && commonStyles.paginationDotActive,
-                  ]}
-                />
-              ))}
-            </View>
-          )}
-        </View>
+            {/* Pagination Dots - Only show when more than 1 banner */}
+            {banners.length > 1 && (
+              <View style={commonStyles.paginationContainer}>
+                {banners.map((banner, index) => (
+                  <View
+                    key={`dot-${banner.id}-${index}`}
+                    style={[
+                      commonStyles.paginationDot,
+                      index === currentBannerIndex && commonStyles.paginationDotActive,
+                    ]}
+                  />
+                ))}
+              </View>
+            )}
+          </View>
+        )}
 
         {/* User Profile Section */}
         {isAuthenticated && user && (

@@ -77,7 +77,10 @@ export type InOutStackParamList = {
       address: string;
     };
   } | undefined;
-  DealerList: undefined;
+  DealerList: {
+    fromInOut?: boolean;
+  } | undefined;
+  DealerSignup: undefined;
 };
 
 export type ProfileStackParamList = {
@@ -148,6 +151,7 @@ const InOutStackNavigator = () => {
     <InOutStack.Navigator screenOptions={{ headerShown: false }}>
       <InOutStack.Screen name="InOut" component={InOutScreen} />
       <InOutStack.Screen name="DealerList" component={DealerListScreen} />
+      <InOutStack.Screen name="DealerSignup" component={DealerSignupScreen} />
     </InOutStack.Navigator>
   );
 };
