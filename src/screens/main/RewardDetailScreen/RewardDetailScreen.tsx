@@ -1,15 +1,13 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
   StyleSheet,
-  ScrollView,
+  FlatList,
   TouchableOpacity,
   StatusBar,
   ActivityIndicator,
   Alert,
-  NativeSyntheticEvent,
-  NativeScrollEvent,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { COLORS, SPACING, BORDER_RADIUS, SHADOWS } from '../../../config/theme';
@@ -78,20 +76,11 @@ const RewardDetailScreen = () => {
   }, [activeTab]);
 
   // Load more when scrolling near bottom
-  const handleScroll = useCallback(
-    (event: NativeSyntheticEvent<NativeScrollEvent>) => {
-      const { layoutMeasurement, contentOffset, contentSize } = event.nativeEvent;
-      const paddingToBottom = 100;
-      const isCloseToBottom =
-        layoutMeasurement.height + contentOffset.y >=
-        contentSize.height - paddingToBottom;
-
-      if (isCloseToBottom && hasNextPage && !isLoadingMore && !isLoading) {
-        loadTransactions(currentPage + 1, false);
-      }
-    },
-    [hasNextPage, isLoadingMore, isLoading, currentPage]
-  );
+  const handleLoadMore = () => {
+    if (hasNextPage && !isLoadingMore && !isLoading) {
+      loadTransactions(currentPage + 1, false);
+    }
+  };
 
   const getTabTitle = (type: RewardTransactionType) => {
     switch (type) {
@@ -148,7 +137,7 @@ const RewardDetailScreen = () => {
 
         <View style={commonStyles.infoRow}>
           <View style={commonStyles.infoLabelContainer}>
-            <Icon name="warranty" size={14} color={COLORS.textSecondary} />
+            <Icon name="warranty-activation" size={14} color={COLORS.textSecondary} />
             <Text style={commonStyles.infoLabel}>Bảo hành:</Text>
           </View>
           <Text style={commonStyles.infoValue}>{item.warrantyPeriod}</Text>
@@ -250,51 +239,46 @@ const RewardDetailScreen = () => {
         </TouchableOpacity>
       </View>
 
-      <ScrollView
-        style={styles.scrollView}
-        showsVerticalScrollIndicator={true}
-        onScroll={handleScroll}
-        scrollEventThrottle={400}
-      >
-        {/* Total Count */}
-        <View style={styles.totalCountCard}>
-          <Text style={styles.totalCountText}>
-            Tổng số: <Text style={styles.totalCountNumber}>{totalCount}</Text>
-          </Text>
+      {isLoading ? (
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color={COLORS.primary} />
         </View>
-
-        {isLoading ? (
-          <View style={styles.loadingContainer}>
-            <ActivityIndicator size="large" color={COLORS.primary} />
-          </View>
-        ) : transactions.length === 0 ? (
-          <View style={styles.emptyContainer}>
-            <Icon name="document" size={48} color={COLORS.gray300} />
-            <Text style={styles.emptyText}>
-              Không có giao dịch {getTabTitle(activeTab).toLowerCase()}
-            </Text>
-          </View>
-        ) : (
-          <>
-            <View style={styles.transactionList}>
-              {transactions.map((transaction, index) =>
-                renderTransactionCard(transaction, index)
-              )}
+      ) : (
+        <FlatList
+          data={transactions}
+          keyExtractor={(item, index) => `${item.id}-${index}`}
+          renderItem={({ item, index }) => renderTransactionCard(item, index)}
+          style={styles.scrollView}
+          showsVerticalScrollIndicator={true}
+          onEndReached={handleLoadMore}
+          onEndReachedThreshold={0.5}
+          ListHeaderComponent={
+            <View style={styles.totalCountCard}>
+              <Text style={styles.totalCountText}>
+                Tổng số: <Text style={styles.totalCountNumber}>{totalCount}</Text>
+              </Text>
             </View>
-
-            {/* Loading more indicator */}
-            {isLoadingMore && (
+          }
+          ListEmptyComponent={
+            <View style={styles.emptyContainer}>
+              <Icon name="document" size={48} color={COLORS.gray300} />
+              <Text style={styles.emptyText}>
+                Không có giao dịch {getTabTitle(activeTab).toLowerCase()}
+              </Text>
+            </View>
+          }
+          ListFooterComponent={
+            isLoadingMore ? (
               <View style={styles.loadingMoreContainer}>
                 <ActivityIndicator size="small" color={COLORS.primary} />
                 <Text style={styles.loadingMoreText}>Đang tải thêm...</Text>
               </View>
-            )}
-          </>
-        )}
-
-        {/* Bottom Spacing */}
-        <View style={styles.bottomSpacing} />
-      </ScrollView>
+            ) : (
+              <View style={styles.bottomSpacing} />
+            )
+          }
+        />
+      )}
     </View>
   );
 };

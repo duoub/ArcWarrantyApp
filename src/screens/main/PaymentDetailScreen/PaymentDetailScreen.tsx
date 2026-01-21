@@ -1,16 +1,15 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
   StyleSheet,
+  FlatList,
   ScrollView,
   StatusBar,
   ActivityIndicator,
   Alert,
   Image,
   TouchableOpacity,
-  NativeSyntheticEvent,
-  NativeScrollEvent,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { COLORS, SPACING, BORDER_RADIUS, SHADOWS } from '../../../config/theme';
@@ -75,20 +74,11 @@ const PaymentDetailScreen = () => {
   }, []);
 
   // Load more when scrolling near bottom
-  const handleScroll = useCallback(
-    (event: NativeSyntheticEvent<NativeScrollEvent>) => {
-      const { layoutMeasurement, contentOffset, contentSize } = event.nativeEvent;
-      const paddingToBottom = 20;
-      const isCloseToBottom =
-        layoutMeasurement.height + contentOffset.y >=
-        contentSize.height - paddingToBottom;
-
-      if (isCloseToBottom && hasNextPage && !isLoadingMore && !isLoading) {
-        loadPayments(currentPage + 1, false);
-      }
-    },
-    [hasNextPage, isLoadingMore, isLoading, currentPage]
-  );
+  const handleLoadMore = () => {
+    if (hasNextPage && !isLoadingMore && !isLoading) {
+      loadPayments(currentPage + 1, false);
+    }
+  };
 
   const handleImagePress = (uri: string) => {
     setSelectedImage(uri);
@@ -166,40 +156,37 @@ const PaymentDetailScreen = () => {
         onLeftPress={handleBack}
       />
 
-      <ScrollView
-        style={styles.scrollView}
-        showsVerticalScrollIndicator={true}
-        onScroll={handleScroll}
-        scrollEventThrottle={400}
-      >
-        {isLoading ? (
-          <View style={styles.loadingContainer}>
-            <ActivityIndicator size="large" color={COLORS.primary} />
-          </View>
-        ) : payments.length === 0 ? (
-          <View style={styles.emptyContainer}>
-            <Icon name="document" size={48} color={COLORS.gray300} />
-            <Text style={styles.emptyText}>Chưa có lịch sử thanh toán</Text>
-          </View>
-        ) : (
-          <>
-            <View style={styles.paymentList}>
-              {payments.map((payment) => renderPaymentCard(payment))}
+      {isLoading ? (
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color={COLORS.primary} />
+        </View>
+      ) : (
+        <FlatList
+          data={payments}
+          keyExtractor={(item) => String(item.id)}
+          renderItem={({ item }) => renderPaymentCard(item)}
+          style={styles.scrollView}
+          showsVerticalScrollIndicator={true}
+          onEndReached={handleLoadMore}
+          onEndReachedThreshold={0.5}
+          ListEmptyComponent={
+            <View style={styles.emptyContainer}>
+              <Icon name="document" size={48} color={COLORS.gray300} />
+              <Text style={styles.emptyText}>Chưa có lịch sử thanh toán</Text>
             </View>
-
-            {/* Loading more indicator */}
-            {isLoadingMore && (
+          }
+          ListFooterComponent={
+            isLoadingMore ? (
               <View style={styles.loadingMoreContainer}>
                 <ActivityIndicator size="small" color={COLORS.primary} />
                 <Text style={styles.loadingMoreText}>Đang tải thêm...</Text>
               </View>
-            )}
-          </>
-        )}
-
-        {/* Bottom Spacing */}
-        <View style={styles.bottomSpacing} />
-      </ScrollView>
+            ) : (
+              <View style={styles.bottomSpacing} />
+            )
+          }
+        />
+      )}
 
       {/* Image Modal */}
       {selectedImage && (

@@ -29,21 +29,49 @@ const DealerListScreen = () => {
   const route = useRoute<DealerListRouteProp>();
   const fromInOut = route.params?.fromInOut ?? false;
   const [searchQuery, setSearchQuery] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
   const [dealers, setDealers] = useState<DealerInfo[]>([]);
-  const [filteredDealers, setFilteredDealers] = useState<DealerInfo[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [hasNextPage, setHasNextPage] = useState(true);
+
+  // Debounce search
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(searchQuery);
+      setCurrentPage(1);
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
 
   // Fetch dealer list from API
   useEffect(() => {
-    fetchDealers();
-  }, []);
+    fetchDealers(1, true);
+  }, [debouncedSearch]);
 
-  const fetchDealers = async () => {
+  const fetchDealers = async (page: number = 1, reset: boolean = false) => {
     try {
-      setIsLoading(true);
-      const response = await dealerService.getDealerList();
-      setDealers(response.list);
-      setFilteredDealers(response.list);
+      if (reset) {
+        setIsLoading(true);
+        setDealers([]);
+      } else {
+        setIsLoadingMore(true);
+      }
+
+      const response = await dealerService.getDealerList({
+        upage: page,
+        keyword: debouncedSearch,
+      });
+
+      if (reset) {
+        setDealers(response.list);
+      } else {
+        setDealers(prev => [...prev, ...response.list]);
+      }
+
+      setHasNextPage(response.nextpage);
+      setCurrentPage(page);
     } catch (error) {
       Alert.alert(
         'Lỗi',
@@ -51,24 +79,15 @@ const DealerListScreen = () => {
       );
     } finally {
       setIsLoading(false);
+      setIsLoadingMore(false);
     }
   };
 
-  // Search filter
-  useEffect(() => {
-    if (searchQuery.trim() === '') {
-      setFilteredDealers(dealers);
-    } else {
-      const query = searchQuery.toLowerCase();
-      const filtered = dealers.filter(
-        (dealer) =>
-          dealer.name.toLowerCase().includes(query) ||
-          dealer.phone.includes(query) ||
-          dealer.address.toLowerCase().includes(query)
-      );
-      setFilteredDealers(filtered);
+  const handleLoadMore = () => {
+    if (!isLoadingMore && !isLoading && hasNextPage) {
+      fetchDealers(currentPage + 1, false);
     }
-  }, [searchQuery, dealers]);
+  };
 
   const handleSelectDealer = (dealer: DealerInfo) => {
     if (fromInOut) {
@@ -151,15 +170,25 @@ const DealerListScreen = () => {
         </View>
       ) : (
         <FlatList
-          data={filteredDealers}
+          data={dealers}
           renderItem={renderDealer}
           keyExtractor={(item) => String(item.id)}
           contentContainerStyle={styles.listContainer}
           showsVerticalScrollIndicator={false}
+          onEndReached={handleLoadMore}
+          onEndReachedThreshold={0.5}
           ListEmptyComponent={
             <View style={commonStyles.emptyContainer}>
               <Text style={commonStyles.emptyText}>Không tìm thấy đại lý</Text>
             </View>
+          }
+          ListFooterComponent={
+            isLoadingMore ? (
+              <View style={styles.loadMoreContainer}>
+                <ActivityIndicator size="small" color={COLORS.primary} />
+                <Text style={styles.loadMoreText}>Đang tải thêm...</Text>
+              </View>
+            ) : null
           }
         />
       )}
@@ -220,6 +249,16 @@ const styles = StyleSheet.create({
   detailLabel: {
     fontWeight: '600',
     color: COLORS.textPrimary,
+  },
+  loadMoreContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: SPACING.lg,
+  },
+  loadMoreText: {
+    fontSize: 13,
+    color: COLORS.textSecondary,
+    marginTop: SPACING.sm,
   },
 });
 

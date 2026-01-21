@@ -61,7 +61,9 @@ export type IconName =
   | 'eye'
   | 'eye-off'
   | 'copy'
-  | 'trophy';
+  | 'trophy'
+  | 'document'
+  | 'calendar';
 
 interface IconConfig {
   provider: 'MaterialCommunityIcons' | 'Feather';
@@ -128,6 +130,8 @@ const iconMap: Record<IconName, IconConfig> = {
   'eye-off': { provider: 'MaterialCommunityIcons', name: 'eye-off-outline' },
   'copy': { provider: 'MaterialCommunityIcons', name: 'content-copy' },
   'trophy': { provider: 'MaterialCommunityIcons', name: 'trophy' },
+  'document': { provider: 'MaterialCommunityIcons', name: 'file-document' },
+  'calendar': { provider: 'MaterialCommunityIcons', name: 'calendar' },
 };
 
 interface IconProps {

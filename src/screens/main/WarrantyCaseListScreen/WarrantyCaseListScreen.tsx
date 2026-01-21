@@ -1,15 +1,14 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
   StyleSheet,
+  FlatList,
   ScrollView,
   TouchableOpacity,
   StatusBar,
   ActivityIndicator,
   Alert,
-  NativeSyntheticEvent,
-  NativeScrollEvent,
   Image,
   Modal,
 } from 'react-native';
@@ -77,20 +76,11 @@ const WarrantyCaseListScreen = () => {
   }, []);
 
   // Load more when scrolling near bottom
-  const handleScroll = useCallback(
-    (event: NativeSyntheticEvent<NativeScrollEvent>) => {
-      const { layoutMeasurement, contentOffset, contentSize } = event.nativeEvent;
-      const paddingToBottom = 100;
-      const isCloseToBottom =
-        layoutMeasurement.height + contentOffset.y >=
-        contentSize.height - paddingToBottom;
-
-      if (isCloseToBottom && hasNextPage && !isLoadingMore && !isLoading) {
-        loadWarrantyCases(currentPage + 1, false);
-      }
-    },
-    [hasNextPage, isLoadingMore, isLoading, currentPage]
-  );
+  const handleLoadMore = () => {
+    if (hasNextPage && !isLoadingMore && !isLoading) {
+      loadWarrantyCases(currentPage + 1, false);
+    }
+  };
 
   // Handle image press
   const handleImagePress = (uri: string) => {
@@ -129,7 +119,7 @@ const WarrantyCaseListScreen = () => {
         {item.serial && (
           <View style={commonStyles.infoRow}>
             <View style={commonStyles.infoLabelContainer}>
-              <Icon name="barcode" size={14} color={COLORS.textSecondary} />
+              <Icon name="in-out" size={14} color={COLORS.textSecondary} />
               <Text style={commonStyles.infoLabel}>Serial:</Text>
             </View>
             <Text style={commonStyles.infoValue}>{item.serial}</Text>
@@ -200,42 +190,37 @@ const WarrantyCaseListScreen = () => {
         onLeftPress={handleBack}
       />
 
-      <ScrollView
-        style={styles.scrollView}
-        showsVerticalScrollIndicator={true}
-        onScroll={handleScroll}
-        scrollEventThrottle={400}
-      >
-        {isLoading ? (
-          <View style={styles.loadingContainer}>
-            <ActivityIndicator size="large" color={COLORS.primary} />
-          </View>
-        ) : warrantyCases.length === 0 ? (
-          <View style={styles.emptyContainer}>
-            <Icon name="warranty-report" size={48} color={COLORS.gray300} />
-            <Text style={styles.emptyText}>Không có ca bảo hành nào</Text>
-          </View>
-        ) : (
-          <>
-            <View style={styles.caseList}>
-              {warrantyCases.map((warrantyCase, index) =>
-                renderWarrantyCaseCard(warrantyCase, index)
-              )}
+      {isLoading ? (
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color={COLORS.primary} />
+        </View>
+      ) : (
+        <FlatList
+          data={warrantyCases}
+          keyExtractor={(item, index) => `${item.id}-${index}`}
+          renderItem={({ item, index }) => renderWarrantyCaseCard(item, index)}
+          style={styles.scrollView}
+          showsVerticalScrollIndicator={true}
+          onEndReached={handleLoadMore}
+          onEndReachedThreshold={0.5}
+          ListEmptyComponent={
+            <View style={styles.emptyContainer}>
+              <Icon name="warranty-report" size={48} color={COLORS.gray300} />
+              <Text style={styles.emptyText}>Không có ca bảo hành nào</Text>
             </View>
-
-            {/* Loading more indicator */}
-            {isLoadingMore && (
+          }
+          ListFooterComponent={
+            isLoadingMore ? (
               <View style={styles.loadingMoreContainer}>
                 <ActivityIndicator size="small" color={COLORS.primary} />
                 <Text style={styles.loadingMoreText}>Đang tải thêm...</Text>
               </View>
-            )}
-          </>
-        )}
-
-        {/* Bottom Spacing */}
-        <View style={styles.bottomSpacing} />
-      </ScrollView>
+            ) : (
+              <View style={styles.bottomSpacing} />
+            )
+          }
+        />
+      )}
 
       {/* Image Modal */}
       {selectedImage && (

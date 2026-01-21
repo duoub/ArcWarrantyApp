@@ -1,17 +1,15 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
   Text,
   StyleSheet,
-  ScrollView,
+  FlatList,
   TouchableOpacity,
   StatusBar,
   TextInput,
   Linking,
   Alert,
   ActivityIndicator,
-  NativeSyntheticEvent,
-  NativeScrollEvent,
 } from 'react-native';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { COLORS, SPACING, BORDER_RADIUS, SHADOWS } from '../../../config/theme';
@@ -109,21 +107,11 @@ const DistributionSystemScreen = () => {
   }, [keyword]);
 
   // Load more when scrolling near bottom
-  const handleScroll = useCallback(
-    (event: NativeSyntheticEvent<NativeScrollEvent>) => {
-      const { layoutMeasurement, contentOffset, contentSize } = event.nativeEvent;
-      const paddingToBottom = 20;
-      const isCloseToBottom =
-        layoutMeasurement.height + contentOffset.y >=
-        contentSize.height - paddingToBottom;
-
-      if (isCloseToBottom && hasNextPage && !isLoadingMore && !isLoading) {
-        loadDistributors(currentPage + 1, false);
-      }
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [hasNextPage, isLoadingMore, isLoading, currentPage]
-  );
+  const handleLoadMore = () => {
+    if (hasNextPage && !isLoadingMore && !isLoading) {
+      loadDistributors(currentPage + 1, false);
+    }
+  };
 
   const handleCallPhone = (phoneNumber: string) => {
     const url = `tel:${phoneNumber}`;
@@ -231,46 +219,40 @@ const DistributionSystemScreen = () => {
         </View>
 
         {/* Distributors List */}
-        <ScrollView
-          style={styles.scrollView}
-          showsVerticalScrollIndicator={true}
-          onScroll={handleScroll}
-          scrollEventThrottle={400}
-        >
-          {isLoading ? (
-            <View style={styles.loadingContainer}>
-              <ActivityIndicator size="large" color={COLORS.primary} />
-            </View>
-          ) : distributors.length === 0 ? (
-            <View style={styles.emptyContainer}>
-              <Icon name="search" size={48} color={COLORS.gray300} style={styles.emptyIcon} />
-              <Text style={styles.emptyText}>
-                Không tìm thấy nhà phân phối
-              </Text>
-            </View>
-          ) : (
-            <>
-              <View style={styles.distributorsList}>
-                {distributors.map((distributor) => (
-                  <React.Fragment key={distributor.id}>
-                    {renderDistributor(distributor)}
-                  </React.Fragment>
-                ))}
+        {isLoading ? (
+          <View style={styles.loadingContainer}>
+            <ActivityIndicator size="large" color={COLORS.primary} />
+          </View>
+        ) : (
+          <FlatList
+            data={distributors}
+            keyExtractor={(item) => String(item.id)}
+            renderItem={({ item }) => renderDistributor(item)}
+            style={styles.scrollView}
+            contentContainerStyle={styles.distributorsList}
+            showsVerticalScrollIndicator={true}
+            onEndReached={handleLoadMore}
+            onEndReachedThreshold={0.5}
+            ListEmptyComponent={
+              <View style={styles.emptyContainer}>
+                <Icon name="search" size={48} color={COLORS.gray300} style={styles.emptyIcon} />
+                <Text style={styles.emptyText}>
+                  Không tìm thấy nhà phân phối
+                </Text>
               </View>
-
-              {/* Loading more indicator */}
-              {isLoadingMore && (
+            }
+            ListFooterComponent={
+              isLoadingMore ? (
                 <View style={styles.loadingMoreContainer}>
                   <ActivityIndicator size="small" color={COLORS.primary} />
                   <Text style={styles.loadingMoreText}>Đang tải thêm...</Text>
                 </View>
-              )}
-            </>
-          )}
-
-          {/* Bottom Spacing */}
-          <View style={styles.bottomSpacing} />
-        </ScrollView>
+              ) : (
+                <View style={styles.bottomSpacing} />
+              )
+            }
+          />
+        )}
       </View>
     </View>
   );

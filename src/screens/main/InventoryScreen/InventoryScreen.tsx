@@ -4,7 +4,7 @@ import {
   Text,
   TextInput,
   StyleSheet,
-  ScrollView,
+  FlatList,
   TouchableOpacity,
   StatusBar,
   ActivityIndicator,
@@ -111,8 +111,8 @@ const InventoryScreen = () => {
     navigation.goBack();
   };
 
-  const renderInventoryItem = (item: InventoryItem, index: number) => (
-    <View key={index} style={styles.inventoryCard}>
+  const renderInventoryItem = ({ item }: { item: InventoryItem }) => (
+    <View style={styles.inventoryCard}>
       {/* Serial Header */}
       <View style={styles.cardHeader}>
         <Text style={[styles.serialText, { color: item.statuscolor }]}>
@@ -265,58 +265,48 @@ const InventoryScreen = () => {
       </View>
 
       {/* Content */}
-      <ScrollView
-        style={styles.scrollView}
-        showsVerticalScrollIndicator={false}
-        onScroll={({ nativeEvent }) => {
-          const { layoutMeasurement, contentOffset, contentSize } = nativeEvent;
-          const isCloseToBottom = layoutMeasurement.height + contentOffset.y >= contentSize.height - 100;
-          if (isCloseToBottom) {
-            handleLoadMore();
-          }
-        }}
-        scrollEventThrottle={400}
-      >
-        {/* Total Count */}
-        <View style={styles.totalCountCard}>
-          <Text style={styles.totalCountText}>
-            Tổng số: <Text style={styles.totalCountNumber}>{totalCount}</Text>
-          </Text>
+      {isLoading ? (
+        <View style={commonStyles.loadingContainer}>
+          <ActivityIndicator size="large" color={COLORS.primary} />
+          <Text style={commonStyles.loadingText}>Đang tải...</Text>
         </View>
-
-        {/* Loading State */}
-        {isLoading && (
-          <View style={commonStyles.loadingContainer}>
-            <ActivityIndicator size="large" color={COLORS.primary} />
-            <Text style={commonStyles.loadingText}>Đang tải...</Text>
-          </View>
-        )}
-
-        {/* Empty State */}
-        {!isLoading && inventoryList.length === 0 && (
-          <View style={commonStyles.emptyContainer}>
-            <Icon name="package" size={64} color={COLORS.gray300} />
-            <Text style={commonStyles.emptyText}>Không có sản phẩm nào</Text>
-            <Text style={commonStyles.emptySubtext}>
-              {keyword ? 'Thử tìm kiếm với từ khóa khác' : 'Chưa có sản phẩm trong danh mục này'}
-            </Text>
-          </View>
-        )}
-
-        {/* Inventory List */}
-        {!isLoading && inventoryList.map((item, index) => renderInventoryItem(item, index))}
-
-        {/* Load More Indicator */}
-        {isLoadingMore && (
-          <View style={styles.loadMoreContainer}>
-            <ActivityIndicator size="small" color={COLORS.primary} />
-            <Text style={styles.loadMoreText}>Đang tải thêm...</Text>
-          </View>
-        )}
-
-        {/* Bottom Spacing */}
-        <View style={commonStyles.bottomSpacingLarge} />
-      </ScrollView>
+      ) : (
+        <FlatList
+          data={inventoryList}
+          renderItem={renderInventoryItem}
+          keyExtractor={(item, index) => `${item.serial}-${index}`}
+          style={styles.scrollView}
+          showsVerticalScrollIndicator={false}
+          onEndReached={handleLoadMore}
+          onEndReachedThreshold={0.5}
+          ListHeaderComponent={
+            <View style={styles.totalCountCard}>
+              <Text style={styles.totalCountText}>
+                Tổng số: <Text style={styles.totalCountNumber}>{totalCount}</Text>
+              </Text>
+            </View>
+          }
+          ListEmptyComponent={
+            <View style={commonStyles.emptyContainer}>
+              <Icon name="package" size={64} color={COLORS.gray300} />
+              <Text style={commonStyles.emptyText}>Không có sản phẩm nào</Text>
+              <Text style={commonStyles.emptySubtext}>
+                {keyword ? 'Thử tìm kiếm với từ khóa khác' : 'Chưa có sản phẩm trong danh mục này'}
+              </Text>
+            </View>
+          }
+          ListFooterComponent={
+            isLoadingMore ? (
+              <View style={styles.loadMoreContainer}>
+                <ActivityIndicator size="small" color={COLORS.primary} />
+                <Text style={styles.loadMoreText}>Đang tải thêm...</Text>
+              </View>
+            ) : (
+              <View style={commonStyles.bottomSpacingLarge} />
+            )
+          }
+        />
+      )}
 
       {/* Floating Action Button */}
       <TouchableOpacity
