@@ -10,6 +10,7 @@ import ForgotPasswordScreen from '../screens/auth/ForgotPasswordScreen/ForgotPas
 import WarrantyStationListScreen from '../screens/main/WarrantyStationListScreen/WarrantyStationListScreen';
 import WarrantyActivationScreen from '../screens/main/WarrantyActivationScreen/WarrantyActivationScreen';
 import DistributionSystemScreen from '../screens/main/DistributionSystemScreen/DistributionSystemScreen';
+import WarrantyLookupScreen from '../screens/main/WarrantyLookupScreen/WarrantyLookupScreen';
 
 export type PreLoginRootStackParamList = {
   Login: undefined;
@@ -21,6 +22,7 @@ export type PreLoginRootStackParamList = {
   ForgotPassword: undefined;
   WarrantyStationList: undefined;
   WarrantyActivation: undefined;
+  WarrantyLookup: undefined;
   DistributionSystem: undefined;
 };
 
@@ -48,6 +50,7 @@ const PreLoginRootNavigator = () => {
       <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen} />
       <Stack.Screen name="WarrantyStationList" component={WarrantyStationListScreen} />
       <Stack.Screen name="WarrantyActivation" component={WarrantyActivationScreen} />
+      <Stack.Screen name="WarrantyLookup" component={WarrantyLookupScreen} />
       <Stack.Screen name="DistributionSystem" component={DistributionSystemScreen} />
     </Stack.Navigator>
   );

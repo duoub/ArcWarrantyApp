@@ -9,9 +9,9 @@ import { PreLoginRootStackParamList } from './PreLoginRootNavigator';
 type PreLoginNavigationProp = StackNavigationProp<PreLoginRootStackParamList, 'Login'>;
 
 interface TabButton {
-  icon: 'warranty-station' | 'warranty-activation' | 'distribution';
+  icon: 'warranty-station' | 'warranty-activation' | 'warranty-lookup';
   title: string;
-  screen: 'WarrantyStationList' | 'WarrantyActivation' | 'DistributionSystem';
+  screen: 'WarrantyStationList' | 'WarrantyActivation' | 'WarrantyLookup';
 }
 
 const tabButtons: TabButton[] = [
@@ -26,9 +26,9 @@ const tabButtons: TabButton[] = [
     screen: 'WarrantyActivation',
   },
   {
-    icon: 'distribution',
-    title: 'Hệ thống phân phối',
-    screen: 'DistributionSystem',
+    icon: 'warranty-lookup',
+    title: 'Tra cứu bảo hành',
+    screen: 'WarrantyLookup',
   },
 ];
 

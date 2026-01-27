@@ -291,14 +291,14 @@ const HomeScreen = () => {
           <View style={styles.rewardSection}>
             <View style={styles.rewardHeader}>
               <Text style={styles.rewardTitle}>Tiền thưởng</Text>
-              <TouchableOpacity
+              {/* <TouchableOpacity
                 style={styles.rankingButton}
                 onPress={handleRankingPress}
                 activeOpacity={0.7}
               >
                 <Icon name="trophy" size={16} color={COLORS.warning} />
                 <Text style={styles.rankingButtonText}>Bảng xếp hạng</Text>
-              </TouchableOpacity>
+              </TouchableOpacity> */}
             </View>
 
             <View style={[commonStyles.tableCard, styles.tableCardWrapper]}>

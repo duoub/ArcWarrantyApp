@@ -98,7 +98,7 @@ const SignupScreen: React.FC = () => {
           </TouchableOpacity>
 
           {/* Người tiêu dùng */}
-          <TouchableOpacity
+          {/* <TouchableOpacity
             style={styles.memberCard}
             onPress={() => navigation.navigate('CustomerSignup')}
             activeOpacity={0.8}
@@ -108,7 +108,7 @@ const SignupScreen: React.FC = () => {
             </View>
             <Text style={styles.memberLabel}>Người tiêu dùng</Text>
             <Text style={styles.memberDescription}>Khách hàng sử dụng</Text>
-          </TouchableOpacity>
+          </TouchableOpacity> */}
         </View>
 
         {/* Info Box */}

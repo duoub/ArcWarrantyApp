@@ -80,7 +80,7 @@ const MenuScreen = () => {
         },
         {
           icon: 'warranty-report',
-          label: 'Báo ca bảo hành',
+          label: 'Báo ca bảo hành cho ĐL/NPP',
           onPress: () => navigation.navigate('WarrantyReport'),
         },
         {

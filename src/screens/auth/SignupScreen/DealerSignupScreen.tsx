@@ -65,7 +65,12 @@ const DealerSignupScreen: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showRePassword, setShowRePassword] = useState(false);
-  const [images, setImages] = useState<ImageItem[]>([]);
+  // Image states for each section
+  const [businessLicenseFront, setBusinessLicenseFront] = useState<ImageItem | null>(null);
+  const [businessLicenseBack, setBusinessLicenseBack] = useState<ImageItem | null>(null);
+  const [idCardFront, setIdCardFront] = useState<ImageItem | null>(null);
+  const [idCardBack, setIdCardBack] = useState<ImageItem | null>(null);
+  const [shopImages, setShopImages] = useState<ImageItem[]>([]);
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [provinceCode, setProvinceCode] = useState('');
 
@@ -99,18 +104,20 @@ const DealerSignupScreen: React.FC = () => {
     }
   }, [user, setValue]);
 
-  const handleAddImage = () => {
+  type ImageType = 'businessLicenseFront' | 'businessLicenseBack' | 'idCardFront' | 'idCardBack' | 'shopImages';
+
+  const handleAddImage = (imageType: ImageType, shopImageIndex?: number) => {
     Alert.alert(
       'Thêm ảnh',
       'Chọn nguồn ảnh',
       [
         {
           text: 'Chụp ảnh',
-          onPress: () => handleTakePhoto(),
+          onPress: () => handleTakePhoto(imageType, shopImageIndex),
         },
         {
           text: 'Thư viện',
-          onPress: () => handlePickFromLibrary(),
+          onPress: () => handlePickFromLibrary(imageType, shopImageIndex),
         },
         {
           text: 'Hủy',
@@ -121,7 +128,7 @@ const DealerSignupScreen: React.FC = () => {
     );
   };
 
-  const handleTakePhoto = async () => {
+  const handleTakePhoto = async (imageType: ImageType, shopImageIndex?: number) => {
     try {
       // Request camera permission for Android
       if (Platform.OS === 'android') {
@@ -151,7 +158,7 @@ const DealerSignupScreen: React.FC = () => {
         uri: image.path,
       };
 
-      setImages([...images, newImage]);
+      setImageByType(imageType, newImage, shopImageIndex);
     } catch (error: any) {
       if (error.code !== 'E_PICKER_CANCELLED') {
         Alert.alert('Lỗi', 'Không thể chụp ảnh. Vui lòng thử lại.');
@@ -159,21 +166,20 @@ const DealerSignupScreen: React.FC = () => {
     }
   };
 
-  const handlePickFromLibrary = async () => {
+  const handlePickFromLibrary = async (imageType: ImageType, shopImageIndex?: number) => {
     try {
-      const selectedImages = await ImagePicker.openPicker({
-        multiple: true,
+      const selectedImage = await ImagePicker.openPicker({
+        multiple: false,
         mediaType: 'photo',
         compressImageQuality: 0.8,
       });
 
-      // Add all selected images to the images array
-      const newImages: ImageItem[] = selectedImages.map((img) => ({
-        src: img.path,
-        uri: img.path,
-      }));
+      const newImage: ImageItem = {
+        src: selectedImage.path,
+        uri: selectedImage.path,
+      };
 
-      setImages([...images, ...newImages]);
+      setImageByType(imageType, newImage, shopImageIndex);
     } catch (error: any) {
       if (error.code !== 'E_PICKER_CANCELLED') {
         Alert.alert('Lỗi', 'Không thể chọn ảnh. Vui lòng thử lại.');
@@ -181,17 +187,83 @@ const DealerSignupScreen: React.FC = () => {
     }
   };
 
-  const handleRemoveImage = (index: number) => {
-    const updatedImages = images.filter((_, i) => i !== index);
-    setImages(updatedImages);
+  const setImageByType = (imageType: ImageType, image: ImageItem, shopImageIndex?: number) => {
+    switch (imageType) {
+      case 'businessLicenseFront':
+        setBusinessLicenseFront(image);
+        break;
+      case 'businessLicenseBack':
+        setBusinessLicenseBack(image);
+        break;
+      case 'idCardFront':
+        setIdCardFront(image);
+        break;
+      case 'idCardBack':
+        setIdCardBack(image);
+        break;
+      case 'shopImages':
+        if (shopImageIndex !== undefined) {
+          const newShopImages = [...shopImages];
+          newShopImages[shopImageIndex] = image;
+          setShopImages(newShopImages);
+        } else {
+          setShopImages([...shopImages, image]);
+        }
+        break;
+    }
+  };
+
+  const handleRemoveImage = (imageType: ImageType, shopImageIndex?: number) => {
+    switch (imageType) {
+      case 'businessLicenseFront':
+        setBusinessLicenseFront(null);
+        break;
+      case 'businessLicenseBack':
+        setBusinessLicenseBack(null);
+        break;
+      case 'idCardFront':
+        setIdCardFront(null);
+        break;
+      case 'idCardBack':
+        setIdCardBack(null);
+        break;
+      case 'shopImages':
+        if (shopImageIndex !== undefined) {
+          const newShopImages = [...shopImages];
+          newShopImages.splice(shopImageIndex, 1);
+          setShopImages(newShopImages);
+        }
+        break;
+    }
+  };
+
+  // Helper function to get all images for submission
+  const getAllImages = (): ImageItem[] => {
+    const allImages: ImageItem[] = [];
+    if (businessLicenseFront) allImages.push(businessLicenseFront);
+    if (businessLicenseBack) allImages.push(businessLicenseBack);
+    if (idCardFront) allImages.push(idCardFront);
+    if (idCardBack) allImages.push(idCardBack);
+    allImages.push(...shopImages);
+    return allImages;
   };
 
   const onSubmit = async (data: DealerSignupFormData) => {
     // Validate images
-    if (images.length < 4) {
-      Alert.alert('Thông báo', 'Vui lòng tải lên ít nhất 4 hình ảnh');
+    if (!businessLicenseFront || !businessLicenseBack) {
+      Alert.alert('Thông báo', 'Vui lòng tải lên đầy đủ ảnh Giấy đăng ký kinh doanh (mặt trước và mặt sau)');
       return;
     }
+    if (!idCardFront || !idCardBack) {
+      Alert.alert('Thông báo', 'Vui lòng tải lên đầy đủ ảnh Căn cước công dân (mặt trước và mặt sau)');
+      return;
+    }
+    if (shopImages.length < 3) {
+      Alert.alert('Thông báo', 'Vui lòng tải lên đủ 3 ảnh cửa hàng');
+      return;
+    }
+
+    const images = getAllImages();
 
     // Validate terms
     if (!termsAccepted) {
@@ -286,7 +358,7 @@ const DealerSignupScreen: React.FC = () => {
         {/* Dealer Registration Form */}
         <View style={styles.registrationCard}>
           {/* Mã đơn vị cha */}
-          <Controller
+          {/* <Controller
             control={control}
             name="codenpp"
             render={({ field: { onChange, onBlur, value } }) => (
@@ -305,7 +377,7 @@ const DealerSignupScreen: React.FC = () => {
                 )}
               </View>
             )}
-          />
+          /> */}
 
           {/* Tên đơn vị */}
           <Controller
@@ -608,36 +680,152 @@ const DealerSignupScreen: React.FC = () => {
             )}
           />
 
-          {/* Image Upload */}
+          {/* Section 1: Giấy Đăng ký kinh doanh */}
           <View style={styles.imageUploadSection}>
             <Text style={styles.sectionTitle}>
-              Hình ảnh <Text style={styles.required}>*</Text>
+              Giấy Đăng ký kinh doanh <Text style={styles.required}>*</Text>
             </Text>
-            <Text style={styles.sectionSubtitle}>Tối thiểu 4 hình ảnh gồm Giấy tờ doanh nghiệp và ảnh cửa hàng</Text>
-
-            <View style={styles.imageGrid}>
-              {images.map((image, index) => (
-                <View key={index} style={styles.imageItem}>
-                  <Image source={{ uri: image.uri }} style={styles.imagePreview} />
+            <View style={styles.imageRow}>
+              {/* Mặt trước */}
+              <View style={styles.imageColumn}>
+                <Text style={styles.imageLabel}>Mặt trước</Text>
+                {businessLicenseFront ? (
+                  <View style={styles.imageItem}>
+                    <Image source={{ uri: businessLicenseFront.uri }} style={styles.imagePreview} />
+                    <TouchableOpacity
+                      style={styles.removeImageButton}
+                      onPress={() => handleRemoveImage('businessLicenseFront')}
+                    >
+                      <Text style={styles.removeImageText}>×</Text>
+                    </TouchableOpacity>
+                  </View>
+                ) : (
                   <TouchableOpacity
-                    style={styles.removeImageButton}
-                    onPress={() => handleRemoveImage(index)}
+                    style={styles.addImageButton}
+                    onPress={() => handleAddImage('businessLicenseFront')}
+                    activeOpacity={0.7}
                   >
-                    <Text style={styles.removeImageText}>×</Text>
+                    <Text style={styles.addImageIcon}>+</Text>
+                    <Text style={styles.addImageText}>Thêm ảnh</Text>
                   </TouchableOpacity>
+                )}
+              </View>
+              {/* Mặt sau */}
+              <View style={styles.imageColumn}>
+                <Text style={styles.imageLabel}>Mặt sau</Text>
+                {businessLicenseBack ? (
+                  <View style={styles.imageItem}>
+                    <Image source={{ uri: businessLicenseBack.uri }} style={styles.imagePreview} />
+                    <TouchableOpacity
+                      style={styles.removeImageButton}
+                      onPress={() => handleRemoveImage('businessLicenseBack')}
+                    >
+                      <Text style={styles.removeImageText}>×</Text>
+                    </TouchableOpacity>
+                  </View>
+                ) : (
+                  <TouchableOpacity
+                    style={styles.addImageButton}
+                    onPress={() => handleAddImage('businessLicenseBack')}
+                    activeOpacity={0.7}
+                  >
+                    <Text style={styles.addImageIcon}>+</Text>
+                    <Text style={styles.addImageText}>Thêm ảnh</Text>
+                  </TouchableOpacity>
+                )}
+              </View>
+            </View>
+          </View>
+
+          {/* Section 2: Căn cước công dân */}
+          <View style={styles.imageUploadSection}>
+            <Text style={styles.sectionTitle}>
+              Căn cước công dân <Text style={styles.required}>*</Text>
+            </Text>
+            <View style={styles.imageRow}>
+              {/* Mặt trước */}
+              <View style={styles.imageColumn}>
+                <Text style={styles.imageLabel}>Mặt trước</Text>
+                {idCardFront ? (
+                  <View style={styles.imageItem}>
+                    <Image source={{ uri: idCardFront.uri }} style={styles.imagePreview} />
+                    <TouchableOpacity
+                      style={styles.removeImageButton}
+                      onPress={() => handleRemoveImage('idCardFront')}
+                    >
+                      <Text style={styles.removeImageText}>×</Text>
+                    </TouchableOpacity>
+                  </View>
+                ) : (
+                  <TouchableOpacity
+                    style={styles.addImageButton}
+                    onPress={() => handleAddImage('idCardFront')}
+                    activeOpacity={0.7}
+                  >
+                    <Text style={styles.addImageIcon}>+</Text>
+                    <Text style={styles.addImageText}>Thêm ảnh</Text>
+                  </TouchableOpacity>
+                )}
+              </View>
+              {/* Mặt sau */}
+              <View style={styles.imageColumn}>
+                <Text style={styles.imageLabel}>Mặt sau</Text>
+                {idCardBack ? (
+                  <View style={styles.imageItem}>
+                    <Image source={{ uri: idCardBack.uri }} style={styles.imagePreview} />
+                    <TouchableOpacity
+                      style={styles.removeImageButton}
+                      onPress={() => handleRemoveImage('idCardBack')}
+                    >
+                      <Text style={styles.removeImageText}>×</Text>
+                    </TouchableOpacity>
+                  </View>
+                ) : (
+                  <TouchableOpacity
+                    style={styles.addImageButton}
+                    onPress={() => handleAddImage('idCardBack')}
+                    activeOpacity={0.7}
+                  >
+                    <Text style={styles.addImageIcon}>+</Text>
+                    <Text style={styles.addImageText}>Thêm ảnh</Text>
+                  </TouchableOpacity>
+                )}
+              </View>
+            </View>
+          </View>
+
+          {/* Section 3: Ảnh cửa hàng */}
+          <View style={styles.imageUploadSection}>
+            <Text style={styles.sectionTitle}>
+              Ảnh cửa hàng <Text style={styles.required}>*</Text>
+            </Text>
+            <Text style={styles.sectionSubtitle}>Tải lên 3 ảnh cửa hàng</Text>
+            <View style={styles.imageGrid}>
+              {[0, 1, 2].map((index) => (
+                <View key={index} style={styles.imageColumn}>
+                  <Text style={styles.imageLabel}>Ảnh {index + 1}</Text>
+                  {shopImages[index] ? (
+                    <View style={styles.imageItem}>
+                      <Image source={{ uri: shopImages[index].uri }} style={styles.imagePreview} />
+                      <TouchableOpacity
+                        style={styles.removeImageButton}
+                        onPress={() => handleRemoveImage('shopImages', index)}
+                      >
+                        <Text style={styles.removeImageText}>×</Text>
+                      </TouchableOpacity>
+                    </View>
+                  ) : (
+                    <TouchableOpacity
+                      style={styles.addImageButton}
+                      onPress={() => handleAddImage('shopImages', index)}
+                      activeOpacity={0.7}
+                    >
+                      <Text style={styles.addImageIcon}>+</Text>
+                      <Text style={styles.addImageText}>Thêm ảnh</Text>
+                    </TouchableOpacity>
+                  )}
                 </View>
               ))}
-
-              {images.length < 6 && (
-                <TouchableOpacity
-                  style={styles.addImageButton}
-                  onPress={handleAddImage}
-                  activeOpacity={0.7}
-                >
-                  <Text style={styles.addImageIcon}>📷</Text>
-                  <Text style={styles.addImageText}>Thêm ảnh</Text>
-                </TouchableOpacity>
-              )}
             </View>
           </View>
 
@@ -772,6 +960,21 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: COLORS.textSecondary,
     marginBottom: SPACING.md,
+  },
+  imageRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    gap: SPACING.md,
+  },
+  imageColumn: {
+    flex: 1,
+    alignItems: 'center',
+  },
+  imageLabel: {
+    fontSize: 12,
+    color: COLORS.textSecondary,
+    marginBottom: SPACING.xs,
+    textAlign: 'center',
   },
   imageGrid: {
     flexDirection: 'row',

@@ -9,7 +9,10 @@ import {
   Alert,
   StatusBar,
   Platform,
+  Image,
+  PermissionsAndroid,
 } from 'react-native';
+import ImagePicker from 'react-native-image-crop-picker';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -22,9 +25,15 @@ import CustomHeader from '../../../components/CustomHeader';
 import { Icon } from '../../../components/common';
 import ProvinceSelector from '../../../components/ProvinceSelector';
 import { authService } from '../../../api/authService';
+import { uploadService, UploadedFile } from '../../../api/uploadService';
 import { USER_TYPES } from '../../../types/user';
 
 type TechnicianSignupScreenNavigationProp = StackNavigationProp<AuthStackParamList, 'TechnicianSignup'>;
+
+interface ImageItem {
+  src: string;
+  uri: string;
+}
 
 // Technician Signup Validation Schema
 const technicianSignupSchema = z.object({
@@ -50,6 +59,9 @@ const TechnicianSignupScreen: React.FC = () => {
   const [showRePassword, setShowRePassword] = useState(false);
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [provinceCode, setProvinceCode] = useState('');
+  // Image states for CCCD
+  const [idCardFront, setIdCardFront] = useState<ImageItem | null>(null);
+  const [idCardBack, setIdCardBack] = useState<ImageItem | null>(null);
 
   const {
     control,
@@ -69,7 +81,112 @@ const TechnicianSignupScreen: React.FC = () => {
     },
   });
 
+  type ImageType = 'idCardFront' | 'idCardBack';
+
+  const handleAddImage = (imageType: ImageType) => {
+    Alert.alert(
+      'Thêm ảnh',
+      'Chọn nguồn ảnh',
+      [
+        {
+          text: 'Chụp ảnh',
+          onPress: () => handleTakePhoto(imageType),
+        },
+        {
+          text: 'Thư viện',
+          onPress: () => handlePickFromLibrary(imageType),
+        },
+        {
+          text: 'Hủy',
+          style: 'cancel',
+        },
+      ],
+      { cancelable: true }
+    );
+  };
+
+  const handleTakePhoto = async (imageType: ImageType) => {
+    try {
+      // Request camera permission for Android
+      if (Platform.OS === 'android') {
+        const granted = await PermissionsAndroid.request(
+          PermissionsAndroid.PERMISSIONS.CAMERA,
+          {
+            title: 'Quyền truy cập Camera',
+            message: 'Ứng dụng cần quyền truy cập camera để chụp ảnh.',
+            buttonNeutral: 'Hỏi sau',
+            buttonNegative: 'Từ chối',
+            buttonPositive: 'Đồng ý',
+          }
+        );
+        if (granted !== PermissionsAndroid.RESULTS.GRANTED) {
+          Alert.alert('Lỗi', 'Bạn cần cấp quyền truy cập camera để tiếp tục.');
+          return;
+        }
+      }
+
+      const image = await ImagePicker.openCamera({
+        mediaType: 'photo',
+        compressImageQuality: 0.8,
+      });
+
+      const newImage: ImageItem = {
+        src: image.path,
+        uri: image.path,
+      };
+
+      if (imageType === 'idCardFront') {
+        setIdCardFront(newImage);
+      } else {
+        setIdCardBack(newImage);
+      }
+    } catch (error: any) {
+      if (error.code !== 'E_PICKER_CANCELLED') {
+        Alert.alert('Lỗi', 'Không thể chụp ảnh. Vui lòng thử lại.');
+      }
+    }
+  };
+
+  const handlePickFromLibrary = async (imageType: ImageType) => {
+    try {
+      const selectedImage = await ImagePicker.openPicker({
+        multiple: false,
+        mediaType: 'photo',
+        compressImageQuality: 0.8,
+      });
+
+      const newImage: ImageItem = {
+        src: selectedImage.path,
+        uri: selectedImage.path,
+      };
+
+      if (imageType === 'idCardFront') {
+        setIdCardFront(newImage);
+      } else {
+        setIdCardBack(newImage);
+      }
+    } catch (error: any) {
+      if (error.code !== 'E_PICKER_CANCELLED') {
+        Alert.alert('Lỗi', 'Không thể chọn ảnh. Vui lòng thử lại.');
+      }
+    }
+  };
+
+  const handleRemoveImage = (imageType: ImageType) => {
+    if (imageType === 'idCardFront') {
+      setIdCardFront(null);
+    } else {
+      setIdCardBack(null);
+    }
+  };
+
   const onSubmit = async (data: TechnicianSignupFormData) => {
+    // Validate images
+    if (!idCardFront || !idCardBack) {
+      Alert.alert('Thông báo', 'Vui lòng tải lên đầy đủ ảnh Căn cước công dân (mặt trước và mặt sau)');
+      return;
+    }
+
     // Validate terms
     if (!termsAccepted) {
       Alert.alert('Thông báo', 'Vui lòng đồng ý với điều khoản sử dụng');
@@ -78,6 +195,22 @@ const TechnicianSignupScreen: React.FC = () => {
 
     try {
       setIsLoading(true);
+
+      let uploadedFiles: UploadedFile[] = [];
+
+      // Step 1: Upload images
+      try {
+        const imagePaths = [idCardFront.uri, idCardBack.uri];
+        uploadedFiles = await uploadService.uploadMultipleImages(imagePaths);
+      } catch (uploadError: any) {
+        Alert.alert(
+          'Lỗi upload ảnh',
+          uploadError.message || 'Không thể upload ảnh. Vui lòng thử lại.',
+          [{ text: 'OK' }]
+        );
+        setIsLoading(false);
+        return;
+      }
 
       // Prepare signup request data
       const signupData = {
@@ -88,7 +221,7 @@ const TechnicianSignupScreen: React.FC = () => {
         email: data.email || '',
         repassword: data.repassword,
         address: data.address,
-        imgs: [], // No images for technician
+        imgs: uploadedFiles,
         tendiaban: data.city,
         madiaban: provinceCode,
         sotaikhoan: '', // No bank info for technician
@@ -371,6 +504,63 @@ const TechnicianSignupScreen: React.FC = () => {
             )}
           />
 
+          {/* Section: Căn cước công dân */}
+          <View style={styles.imageUploadSection}>
+            <Text style={styles.sectionTitle}>
+              Căn cước công dân <Text style={styles.required}>*</Text>
+            </Text>
+            <View style={styles.imageRow}>
+              {/* Mặt trước */}
+              <View style={styles.imageColumn}>
+                <Text style={styles.imageLabel}>Mặt trước</Text>
+                {idCardFront ? (
+                  <View style={styles.imageItem}>
+                    <Image source={{ uri: idCardFront.uri }} style={styles.imagePreview} />
+                    <TouchableOpacity
+                      style={styles.removeImageButton}
+                      onPress={() => handleRemoveImage('idCardFront')}
+                    >
+                      <Text style={styles.removeImageText}>×</Text>
+                    </TouchableOpacity>
+                  </View>
+                ) : (
+                  <TouchableOpacity
+                    style={styles.addImageButton}
+                    onPress={() => handleAddImage('idCardFront')}
+                    activeOpacity={0.7}
+                  >
+                    <Text style={styles.addImageIcon}>+</Text>
+                    <Text style={styles.addImageText}>Thêm ảnh</Text>
+                  </TouchableOpacity>
+                )}
+              </View>
+              {/* Mặt sau */}
+              <View style={styles.imageColumn}>
+                <Text style={styles.imageLabel}>Mặt sau</Text>
+                {idCardBack ? (
+                  <View style={styles.imageItem}>
+                    <Image source={{ uri: idCardBack.uri }} style={styles.imagePreview} />
+                    <TouchableOpacity
+                      style={styles.removeImageButton}
+                      onPress={() => handleRemoveImage('idCardBack')}
+                    >
+                      <Text style={styles.removeImageText}>×</Text>
+                    </TouchableOpacity>
+                  </View>
+                ) : (
+                  <TouchableOpacity
+                    style={styles.addImageButton}
+                    onPress={() => handleAddImage('idCardBack')}
+                    activeOpacity={0.7}
+                  >
+                    <Text style={styles.addImageIcon}>+</Text>
+                    <Text style={styles.addImageText}>Thêm ảnh</Text>
+                  </TouchableOpacity>
+                )}
+              </View>
+            </View>
+          </View>
+
           {/* Terms and Conditions */}
           <TouchableOpacity
             style={styles.termsContainer}
@@ -485,6 +675,78 @@ const styles = StyleSheet.create({
     minWidth: 32,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+
+  // Image Upload
+  imageUploadSection: {
+    marginTop: SPACING.md,
+    marginBottom: SPACING.lg,
+  },
+  sectionTitle: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: COLORS.textPrimary,
+    marginBottom: SPACING.md,
+  },
+  imageRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    gap: SPACING.md,
+  },
+  imageColumn: {
+    flex: 1,
+    alignItems: 'center',
+  },
+  imageLabel: {
+    fontSize: 12,
+    color: COLORS.textSecondary,
+    marginBottom: SPACING.xs,
+    textAlign: 'center',
+  },
+  imageItem: {
+    position: 'relative',
+    width: 100,
+    height: 100,
+  },
+  imagePreview: {
+    width: '100%',
+    height: '100%',
+    borderRadius: BORDER_RADIUS.md,
+  },
+  removeImageButton: {
+    position: 'absolute',
+    top: -8,
+    right: -8,
+    backgroundColor: COLORS.error,
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  removeImageText: {
+    color: COLORS.white,
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  addImageButton: {
+    width: 100,
+    height: 100,
+    borderWidth: 2,
+    borderStyle: 'dashed',
+    borderColor: COLORS.gray300,
+    borderRadius: BORDER_RADIUS.md,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  addImageIcon: {
+    fontSize: 32,
+    color: COLORS.gray400,
+    marginBottom: 4,
+  },
+  addImageText: {
+    fontSize: 12,
+    color: COLORS.textSecondary,
   },
 
   // Terms

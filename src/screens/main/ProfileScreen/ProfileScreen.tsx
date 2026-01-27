@@ -201,7 +201,7 @@ const ProfileScreen = () => {
   const handleCopyCode = () => {
     if (user?.codenpp) {
       Clipboard.setString(user.codenpp);
-      Alert.alert('Thành công', 'Đã sao chép mã đơn vị');
+      Alert.alert('Thành công', 'Đã sao chép mã giới thiệu');
     }
   };
 
@@ -265,7 +265,7 @@ const ProfileScreen = () => {
             <View style={styles.codeContainer}>
               <View style={styles.codeCard}>
                 <View style={styles.codeContent}>
-                  <Text style={styles.codeLabel}>Mã đơn vị</Text>
+                  <Text style={styles.codeLabel}>Mã giới thiệu</Text>
                   <Text style={styles.codeValue}>{user.codenpp}</Text>
                 </View>
                 <TouchableOpacity
