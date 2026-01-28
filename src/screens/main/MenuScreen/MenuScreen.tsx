@@ -6,7 +6,6 @@ import {
   ScrollView,
   TouchableOpacity,
   StatusBar,
-  Alert,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -51,7 +50,7 @@ const MenuScreen = () => {
         {
           icon: 'sales-policy',
           label: 'Chính sách bán hàng',
-          onPress: () => Alert.alert('Chính sách bán hàng', 'Chức năng đang phát triển'),
+          onPress: () => navigation.navigate('SalesPolicy'),
         },
         {
           icon: 'distribution',
@@ -96,7 +95,7 @@ const MenuScreen = () => {
         {
           icon: 'warranty-policy',
           label: 'Chính sách bảo hành',
-          onPress: () => Alert.alert('Chính sách bảo hành', 'Chức năng đang phát triển'),
+          onPress: () => navigation.navigate('WarrantyPolicy'),
         },
         {
           icon: 'warranty-station',

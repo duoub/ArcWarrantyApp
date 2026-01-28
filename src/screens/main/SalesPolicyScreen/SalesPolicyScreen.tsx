@@ -10,21 +10,24 @@ import {
   RefreshControl,
   ActivityIndicator,
   FlatList,
+  LayoutAnimation,
+  Platform,
+  UIManager,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { StackNavigationProp } from '@react-navigation/stack';
 import { COLORS, SPACING, BORDER_RADIUS, SHADOWS } from '../../../config/theme';
 import CustomHeader from '../../../components/CustomHeader';
 import { Icon } from '../../../components/common';
 import { commonStyles } from '../../../styles/commonStyles';
 import { newsService } from '../../../api/newsService';
 import { NewsItem } from '../../../types/news';
-import { MenuStackParamList } from '../../../navigation/MainNavigator';
 
-type NavigationProp = StackNavigationProp<MenuStackParamList, 'News'>;
+if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
+  UIManager.setLayoutAnimationEnabledExperimental(true);
+}
 
-const NewsScreen = () => {
-  const navigation = useNavigation<NavigationProp>();
+const SalesPolicyScreen = () => {
+  const navigation = useNavigation();
   const [keyword, setKeyword] = useState('');
   const [articles, setArticles] = useState<NewsItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -32,17 +35,16 @@ const NewsScreen = () => {
   const [page, setPage] = useState(1);
   const [hasNextPage, setHasNextPage] = useState(false);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const [expandedId, setExpandedId] = useState<number | null>(null);
 
-  const loadNews = useCallback(async (pageNum: number = 1, searchKeyword: string = '', isRefresh: boolean = false) => {
+  const loadData = useCallback(async (pageNum: number = 1, searchKeyword: string = '', isRefresh: boolean = false) => {
     if (pageNum === 1) {
-      if (!isRefresh) {
-        setIsLoading(true);
-      }
+      if (!isRefresh) setIsLoading(true);
     } else {
       setIsLoadingMore(true);
     }
 
-    const result = await newsService.getNewsList(pageNum, searchKeyword);
+    const result = await newsService.getNewsList(pageNum, searchKeyword, 'chinh-sach-ban-hang');
 
     if (result.status) {
       if (pageNum === 1) {
@@ -60,16 +62,15 @@ const NewsScreen = () => {
   }, []);
 
   useEffect(() => {
-    loadNews(1, '');
-  }, [loadNews]);
+    loadData(1, '');
+  }, [loadData]);
 
   useEffect(() => {
     const timeoutId = setTimeout(() => {
-      loadNews(1, keyword);
+      loadData(1, keyword);
     }, 500);
-
     return () => clearTimeout(timeoutId);
-  }, [keyword, loadNews]);
+  }, [keyword, loadData]);
 
   const handleBackPress = () => {
     navigation.goBack();
@@ -77,58 +78,72 @@ const NewsScreen = () => {
 
   const handleRefresh = () => {
     setRefreshing(true);
-    loadNews(1, keyword, true);
+    loadData(1, keyword, true);
   };
 
   const handleLoadMore = () => {
     if (hasNextPage && !isLoadingMore) {
-      loadNews(page + 1, keyword);
+      loadData(page + 1, keyword);
     }
   };
 
-  const handleArticlePress = (article: NewsItem) => {
-    navigation.navigate('NewsDetail', { article });
+  const toggleExpand = (id: number) => {
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+    setExpandedId(prev => (prev === id ? null : id));
   };
 
-  const renderArticleCard = ({ item }: { item: NewsItem }) => (
-    <TouchableOpacity
-      style={styles.articleCard}
-      onPress={() => handleArticlePress(item)}
-      activeOpacity={0.7}
-    >
-      {item.imgurl ? (
-        <Image
-          source={{ uri: item.imgurl }}
-          style={styles.articleImage}
-          resizeMode="cover"
-        />
-      ) : null}
+  const renderArticleCard = ({ item }: { item: NewsItem }) => {
+    const isExpanded = expandedId === item.id;
 
-      <View style={styles.articleContent}>
-        <Text style={styles.articleTitle} numberOfLines={2}>
-          {item.title}
-        </Text>
+    return (
+      <TouchableOpacity
+        style={styles.articleCard}
+        onPress={() => toggleExpand(item.id)}
+        activeOpacity={0.7}
+      >
+        {item.imgurl ? (
+          <Image
+            source={{ uri: item.imgurl }}
+            style={styles.articleImage}
+            resizeMode="cover"
+          />
+        ) : null}
 
-        <Text style={styles.articleDescription} numberOfLines={3}>
-          {item.description}
-        </Text>
+        <View style={styles.articleContent}>
+          <Text style={styles.articleTitle} numberOfLines={isExpanded ? undefined : 2}>
+            {item.title}
+          </Text>
 
-        <View style={styles.articleFooter}>
-          <View style={styles.metaContainer}>
+          <Text style={styles.articleDescription} numberOfLines={isExpanded ? undefined : 3}>
+            {item.description}
+          </Text>
+
+          <View style={styles.articleFooter}>
             <View style={styles.dateContainer}>
               <Icon name="calendar" size={14} color={COLORS.textSecondary} style={styles.metaIcon} />
               <Text style={styles.metaText}>{item.createdate}</Text>
             </View>
-            <View style={styles.viewContainer}>
-              <Icon name="eye" size={14} color={COLORS.textSecondary} style={styles.metaIcon} />
-              <Text style={styles.metaText}>{item.luotview}</Text>
+            <View style={styles.expandIndicator}>
+              <Text style={styles.readMore}>{isExpanded ? 'Thu gọn' : 'Xem chi tiết'}</Text>
+              <Icon
+                name="chevron-down"
+                size={16}
+                color={COLORS.primary}
+                style={isExpanded ? styles.chevronUp : undefined}
+              />
             </View>
           </View>
-          <Text style={styles.readMore}>Xem chi tiết →</Text>
+
+          {isExpanded && (
+            <View style={styles.expandedContent}>
+              <View style={styles.divider} />
+              <Text style={styles.content}>{item.content}</Text>
+            </View>
+          )}
         </View>
-      </View>
-    </TouchableOpacity>
-  );
+      </TouchableOpacity>
+    );
+  };
 
   const renderFooter = () => {
     if (!isLoadingMore) return null;
@@ -143,7 +158,7 @@ const NewsScreen = () => {
     if (isLoading) return null;
     return (
       <View style={commonStyles.emptyContainer}>
-        <Text style={commonStyles.emptyText}>Không tìm thấy tin tức phù hợp</Text>
+        <Text style={commonStyles.emptyText}>Không có dữ liệu</Text>
       </View>
     );
   };
@@ -153,7 +168,7 @@ const NewsScreen = () => {
       <StatusBar barStyle="light-content" backgroundColor={COLORS.primary} />
 
       <CustomHeader
-        title="Tin tức"
+        title="Chính sách bán hàng"
         leftIcon={<Text style={commonStyles.backIconMedium}>‹</Text>}
         onLeftPress={handleBackPress}
       />
@@ -163,7 +178,7 @@ const NewsScreen = () => {
           <Icon name="search" size={18} color={COLORS.gray500} style={commonStyles.searchIcon} />
           <TextInput
             style={commonStyles.searchInput}
-            placeholder="Tìm kiếm tin tức"
+            placeholder="Tìm kiếm"
             placeholderTextColor={COLORS.gray400}
             value={keyword}
             onChangeText={setKeyword}
@@ -243,16 +258,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
   },
-  metaContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: SPACING.md,
-  },
   dateContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  viewContainer: {
     flexDirection: 'row',
     alignItems: 'center',
   },
@@ -263,10 +269,31 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: COLORS.textSecondary,
   },
+  expandIndicator: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
   readMore: {
     fontSize: 14,
     color: COLORS.primary,
     fontWeight: '600',
+  },
+  chevronUp: {
+    transform: [{ rotate: '180deg' }],
+  },
+  expandedContent: {
+    marginTop: SPACING.md,
+  },
+  divider: {
+    height: 1,
+    backgroundColor: COLORS.gray200,
+    marginBottom: SPACING.md,
+  },
+  content: {
+    fontSize: 15,
+    color: COLORS.textPrimary,
+    lineHeight: 24,
   },
   loadingMore: {
     paddingVertical: SPACING.lg,
@@ -274,4 +301,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default NewsScreen;
+export default SalesPolicyScreen;

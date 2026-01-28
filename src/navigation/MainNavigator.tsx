@@ -27,6 +27,10 @@ import ProductScreen from '../screens/main/ProductScreen/ProductScreen';
 import DistributionSystemScreen from '../screens/main/DistributionSystemScreen/DistributionSystemScreen';
 import NotificationScreen from '../screens/main/NotificationScreen/NotificationScreen';
 import NewsScreen from '../screens/main/NewsScreen/NewsScreen';
+import NewsDetailScreen from '../screens/main/NewsDetailScreen/NewsDetailScreen';
+import SalesPolicyScreen from '../screens/main/SalesPolicyScreen/SalesPolicyScreen';
+import WarrantyPolicyScreen from '../screens/main/WarrantyPolicyScreen/WarrantyPolicyScreen';
+import { NewsItem } from '../types/news';
 import ContactScreen from '../screens/main/ContactScreen/ContactScreen';
 import PaymentDetailScreen from '../screens/main/PaymentDetailScreen/PaymentDetailScreen';
 import RewardDetailScreen from '../screens/main/RewardDetailScreen/RewardDetailScreen';
@@ -65,6 +69,9 @@ export type MenuStackParamList = {
   DistributionSystem: { type?: UserType } | undefined;
   Notification: undefined;
   News: undefined;
+  NewsDetail: { article: NewsItem };
+  SalesPolicy: undefined;
+  WarrantyPolicy: undefined;
   Contact: undefined;
 };
 
@@ -140,6 +147,9 @@ const MenuStackNavigator = () => {
       <MenuStack.Screen name="DistributionSystem" component={DistributionSystemScreen} />
       <MenuStack.Screen name="Notification" component={NotificationScreen} />
       <MenuStack.Screen name="News" component={NewsScreen} />
+      <MenuStack.Screen name="NewsDetail" component={NewsDetailScreen} />
+      <MenuStack.Screen name="SalesPolicy" component={SalesPolicyScreen} />
+      <MenuStack.Screen name="WarrantyPolicy" component={WarrantyPolicyScreen} />
       <MenuStack.Screen name="Contact" component={ContactScreen} />
     </MenuStack.Navigator>
   );
