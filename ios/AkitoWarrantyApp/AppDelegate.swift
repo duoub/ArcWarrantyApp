@@ -42,15 +42,28 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
     reactNativeDelegate = delegate
     reactNativeFactory = factory
 
-    window = UIWindow(frame: UIScreen.main.bounds)
-
-    factory.startReactNative(
-      withModuleName: "AkitoWarrantyApp",
-      in: window,
-      launchOptions: launchOptions
-    )
+    // For iOS 13+, window is created in SceneDelegate
+    // For older iOS, create window here
+    if #available(iOS 13.0, *) {
+      // SceneDelegate will handle window creation
+    } else {
+      window = UIWindow(frame: UIScreen.main.bounds)
+      factory.startReactNative(
+        withModuleName: "AkitoWarrantyApp",
+        in: window,
+        launchOptions: launchOptions
+      )
+    }
 
     return true
+  }
+
+  // MARK: UISceneSession Lifecycle
+  func application(_ application: UIApplication, configurationForConnecting connectingSceneSession: UISceneSession, options: UIScene.ConnectionOptions) -> UISceneConfiguration {
+    return UISceneConfiguration(name: "Default Configuration", sessionRole: connectingSceneSession.role)
+  }
+
+  func application(_ application: UIApplication, didDiscardSceneSessions sceneSessions: Set<UISceneSession>) {
   }
 
   // Handle push notifications when app is in foreground
