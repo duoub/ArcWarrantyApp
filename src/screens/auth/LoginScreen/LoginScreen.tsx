@@ -224,9 +224,9 @@ const LoginScreen = () => {
           </View>
 
           {/* Footer */}
-          <View style={styles.footer}>
+          {/* <View style={styles.footer}>
             <Text style={styles.footerText}>Sản phẩm đẳng cấp từ <Text style={styles.signupLink}>MALAYSIA</Text></Text>
-          </View>
+          </View> */}
         </View>
       </KeyboardAwareScrollView>
 

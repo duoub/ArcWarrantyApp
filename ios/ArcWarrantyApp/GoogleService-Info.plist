@@ -2,6 +2,10 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>CLIENT_ID</key>
+	<string>1041247967459-gdk7upvve60f51hg2e3r0ucb794blq37.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.1041247967459-gdk7upvve60f51hg2e3r0ucb794blq37</string>
 	<key>API_KEY</key>
 	<string>AIzaSyDibhFblazMGBkrfMhqxacqOxKsPDAvMkE</string>
 	<key>GCM_SENDER_ID</key>
@@ -9,11 +13,11 @@
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
-	<string>vn.qbis.arc</string>
+	<string>vn.asiatic.bhdt</string>
 	<key>PROJECT_ID</key>
 	<string>qbis-d998a</string>
 	<key>STORAGE_BUCKET</key>
-	<string>qbis-d998a.firebasestorage.app</string>
+	<string>qbis-d998a.appspot.com</string>
 	<key>IS_ADS_ENABLED</key>
 	<false></false>
 	<key>IS_ANALYTICS_ENABLED</key>
@@ -25,7 +29,7 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:1041247967459:ios:382edfbda01ad91d430dd6</string>
+	<string>1:1041247967459:ios:756a3b41ad7d9405430dd6</string>
 	<key>DATABASE_URL</key>
 	<string>https://qbis-d998a.firebaseio.com</string>
 </dict>
