@@ -78,9 +78,9 @@ android {
     buildToolsVersion rootProject.ext.buildToolsVersion
     compileSdk rootProject.ext.compileSdkVersion
 
-    namespace "vn.qbis.arc"
+    namespace "vn.asiatic.bhdt"
     defaultConfig {
-        applicationId "vn.qbis.arc"
+        applicationId "vn.asiatic.bhdt"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 22

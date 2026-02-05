@@ -1,4 +1,4 @@
-package vn.qbis.arc
+package vn.asiatic.bhdt
 
 import android.app.Application
 import com.facebook.react.PackageList

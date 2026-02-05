@@ -4,10 +4,10 @@
  */
 
 export const COLORS = {
-  // Primary Colors (from ARC logo & banner)
-  primary: '#E31E24',        // ARC Red
-  primaryDark: '#B71C1C',    // Darker red for pressed states
-  primaryLight: '#EF5350',   // Lighter red for backgrounds
+  // Primary Colors (from ARC logo)
+  primary: '#2B3BA0',        // ARC Navy Blue
+  primaryDark: '#1E2B7A',    // Darker navy for pressed states
+  primaryLight: '#4A5BC4',   // Lighter navy for backgrounds
 
   // Secondary Colors
   secondary: '#2D2D2D',      // Black from logo text

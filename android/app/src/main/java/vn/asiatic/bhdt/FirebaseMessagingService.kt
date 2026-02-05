@@ -1,4 +1,4 @@
-package vn.qbis.arc
+package vn.asiatic.bhdt
 
 import android.app.NotificationChannel
 import android.app.NotificationManager

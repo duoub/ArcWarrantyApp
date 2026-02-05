@@ -1,4 +1,4 @@
-package vn.qbis.arc
+package vn.asiatic.bhdt
 
 import com.facebook.react.bridge.ReactApplicationContext
 import com.facebook.react.bridge.ReactContextBaseJavaModule
