@@ -50,7 +50,7 @@ const SignupScreen: React.FC = () => {
       >
         {/* Header Section */}
         <View style={styles.headerSection}>
-          <Text style={styles.headerTitle}>Chào mừng đến với Akito</Text>
+          <Text style={styles.headerTitle}>Chào mừng đến với Arc</Text>
           <Text style={styles.headerSubtitle}>
             Vui lòng chọn loại hội viên để đăng ký
           </Text>
@@ -68,7 +68,7 @@ const SignupScreen: React.FC = () => {
               <Image source={distributorImage} style={styles.memberImage} resizeMode="contain" />
             </View>
             <Text style={styles.memberLabel}>Nhà phân phối</Text>
-            <Text style={styles.memberDescription}>Phân phối sản phẩm Akito</Text>
+            <Text style={styles.memberDescription}>Phân phối sản phẩm Arc</Text>
           </TouchableOpacity>
 
           {/* Đại lý */}
@@ -81,7 +81,7 @@ const SignupScreen: React.FC = () => {
               <Image source={dealerImage} style={styles.memberImage} resizeMode="contain" />
             </View>
             <Text style={styles.memberLabel}>Đại lý</Text>
-            <Text style={styles.memberDescription}>Kinh doanh sản phẩm Akito</Text>
+            <Text style={styles.memberDescription}>Kinh doanh sản phẩm Arc</Text>
           </TouchableOpacity>
 
           {/* Thợ */}
@@ -116,7 +116,7 @@ const SignupScreen: React.FC = () => {
           <Icon name="info" size={18} color={COLORS.accent} style={commonStyles.infoBoxIcon} />
           <View style={commonStyles.infoBoxContent}>
             <Text style={commonStyles.infoBoxText}>
-              Trở thành hội viên Akito để nhận nhiều ưu đãi và quyền lợi đặc biệt
+              Trở thành hội viên Arc để nhận nhiều ưu đãi và quyền lợi đặc biệt
             </Text>
             <TouchableOpacity activeOpacity={0.7}>
               <Text style={commonStyles.infoBoxLink}>Tìm hiểu thêm →</Text>

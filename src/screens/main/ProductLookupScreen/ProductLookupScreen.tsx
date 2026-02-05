@@ -244,7 +244,7 @@ const ProductLookupScreen = () => {
                 <View style={styles.authenticNote}>
                   {/* <Icon name="product-lookup" size={22} color={COLORS.success} /> */}
                   <Text style={styles.authenticNoteText}>
-                    Sản phẩm này đã được xác thực là hàng chính hãng của AKITO.
+                    Sản phẩm này đã được xác thực là hàng chính hãng của ARC.
                     Quý khách được hưởng đầy đủ chính sách bảo hành theo quy định.
                   </Text>
                 </View>
@@ -259,7 +259,7 @@ const ProductLookupScreen = () => {
           <View style={commonStyles.infoBoxContent}>
             <Text style={commonStyles.infoBoxText}>
               Nhập số serial trên tem sản phẩm hoặc quét mã QR để kiểm tra
-              tính xác thực của sản phẩm AKITO.
+              tính xác thực của sản phẩm ARC.
             </Text>
           </View>
         </View>

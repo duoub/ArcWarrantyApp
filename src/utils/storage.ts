@@ -7,7 +7,7 @@ import { createMMKV } from 'react-native-mmkv';
 
 // Create storage instance
 export const storage = createMMKV({
-  id: 'akito-warranty-app',
+  id: 'arc-warranty-app',
 });
 
 // Type-safe storage helpers

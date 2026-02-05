@@ -1,4 +1,4 @@
-package vn.qbis.akito
+package vn.qbis.arc
 
 import android.os.Bundle
 import com.facebook.react.ReactActivity
@@ -12,7 +12,7 @@ class MainActivity : ReactActivity() {
    * Returns the name of the main component registered from JavaScript. This is used to schedule
    * rendering of the component.
    */
-  override fun getMainComponentName(): String = "AkitoWarrantyApp"
+  override fun getMainComponentName(): String = "ArcWarrantyApp"
 
   override fun onCreate(savedInstanceState: Bundle?) {
     SplashScreen.show(this, R.style.SplashTheme)

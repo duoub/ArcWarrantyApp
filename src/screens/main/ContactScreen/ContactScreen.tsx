@@ -93,7 +93,7 @@ const ContactScreen = () => {
 
   const handleContactPress = (item: ContactInfo) => {
     if (item.type === 'address' && appInfo?.address) {
-      openMapDirections(appInfo.address, 'AKITO');
+      openMapDirections(appInfo.address, 'ARC');
       return;
     }
 
@@ -183,7 +183,7 @@ const ContactScreen = () => {
           {/* Description */}
           <View style={styles.descriptionContainer}>
             <Text style={styles.descriptionText}>
-              {appInfo?.titleApp || 'AKITO APP là ứng dụng quản lý bảo hành và chăm sóc khách hàng của AKITO.'}
+              {appInfo?.titleApp || 'ARC APP là ứng dụng quản lý bảo hành và chăm sóc khách hàng của ARC.'}
             </Text>
           </View>
 

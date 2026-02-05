@@ -15,7 +15,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         window = UIWindow(windowScene: windowScene)
 
         factory.startReactNative(
-            withModuleName: "AkitoWarrantyApp",
+            withModuleName: "ArcWarrantyApp",
             in: window,
             launchOptions: nil
         )

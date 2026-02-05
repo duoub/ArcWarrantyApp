@@ -1,11 +1,11 @@
 /**
- * AKITO Warranty App - Theme Configuration
- * Based on AKITO Air Conditioner brand identity
+ * ARC Warranty App - Theme Configuration
+ * Based on ARC Air Conditioner brand identity
  */
 
 export const COLORS = {
-  // Primary Colors (from AKITO logo & banner)
-  primary: '#E31E24',        // AKITO Red
+  // Primary Colors (from ARC logo & banner)
+  primary: '#E31E24',        // ARC Red
   primaryDark: '#B71C1C',    // Darker red for pressed states
   primaryLight: '#EF5350',   // Lighter red for backgrounds
 

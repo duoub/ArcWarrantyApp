@@ -25,7 +25,7 @@
 		BE39376767864D5C9651A21A /* FontAwesome5_Solid.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 44CA9A5A8BAC4EA48CF51B01 /* FontAwesome5_Solid.ttf */; };
 		D061C5BDFF6945E4817BD3CA /* Entypo.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 3279949C5B3844AE8B796484 /* Entypo.ttf */; };
 		D0D66F72029F4FB1A59B6F41 /* MaterialIcons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 9E9A0BA53AA14B499A7225C6 /* MaterialIcons.ttf */; };
-		D964242E4732F442260DFFA8 /* libPods-AkitoWarrantyApp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 06882B746B59E2A528306198 /* libPods-AkitoWarrantyApp.a */; };
+		D964242E4732F442260DFFA8 /* libPods-ArcWarrantyApp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 06882B746B59E2A528306198 /* libPods-ArcWarrantyApp.a */; };
 		DAF41742FC7D4F3D813E554C /* AntDesign.ttf in Resources */ = {isa = PBXBuildFile; fileRef = B4F0C88F03C84778AAF8EE9F /* AntDesign.ttf */; };
 		DB005AD17C304F0F84B3EBF0 /* FontAwesome.ttf in Resources */ = {isa = PBXBuildFile; fileRef = BBB583A5E359412D8FFA47A1 /* FontAwesome.ttf */; };
 		E0F454ED76E94E4B89DB55BF /* FontAwesome6_Brands.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 79C9FEF6B2DB4F019E54BF51 /* FontAwesome6_Brands.ttf */; };
@@ -36,14 +36,14 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		06882B746B59E2A528306198 /* libPods-AkitoWarrantyApp.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-AkitoWarrantyApp.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		06882B746B59E2A528306198 /* libPods-ArcWarrantyApp.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-ArcWarrantyApp.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		0A9A2A600A3840BCA31EAE86 /* FontAwesome6_Solid.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = FontAwesome6_Solid.ttf; path = "../node_modules/react-native-vector-icons/Fonts/FontAwesome6_Solid.ttf"; sourceTree = "<group>"; };
-		13B07F961A680F5B00A75B9A /* AkitoWarrantyApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AkitoWarrantyApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		13B07FB51A68108700A75B9A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = AkitoWarrantyApp/Images.xcassets; sourceTree = "<group>"; };
-		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = AkitoWarrantyApp/Info.plist; sourceTree = "<group>"; };
-		13B07FB81A68108700A75B9A /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = PrivacyInfo.xcprivacy; path = AkitoWarrantyApp/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		13B07F961A680F5B00A75B9A /* ArcWarrantyApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ArcWarrantyApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		13B07FB51A68108700A75B9A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = ArcWarrantyApp/Images.xcassets; sourceTree = "<group>"; };
+		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = ArcWarrantyApp/Info.plist; sourceTree = "<group>"; };
+		13B07FB81A68108700A75B9A /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = PrivacyInfo.xcprivacy; path = ArcWarrantyApp/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		171E143183394E6C8946E930 /* SimpleLineIcons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = SimpleLineIcons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/SimpleLineIcons.ttf"; sourceTree = "<group>"; };
-		17B2062F97C32C5CC1056C3C /* Pods-AkitoWarrantyApp.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AkitoWarrantyApp.release.xcconfig"; path = "Target Support Files/Pods-AkitoWarrantyApp/Pods-AkitoWarrantyApp.release.xcconfig"; sourceTree = "<group>"; };
+		17B2062F97C32C5CC1056C3C /* Pods-ArcWarrantyApp.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ArcWarrantyApp.release.xcconfig"; path = "Target Support Files/Pods-ArcWarrantyApp/Pods-ArcWarrantyApp.release.xcconfig"; sourceTree = "<group>"; };
 		1E1CF6D20E94435CAA618AC0 /* FontAwesome5_Regular.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = FontAwesome5_Regular.ttf; path = "../node_modules/react-native-vector-icons/Fonts/FontAwesome5_Regular.ttf"; sourceTree = "<group>"; };
 		3279949C5B3844AE8B796484 /* Entypo.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Entypo.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Entypo.ttf"; sourceTree = "<group>"; };
 		44CA9A5A8BAC4EA48CF51B01 /* FontAwesome5_Solid.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = FontAwesome5_Solid.ttf; path = "../node_modules/react-native-vector-icons/Fonts/FontAwesome5_Solid.ttf"; sourceTree = "<group>"; };
@@ -51,20 +51,20 @@
 		4DD346D9496A48A6A52D04F7 /* FontAwesome6_Regular.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = FontAwesome6_Regular.ttf; path = "../node_modules/react-native-vector-icons/Fonts/FontAwesome6_Regular.ttf"; sourceTree = "<group>"; };
 		64E965EF95804432A953812E /* Foundation.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Foundation.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Foundation.ttf"; sourceTree = "<group>"; };
 		75863E8F19BA4175896E02A9 /* Feather.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Feather.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Feather.ttf"; sourceTree = "<group>"; };
-		761780EC2CA45674006654EE /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AppDelegate.swift; path = AkitoWarrantyApp/AppDelegate.swift; sourceTree = "<group>"; };
-		761780EE2CA45675006654EF /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = SceneDelegate.swift; path = AkitoWarrantyApp/SceneDelegate.swift; sourceTree = "<group>"; };
-		78ACC82A2F2CB8140033ECC6 /* AkitoWarrantyApp.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = AkitoWarrantyApp.entitlements; path = AkitoWarrantyApp/AkitoWarrantyApp.entitlements; sourceTree = "<group>"; };
+		761780EC2CA45674006654EE /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AppDelegate.swift; path = ArcWarrantyApp/AppDelegate.swift; sourceTree = "<group>"; };
+		761780EE2CA45675006654EF /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = SceneDelegate.swift; path = ArcWarrantyApp/SceneDelegate.swift; sourceTree = "<group>"; };
+		78ACC82A2F2CB8140033ECC6 /* ArcWarrantyApp.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = ArcWarrantyApp.entitlements; path = ArcWarrantyApp/ArcWarrantyApp.entitlements; sourceTree = "<group>"; };
 		79C9FEF6B2DB4F019E54BF51 /* FontAwesome6_Brands.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = FontAwesome6_Brands.ttf; path = "../node_modules/react-native-vector-icons/Fonts/FontAwesome6_Brands.ttf"; sourceTree = "<group>"; };
-		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = AkitoWarrantyApp/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = ArcWarrantyApp/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		9E24828BA6C649B5A2D8A829 /* Ionicons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Ionicons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Ionicons.ttf"; sourceTree = "<group>"; };
 		9E9A0BA53AA14B499A7225C6 /* MaterialIcons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = MaterialIcons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/MaterialIcons.ttf"; sourceTree = "<group>"; };
 		B42DDBF0DA8E46A8B0031EC5 /* EvilIcons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = EvilIcons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/EvilIcons.ttf"; sourceTree = "<group>"; };
 		B4F0C88F03C84778AAF8EE9F /* AntDesign.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = AntDesign.ttf; path = "../node_modules/react-native-vector-icons/Fonts/AntDesign.ttf"; sourceTree = "<group>"; };
 		BBB583A5E359412D8FFA47A1 /* FontAwesome.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = FontAwesome.ttf; path = "../node_modules/react-native-vector-icons/Fonts/FontAwesome.ttf"; sourceTree = "<group>"; };
-		CE0778BFCD46473EAA1471FC /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "GoogleService-Info.plist"; path = "AkitoWarrantyApp/GoogleService-Info.plist"; sourceTree = "<group>"; };
+		CE0778BFCD46473EAA1471FC /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "GoogleService-Info.plist"; path = "ArcWarrantyApp/GoogleService-Info.plist"; sourceTree = "<group>"; };
 		D487A4FA977B48F08692B34C /* Zocial.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Zocial.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Zocial.ttf"; sourceTree = "<group>"; };
 		DBA499D371CA42BD881279F4 /* Octicons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Octicons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Octicons.ttf"; sourceTree = "<group>"; };
-		DE6C60B4DE1E71FC6CB9F8C4 /* Pods-AkitoWarrantyApp.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AkitoWarrantyApp.debug.xcconfig"; path = "Target Support Files/Pods-AkitoWarrantyApp/Pods-AkitoWarrantyApp.debug.xcconfig"; sourceTree = "<group>"; };
+		DE6C60B4DE1E71FC6CB9F8C4 /* Pods-ArcWarrantyApp.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ArcWarrantyApp.debug.xcconfig"; path = "Target Support Files/Pods-ArcWarrantyApp/Pods-ArcWarrantyApp.debug.xcconfig"; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 		EE5AC285813142C9B4818E64 /* MaterialCommunityIcons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = MaterialCommunityIcons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/MaterialCommunityIcons.ttf"; sourceTree = "<group>"; };
 		F3C32D78E3A9481B814B9A41 /* FontAwesome5_Brands.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = FontAwesome5_Brands.ttf; path = "../node_modules/react-native-vector-icons/Fonts/FontAwesome5_Brands.ttf"; sourceTree = "<group>"; };
@@ -75,17 +75,17 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				D964242E4732F442260DFFA8 /* libPods-AkitoWarrantyApp.a in Frameworks */,
+				D964242E4732F442260DFFA8 /* libPods-ArcWarrantyApp.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		13B07FAE1A68108700A75B9A /* AkitoWarrantyApp */ = {
+		13B07FAE1A68108700A75B9A /* ArcWarrantyApp */ = {
 			isa = PBXGroup;
 			children = (
-				78ACC82A2F2CB8140033ECC6 /* AkitoWarrantyApp.entitlements */,
+				78ACC82A2F2CB8140033ECC6 /* ArcWarrantyApp.entitlements */,
 				13B07FB51A68108700A75B9A /* Images.xcassets */,
 				761780EC2CA45674006654EE /* AppDelegate.swift */,
 				761780EE2CA45675006654EF /* SceneDelegate.swift */,
@@ -94,14 +94,14 @@
 				81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */,
 				13B07FB81A68108700A75B9A /* PrivacyInfo.xcprivacy */,
 			);
-			name = AkitoWarrantyApp;
+			name = ArcWarrantyApp;
 			sourceTree = "<group>";
 		};
 		2D16E6871FA4F8E400B85C8A /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
 				ED297162215061F000B7C4FE /* JavaScriptCore.framework */,
-				06882B746B59E2A528306198 /* libPods-AkitoWarrantyApp.a */,
+				06882B746B59E2A528306198 /* libPods-ArcWarrantyApp.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -116,7 +116,7 @@
 		83CBB9F61A601CBA00E9B192 = {
 			isa = PBXGroup;
 			children = (
-				13B07FAE1A68108700A75B9A /* AkitoWarrantyApp */,
+				13B07FAE1A68108700A75B9A /* ArcWarrantyApp */,
 				832341AE1AAA6A7D00B99B32 /* Libraries */,
 				83CBBA001A601CBA00E9B192 /* Products */,
 				2D16E6871FA4F8E400B85C8A /* Frameworks */,
@@ -131,7 +131,7 @@
 		83CBBA001A601CBA00E9B192 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				13B07F961A680F5B00A75B9A /* AkitoWarrantyApp.app */,
+				13B07F961A680F5B00A75B9A /* ArcWarrantyApp.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -165,8 +165,8 @@
 		BBD78D7AC51CEA395F1C20DB /* Pods */ = {
 			isa = PBXGroup;
 			children = (
-				DE6C60B4DE1E71FC6CB9F8C4 /* Pods-AkitoWarrantyApp.debug.xcconfig */,
-				17B2062F97C32C5CC1056C3C /* Pods-AkitoWarrantyApp.release.xcconfig */,
+				DE6C60B4DE1E71FC6CB9F8C4 /* Pods-ArcWarrantyApp.debug.xcconfig */,
+				17B2062F97C32C5CC1056C3C /* Pods-ArcWarrantyApp.release.xcconfig */,
 			);
 			path = Pods;
 			sourceTree = "<group>";
@@ -174,9 +174,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		13B07F861A680F5B00A75B9A /* AkitoWarrantyApp */ = {
+		13B07F861A680F5B00A75B9A /* ArcWarrantyApp */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 13B07F931A680F5B00A75B9A /* Build configuration list for PBXNativeTarget "AkitoWarrantyApp" */;
+			buildConfigurationList = 13B07F931A680F5B00A75B9A /* Build configuration list for PBXNativeTarget "ArcWarrantyApp" */;
 			buildPhases = (
 				790747DEAEC877C951834853 /* [CP] Check Pods Manifest.lock */,
 				13B07F871A680F5B00A75B9A /* Sources */,
@@ -191,9 +191,9 @@
 			);
 			dependencies = (
 			);
-			name = AkitoWarrantyApp;
-			productName = AkitoWarrantyApp;
-			productReference = 13B07F961A680F5B00A75B9A /* AkitoWarrantyApp.app */;
+			name = ArcWarrantyApp;
+			productName = ArcWarrantyApp;
+			productReference = 13B07F961A680F5B00A75B9A /* ArcWarrantyApp.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -210,7 +210,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 83CBB9FA1A601CBA00E9B192 /* Build configuration list for PBXProject "AkitoWarrantyApp" */;
+			buildConfigurationList = 83CBB9FA1A601CBA00E9B192 /* Build configuration list for PBXProject "ArcWarrantyApp" */;
 			compatibilityVersion = "Xcode 12.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -223,7 +223,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				13B07F861A680F5B00A75B9A /* AkitoWarrantyApp */,
+				13B07F861A680F5B00A75B9A /* ArcWarrantyApp */,
 			);
 		};
 /* End PBXProject section */
@@ -293,7 +293,7 @@
 			outputFileListPaths = (
 			);
 			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-AkitoWarrantyApp-checkManifestLockResult.txt",
+				"$(DERIVED_FILE_DIR)/Pods-ArcWarrantyApp-checkManifestLockResult.txt",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -306,19 +306,19 @@
 			files = (
 			);
 			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-AkitoWarrantyApp/Pods-AkitoWarrantyApp-resources-${CONFIGURATION}-input-files.xcfilelist",
+				"${PODS_ROOT}/Target Support Files/Pods-ArcWarrantyApp/Pods-ArcWarrantyApp-resources-${CONFIGURATION}-input-files.xcfilelist",
 			);
 			inputPaths = (
 			);
 			name = "[CP] Copy Pods Resources";
 			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-AkitoWarrantyApp/Pods-AkitoWarrantyApp-resources-${CONFIGURATION}-output-files.xcfilelist",
+				"${PODS_ROOT}/Target Support Files/Pods-ArcWarrantyApp/Pods-ArcWarrantyApp-resources-${CONFIGURATION}-output-files.xcfilelist",
 			);
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-AkitoWarrantyApp/Pods-AkitoWarrantyApp-resources.sh\"\n";
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-ArcWarrantyApp/Pods-ArcWarrantyApp-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		D3D5579D4211E2928F1004F7 /* [CP-User] [RNFB] Core Configuration */ = {
@@ -342,19 +342,19 @@
 			files = (
 			);
 			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-AkitoWarrantyApp/Pods-AkitoWarrantyApp-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+				"${PODS_ROOT}/Target Support Files/Pods-ArcWarrantyApp/Pods-ArcWarrantyApp-frameworks-${CONFIGURATION}-input-files.xcfilelist",
 			);
 			inputPaths = (
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-AkitoWarrantyApp/Pods-AkitoWarrantyApp-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+				"${PODS_ROOT}/Target Support Files/Pods-ArcWarrantyApp/Pods-ArcWarrantyApp-frameworks-${CONFIGURATION}-output-files.xcfilelist",
 			);
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-AkitoWarrantyApp/Pods-AkitoWarrantyApp-frameworks.sh\"\n";
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-ArcWarrantyApp/Pods-ArcWarrantyApp-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
@@ -374,19 +374,19 @@
 /* Begin XCBuildConfiguration section */
 		13B07F941A680F5B00A75B9A /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = DE6C60B4DE1E71FC6CB9F8C4 /* Pods-AkitoWarrantyApp.debug.xcconfig */;
+			baseConfigurationReference = DE6C60B4DE1E71FC6CB9F8C4 /* Pods-ArcWarrantyApp.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
 				CLANG_ENABLE_MODULES = YES;
-				CODE_SIGN_ENTITLEMENTS = AkitoWarrantyApp/AkitoWarrantyApp.entitlements;
+				CODE_SIGN_ENTITLEMENTS = ArcWarrantyApp/ArcWarrantyApp.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = WBXWW927P5;
 				ENABLE_BITCODE = NO;
-				INFOPLIST_FILE = AkitoWarrantyApp/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = Akito;
+				INFOPLIST_FILE = ArcWarrantyApp/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = Arc;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -398,8 +398,8 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = vn.qbis.akito;
-				PRODUCT_NAME = AkitoWarrantyApp;
+				PRODUCT_BUNDLE_IDENTIFIER = vn.qbis.arc;
+				PRODUCT_NAME = ArcWarrantyApp;
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
@@ -414,18 +414,18 @@
 		};
 		13B07F951A680F5B00A75B9A /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 17B2062F97C32C5CC1056C3C /* Pods-AkitoWarrantyApp.release.xcconfig */;
+			baseConfigurationReference = 17B2062F97C32C5CC1056C3C /* Pods-ArcWarrantyApp.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
 				CLANG_ENABLE_MODULES = YES;
-				CODE_SIGN_ENTITLEMENTS = AkitoWarrantyApp/AkitoWarrantyApp.entitlements;
+				CODE_SIGN_ENTITLEMENTS = ArcWarrantyApp/ArcWarrantyApp.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = WBXWW927P5;
-				INFOPLIST_FILE = AkitoWarrantyApp/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = Akito;
+				INFOPLIST_FILE = ArcWarrantyApp/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = Arc;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -437,8 +437,8 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = vn.qbis.akito;
-				PRODUCT_NAME = AkitoWarrantyApp;
+				PRODUCT_BUNDLE_IDENTIFIER = vn.qbis.arc;
+				PRODUCT_NAME = ArcWarrantyApp;
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
@@ -606,7 +606,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		13B07F931A680F5B00A75B9A /* Build configuration list for PBXNativeTarget "AkitoWarrantyApp" */ = {
+		13B07F931A680F5B00A75B9A /* Build configuration list for PBXNativeTarget "ArcWarrantyApp" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				13B07F941A680F5B00A75B9A /* Debug */,
@@ -615,7 +615,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		83CBB9FA1A601CBA00E9B192 /* Build configuration list for PBXProject "AkitoWarrantyApp" */ = {
+		83CBB9FA1A601CBA00E9B192 /* Build configuration list for PBXProject "ArcWarrantyApp" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				83CBBA201A601CBA00E9B192 /* Debug */,

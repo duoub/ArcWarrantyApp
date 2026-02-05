@@ -1,4 +1,4 @@
-package vn.qbis.akito
+package vn.qbis.arc
 
 import android.app.Activity
 import android.app.Dialog

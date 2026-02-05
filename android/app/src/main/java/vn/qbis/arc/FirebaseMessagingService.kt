@@ -1,4 +1,4 @@
-package vn.qbis.akito
+package vn.qbis.arc
 
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -44,12 +44,12 @@ class FirebaseMessagingService : FirebaseMessagingService() {
             PendingIntent.FLAG_ONE_SHOT or PendingIntent.FLAG_IMMUTABLE
         )
 
-        val channelId = "akito_warranty_channel"
+        val channelId = "arc_warranty_channel"
         val defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
 
         val notificationBuilder = NotificationCompat.Builder(this, channelId)
             .setSmallIcon(R.mipmap.ic_launcher)
-            .setContentTitle(title ?: "Akito Warranty")
+            .setContentTitle(title ?: "Arc Warranty")
             .setContentText(messageBody ?: "")
             .setAutoCancel(true)
             .setSound(defaultSoundUri)
@@ -62,7 +62,7 @@ class FirebaseMessagingService : FirebaseMessagingService() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
                 channelId,
-                "Akito Warranty Notifications",
+                "Arc Warranty Notifications",
                 NotificationManager.IMPORTANCE_HIGH
             )
             notificationManager.createNotificationChannel(channel)

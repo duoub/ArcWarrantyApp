@@ -49,7 +49,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
     } else {
       window = UIWindow(frame: UIScreen.main.bounds)
       factory.startReactNative(
-        withModuleName: "AkitoWarrantyApp",
+        withModuleName: "ArcWarrantyApp",
         in: window,
         launchOptions: launchOptions
       )

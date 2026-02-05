@@ -1,4 +1,4 @@
-# Akito Warranty App - Project Context
+# Arc Warranty App - Project Context
 
 ## Tech Stack
 - **React Native** 0.83.0 with **Expo**
@@ -27,7 +27,7 @@ src/
 
 ## Commands
 ```bash
-cd AkitoWarrantyApp && npx expo start
+cd ArcWarrantyApp && npx expo start
 npx expo start --clear
 ```
 
@@ -166,5 +166,5 @@ import { Icon } from '../../../components/common';
 
 - UI text: Vietnamese
 - API fields: Vietnamese without diacritics (`hoten`, `tinhthanh`)
-- Primary color: `#E31E24` (AKITO Red)
+- Primary color: `#E31E24` (ARC Red)
 - Always use `commonStyles` for consistent UI
