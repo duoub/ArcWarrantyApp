@@ -35,6 +35,7 @@ export const appInfoService = {
           status: true,
           info: {
             hotline: result.hotline,
+            zalo: result.zalo,
             website: result.website,
             titleApp: result.titleApp,
             address: result.address,
@@ -52,6 +53,40 @@ export const appInfoService = {
         status: false,
         info: null,
       };
+    }
+  },
+
+  /**
+   * Get contact info for the draggable widget (no auth required)
+   * API: /getinfoapp?storeid=xxx&userid=
+   */
+  getContactInfo: async (): Promise<{ hotline: string; zalo: string; website: string } | null> => {
+    try {
+      const url = buildApiUrl('/getinfoapp', {
+        storeid: API_CONFIG.STORE_ID,
+        userid: '',
+      });
+
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      const result: GetInfoAppResponse = await response.json();
+
+      if (result && result.status) {
+        return {
+          hotline: result.hotline,
+          zalo: result.zalo,
+          website: result.website,
+        };
+      }
+
+      return null;
+    } catch {
+      return null;
     }
   },
 };

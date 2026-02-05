@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   View,
   Text,
@@ -9,29 +9,89 @@ import {
   Platform,
   ActivityIndicator,
   Alert,
+  Dimensions,
+  FlatList,
+  StatusBar,
 } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { COLORS, SPACING, BORDER_RADIUS } from '../../../config/theme';
 import { PreLoginRootStackParamList } from '../../../navigation/PreLoginRootNavigator';
 import { loginSchema, LoginFormData } from '../../../utils/validation';
 import { Icon } from '../../../components/common';
 import { authService } from '../../../api/authService';
 import { useAuthStore } from '../../../store/authStore';
+import { bannerService } from '../../../api/bannerService';
+import { BannerItem } from '../../../types/banner';
+import { commonStyles } from '../../../styles/commonStyles';
 import PreLoginNavigator from '../../../navigation/PreLoginNavigator';
+
+const { width } = Dimensions.get('window');
+const BANNER_WIDTH = width;
+const BANNER_HEIGHT = width;
+
+const DEFAULT_BANNER_IMAGE = require('../../../assets/images/banner.jpg');
 
 type LoginScreenNavigationProp = StackNavigationProp<PreLoginRootStackParamList, 'Login'>;
 
 const LoginScreen = () => {
   const navigation = useNavigation<LoginScreenNavigationProp>();
   const { login } = useAuthStore();
+  const insets = useSafeAreaInsets();
 
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isCustomerAccount, setIsCustomerAccount] = useState(false);
+
+  // Banner state
+  const [banners, setBanners] = useState<BannerItem[]>([]);
+  const [currentBannerIndex, setCurrentBannerIndex] = useState(0);
+  const bannerListRef = useRef<FlatList>(null);
+
+  // Load banners on mount (no userid for pre-login)
+  useEffect(() => {
+    const loadBanners = async () => {
+      try {
+        const response = await bannerService.getHomeBannerWithUserId('');
+        if (response.status && response.banners.length > 0) {
+          setBanners(response.banners);
+        }
+      } catch {
+        // Keep empty banners on error
+      }
+    };
+    loadBanners();
+  }, []);
+
+  // Auto-slide banners
+  useEffect(() => {
+    if (banners.length <= 1) return;
+
+    const interval = setInterval(() => {
+      setCurrentBannerIndex((prevIndex) => {
+        const nextIndex = (prevIndex + 1) % banners.length;
+        bannerListRef.current?.scrollToIndex({ index: nextIndex, animated: true });
+        return nextIndex;
+      });
+    }, 3500);
+
+    return () => clearInterval(interval);
+  }, [banners.length]);
+
+  const renderBanner = ({ item }: { item: BannerItem }) => (
+    <View style={styles.bannerItem}>
+      <Image
+        source={{ uri: item.bannerurl }}
+        style={styles.bannerImage}
+        resizeMode="cover"
+        defaultSource={DEFAULT_BANNER_IMAGE}
+      />
+    </View>
+  );
 
   const {
     control,
@@ -75,31 +135,56 @@ const LoginScreen = () => {
 
   return (
     <View style={styles.container}>
+      <StatusBar barStyle="light-content" backgroundColor={COLORS.primary} />
       <KeyboardAwareScrollView
         style={styles.scrollView}
-        contentContainerStyle={styles.scrollContent}
+        contentContainerStyle={[styles.scrollContent, { paddingTop: insets.top }]}
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
         enableOnAndroid={true}
         extraScrollHeight={Platform.OS === 'ios' ? 20 : 100}
         extraHeight={120}
       >
-        <View style={styles.content}>
-          {/* Logo Section */}
-          <View style={styles.logoSection}>
-            <Image
-              source={require('../../../assets/images/logo.png')}
-              style={styles.logo}
-              resizeMode="contain"
+        {/* Banner Slider - full width, outside padded content */}
+        {banners.length > 0 && (
+          <View style={styles.bannerContainer}>
+            <FlatList
+              ref={bannerListRef}
+              data={banners}
+              renderItem={renderBanner}
+              keyExtractor={(item, index) => `banner-${item.id}-${index}`}
+              horizontal
+              pagingEnabled
+              showsHorizontalScrollIndicator={false}
+              style={{ height: BANNER_HEIGHT }}
+              onMomentumScrollEnd={(event) => {
+                const index = Math.round(
+                  event.nativeEvent.contentOffset.x / BANNER_WIDTH
+                );
+                setCurrentBannerIndex(index);
+              }}
             />
-            <Text style={styles.tagline}>Quản lý bảo hành chuyên nghiệp</Text>
-          </View>
 
+            {/* Pagination Dots */}
+            {banners.length > 1 && (
+              <View style={commonStyles.paginationContainer}>
+                {banners.map((banner, index) => (
+                  <View
+                    key={`dot-${banner.id}-${index}`}
+                    style={[
+                      commonStyles.paginationDot,
+                      index === currentBannerIndex && commonStyles.paginationDotActive,
+                    ]}
+                  />
+                ))}
+              </View>
+            )}
+          </View>
+        )}
+
+        <View style={styles.content}>
           {/* Login Card */}
           <View style={styles.loginCard}>
-            {/* Card Header */}
-            <Text style={styles.welcomeText}>Đăng nhập</Text>
-
             {/* Customer Account Checkbox */}
             {/* <TouchableOpacity
                 style={styles.checkboxContainer}
@@ -119,7 +204,7 @@ const LoginScreen = () => {
               name="username"
               render={({ field: { onChange, onBlur, value } }) => (
                 <View style={styles.inputContainer}>
-                  <Text style={styles.inputLabel}>Tên đăng nhập</Text>
+                  {/* <Text style={styles.inputLabel}>Tên đăng nhập</Text> */}
                   <View
                     style={[
                       styles.inputWrapper,
@@ -128,7 +213,7 @@ const LoginScreen = () => {
                   >
                     <TextInput
                       style={styles.input}
-                      placeholder="Nhập tên đăng nhập"
+                      placeholder="Tên đăng nhập"
                       placeholderTextColor={COLORS.gray400}
                       value={value}
                       onChangeText={onChange}
@@ -151,7 +236,7 @@ const LoginScreen = () => {
               name="password"
               render={({ field: { onChange, onBlur, value } }) => (
                 <View style={styles.inputContainer}>
-                  <Text style={styles.inputLabel}>Mật khẩu</Text>
+                  {/* <Text style={styles.inputLabel}>Mật khẩu</Text> */}
                   <View
                     style={[
                       styles.inputWrapper,
@@ -160,7 +245,7 @@ const LoginScreen = () => {
                   >
                     <TextInput
                       style={styles.input}
-                      placeholder="Nhập mật khẩu"
+                      placeholder="Mật khẩu"
                       placeholderTextColor={COLORS.gray400}
                       value={value}
                       onChangeText={onChange}
@@ -250,25 +335,22 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
     paddingHorizontal: SPACING.lg,
-    paddingTop: SPACING.xl,
+    paddingTop: SPACING.sm,
     paddingBottom: SPACING.lg,
     justifyContent: 'center',
   },
 
-  // Logo Section
-  logoSection: {
-    alignItems: 'center',
-    marginBottom: SPACING.lg,
+  // Banner Slider
+  bannerContainer: {
+    marginBottom: SPACING.sm,
   },
-  logo: {
-    width: 140,
-    height: 45,
-    marginBottom: SPACING.xs,
+  bannerItem: {
+    width: BANNER_WIDTH,
+    height: BANNER_HEIGHT,
   },
-  tagline: {
-    fontSize: 13,
-    color: COLORS.textSecondary,
-    textAlign: 'center',
+  bannerImage: {
+    width: '100%',
+    height: '100%',
   },
 
   // Login Card
@@ -283,15 +365,6 @@ const styles = StyleSheet.create({
     elevation: 4,
     borderWidth: 1,
     borderColor: COLORS.gray200,
-  },
-
-  // Card Header
-  welcomeText: {
-    fontSize: 22,
-    fontWeight: '700',
-    color: COLORS.textPrimary,
-    marginBottom: SPACING.md,
-    textAlign: 'center',
   },
 
   // Checkbox

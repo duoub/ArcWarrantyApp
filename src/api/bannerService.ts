@@ -9,7 +9,7 @@ import { API_CONFIG } from '../config/constants';
 
 export const bannerService = {
   /**
-   * Get home banner list
+   * Get home banner list (requires logged-in user)
    * API: /getlisthomebanner?storeid=xxx&userid=xxx
    */
   getHomeBanner: async (): Promise<{ status: boolean; banners: BannerItem[] }> => {
@@ -19,6 +19,46 @@ export const bannerService = {
       const url = buildApiUrl('/getlisthomebanner', {
         storeid: API_CONFIG.STORE_ID,
         userid: credentials.username,
+      });
+
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      const result: GetHomeBannerResponse = await response.json();
+
+      if (result && result.banners3 && result.banners3.length > 0) {
+        return {
+          status: true,
+          banners: result.banners3,
+        };
+      } else {
+        return {
+          status: false,
+          banners: [],
+        };
+      }
+    } catch (error) {
+      return {
+        status: false,
+        banners: [],
+      };
+    }
+  },
+
+  /**
+   * Get home banner list with optional userid (for pre-login screens)
+   * API: /getlisthomebanner?storeid=xxx&userid=xxx
+   * @param userid - Leave empty string when not logged in
+   */
+  getHomeBannerWithUserId: async (userid: string = ''): Promise<{ status: boolean; banners: BannerItem[] }> => {
+    try {
+      const url = buildApiUrl('/getlisthomebanner', {
+        storeid: API_CONFIG.STORE_ID,
+        userid,
       });
 
       const response = await fetch(url, {

@@ -29,7 +29,7 @@ const NotificationScreen = () => {
   const allNotifications: Notification[] = [
     {
       id: '1',
-      content: 'Chương trình khuyến mãi đặc biệt dành cho sản phẩm điều hòa ARC 12000BTU. Giảm giá lên đến 20% cho đơn hàng từ hôm nay đến hết tháng.',
+      content: 'Chương trình khuyến mãi đặc biệt dành cho sản phẩm tivi ARC. Giảm giá lên đến 20% cho đơn hàng từ hôm nay đến hết tháng.',
       createdate: '15/12/2024 10:30',
       isRead: false,
     },
@@ -47,7 +47,7 @@ const NotificationScreen = () => {
     },
     {
       id: '4',
-      content: 'Cảm ơn bạn đã kích hoạt bảo hành cho sản phẩm điều hòa ARC. Mã bảo hành của bạn là: BH123456789.',
+      content: 'Cảm ơn bạn đã kích hoạt bảo hành cho sản phẩm tivi ARC. Mã bảo hành của bạn là: BH123456789.',
       createdate: '12/12/2024 14:20',
       isRead: true,
     },

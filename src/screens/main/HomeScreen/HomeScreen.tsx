@@ -30,8 +30,8 @@ import { commonStyles } from '../../../styles/commonStyles';
 type HomeScreenNavigationProp = StackNavigationProp<HomeStackParamList, 'Home'>;
 
 const { width } = Dimensions.get('window');
-const BANNER_WIDTH = width - SPACING.lg * 2;
-const BANNER_HEIGHT = BANNER_WIDTH * 0.5;
+const BANNER_WIDTH = width;
+const BANNER_HEIGHT = width;
 
 // Default banner image if API doesn't return any
 const DEFAULT_BANNER_IMAGE = require('../../../assets/images/banner.jpg');
@@ -208,6 +208,7 @@ const HomeScreen = () => {
               horizontal
               pagingEnabled
               showsHorizontalScrollIndicator={false}
+              style={{ height: BANNER_HEIGHT }}
               onMomentumScrollEnd={(event) => {
                 const index = Math.round(
                   event.nativeEvent.contentOffset.x / BANNER_WIDTH
@@ -391,14 +392,11 @@ const styles = StyleSheet.create({
 
   // Banner Slider
   bannerContainer: {
-    marginVertical: SPACING.md,
+    marginBottom: SPACING.md,
   },
   bannerItem: {
     width: BANNER_WIDTH,
     height: BANNER_HEIGHT,
-    marginHorizontal: SPACING.lg,
-    borderRadius: BORDER_RADIUS.lg,
-    overflow: 'hidden',
   },
   bannerImage: {
     width: '100%',

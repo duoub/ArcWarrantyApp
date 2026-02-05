@@ -19,6 +19,7 @@ export interface GetInfoAppResponse {
 
 export interface AppInfo {
   hotline: string;
+  zalo: string;
   website: string;
   titleApp: string;
   address: string;

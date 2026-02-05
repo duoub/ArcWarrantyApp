@@ -17,7 +17,7 @@ export const API_CONFIG = {
     ? 'https://ferroliapp.qbis.vn/api/mobileapp'
     : 'https://ferroliapp.qbis.vn/api/mobileapp',
   TRACKING_TOKEN: '', // Token for tracking API
-  STORE_ID: '022665047387', // Store ID for API calls
+  STORE_ID: '022665066528', // Store ID for API calls
   TIMEOUT: 30000,
   RETRY_ATTEMPTS: 3,
 };

@@ -63,7 +63,9 @@ export type IconName =
   | 'copy'
   | 'trophy'
   | 'document'
-  | 'calendar';
+  | 'calendar'
+  | 'facebook'
+  | 'zalo';
 
 interface IconConfig {
   provider: 'MaterialCommunityIcons' | 'Feather';
@@ -132,6 +134,8 @@ const iconMap: Record<IconName, IconConfig> = {
   'trophy': { provider: 'MaterialCommunityIcons', name: 'trophy' },
   'document': { provider: 'MaterialCommunityIcons', name: 'file-document' },
   'calendar': { provider: 'MaterialCommunityIcons', name: 'calendar' },
+  'facebook': { provider: 'MaterialCommunityIcons', name: 'facebook' },
+  'zalo': { provider: 'MaterialCommunityIcons', name: 'chat-circle-outline' },
 };
 
 interface IconProps {
