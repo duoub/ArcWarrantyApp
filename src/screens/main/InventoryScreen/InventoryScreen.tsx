@@ -345,7 +345,7 @@ const styles = StyleSheet.create({
   // Total Count
   totalCountCard: {
     backgroundColor: COLORS.white,
-    marginHorizontal: SPACING.lg,
+    marginHorizontal: SPACING.screen_lg,
     marginTop: SPACING.md,
     padding: SPACING.md,
     borderRadius: BORDER_RADIUS.lg,
@@ -365,7 +365,7 @@ const styles = StyleSheet.create({
   // Inventory Card
   inventoryCard: {
     backgroundColor: COLORS.white,
-    marginHorizontal: SPACING.lg,
+    marginHorizontal: SPACING.screen_lg,
     marginTop: SPACING.md,
     borderRadius: BORDER_RADIUS.lg,
     overflow: 'hidden',

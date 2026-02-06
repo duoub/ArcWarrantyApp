@@ -292,7 +292,7 @@ const styles = StyleSheet.create({
   statusHeader: {
     alignItems: 'center',
     paddingVertical: SPACING.xl,
-    paddingHorizontal: SPACING.lg,
+    paddingHorizontal: SPACING.screen_lg,
   },
   statusIconContainer: {
     width: 80,
@@ -341,7 +341,7 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   infoBoxMargin: {
-    marginHorizontal: SPACING.lg,
+    marginHorizontal: SPACING.screen_lg,
     marginTop: SPACING.md,
   },
 });

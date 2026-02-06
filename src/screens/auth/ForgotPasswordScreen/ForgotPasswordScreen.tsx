@@ -233,7 +233,7 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
-    paddingHorizontal: SPACING.lg,
+    paddingHorizontal: SPACING.screen_lg,
     paddingTop: SPACING.xl,
     paddingBottom: SPACING.lg,
     justifyContent: 'center',
@@ -243,7 +243,7 @@ const styles = StyleSheet.create({
   topBackButton: {
     position: 'absolute',
     top: SPACING.xl,
-    left: SPACING.lg,
+    left: SPACING.screen_lg,
     width: 44,
     height: 44,
     alignItems: 'center',

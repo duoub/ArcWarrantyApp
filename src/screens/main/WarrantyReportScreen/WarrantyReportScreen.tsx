@@ -756,7 +756,7 @@ const styles = StyleSheet.create({
   // Form Card
   formCard: {
     backgroundColor: COLORS.white,
-    marginHorizontal: SPACING.lg,
+    marginHorizontal: SPACING.screen_lg,
     marginTop: SPACING.md,
     padding: SPACING.lg,
     borderRadius: BORDER_RADIUS.xl,

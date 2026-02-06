@@ -14,7 +14,7 @@ export const commonStyles = StyleSheet.create({
   },
   scrollContent: {
     flexGrow: 1,
-    paddingHorizontal: SPACING.lg,
+    paddingHorizontal: SPACING.screen_lg,
     paddingTop: SPACING.xxl,
     paddingBottom: SPACING.xl,
   },
@@ -73,7 +73,7 @@ export const commonStyles = StyleSheet.create({
     marginBottom: SPACING.lg,
   },
   header: {
-    paddingHorizontal: SPACING.lg,
+    paddingHorizontal: SPACING.screen_lg,
     paddingTop: SPACING.xl,
     marginBottom: SPACING.lg,
   },
@@ -387,7 +387,7 @@ export const commonStyles = StyleSheet.create({
   // Search Bar
   searchContainer: {
     backgroundColor: COLORS.white,
-    paddingHorizontal: SPACING.lg,
+    paddingHorizontal: SPACING.screen_lg,
     paddingVertical: SPACING.md,
     borderBottomWidth: 1,
     borderBottomColor: COLORS.gray200,
@@ -473,7 +473,7 @@ export const commonStyles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingVertical: SPACING.md,
-    paddingHorizontal: SPACING.md,
+    paddingHorizontal: 0,
     borderBottomWidth: 1,
     borderBottomColor: COLORS.gray200,
   },
@@ -605,7 +605,7 @@ export const commonStyles = StyleSheet.create({
     fontWeight: '700',
     color: COLORS.textPrimary,
     marginBottom: SPACING.sm,
-    marginHorizontal: SPACING.lg,
+    marginHorizontal: SPACING.screen_lg,
   },
 
   // Card with horizontal margin
@@ -613,7 +613,7 @@ export const commonStyles = StyleSheet.create({
     backgroundColor: COLORS.white,
     borderRadius: BORDER_RADIUS.lg,
     padding: SPACING.md,
-    marginHorizontal: SPACING.lg,
+    marginHorizontal: SPACING.screen_lg,
     marginBottom: SPACING.md,
     shadowColor: COLORS.black,
     shadowOffset: { width: 0, height: 4 },
@@ -626,8 +626,9 @@ export const commonStyles = StyleSheet.create({
   cardWithMarginLarge: {
     backgroundColor: COLORS.white,
     borderRadius: BORDER_RADIUS.xl,
-    padding: SPACING.lg,
-    marginHorizontal: SPACING.lg,
+    paddingVertical: SPACING.lg,
+    paddingHorizontal: SPACING.lg,
+    marginHorizontal: SPACING.screen_lg,
     marginBottom: SPACING.md,
     shadowColor: COLORS.black,
     shadowOffset: { width: 0, height: 4 },
@@ -770,7 +771,7 @@ export const commonStyles = StyleSheet.create({
   // Page Header
   pageHeader: {
     backgroundColor: COLORS.white,
-    marginHorizontal: SPACING.lg,
+    marginHorizontal: SPACING.screen_lg,
     marginTop: SPACING.md,
     padding: SPACING.md,
     borderRadius: BORDER_RADIUS.lg,

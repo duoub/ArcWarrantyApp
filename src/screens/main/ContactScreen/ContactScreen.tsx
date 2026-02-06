@@ -223,7 +223,7 @@ const styles = StyleSheet.create({
   headerImageContainer: {
     backgroundColor: COLORS.white,
     paddingVertical: SPACING.xl,
-    paddingHorizontal: SPACING.lg,
+    paddingHorizontal: SPACING.screen_lg,
     alignItems: 'center',
     ...SHADOWS.sm,
   },
@@ -237,7 +237,7 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.white,
     marginTop: SPACING.md,
     paddingVertical: SPACING.md,
-    paddingHorizontal: SPACING.lg,
+    paddingHorizontal: SPACING.screen_lg,
     ...SHADOWS.sm,
   },
   descriptionText: {
@@ -251,7 +251,7 @@ const styles = StyleSheet.create({
   // Contact Card
   contactCard: {
     backgroundColor: COLORS.white,
-    marginHorizontal: SPACING.lg,
+    marginHorizontal: SPACING.screen_lg,
     marginTop: SPACING.md,
     borderRadius: BORDER_RADIUS.lg,
     overflow: 'hidden',

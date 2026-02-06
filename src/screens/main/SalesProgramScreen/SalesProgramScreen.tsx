@@ -269,7 +269,7 @@ const styles = StyleSheet.create({
   // Page Header
   pageHeader: {
     backgroundColor: COLORS.white,
-    marginHorizontal: SPACING.lg,
+    marginHorizontal: SPACING.screen_lg,
     marginTop: SPACING.md,
     padding: SPACING.md,
     borderRadius: BORDER_RADIUS.lg,
@@ -303,7 +303,7 @@ const styles = StyleSheet.create({
   // Program Card
   programCard: {
     backgroundColor: COLORS.white,
-    marginHorizontal: SPACING.lg,
+    marginHorizontal: SPACING.screen_lg,
     marginBottom: SPACING.lg,
     borderRadius: BORDER_RADIUS.xl,
     overflow: 'hidden',

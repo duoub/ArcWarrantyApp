@@ -147,7 +147,7 @@ const styles = StyleSheet.create({
 
   // Header Section
   headerSection: {
-    paddingHorizontal: SPACING.lg,
+    paddingHorizontal: SPACING.screen_lg,
     paddingTop: SPACING.xl,
     paddingBottom: SPACING.md,
   },
@@ -169,7 +169,7 @@ const styles = StyleSheet.create({
   memberGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    paddingHorizontal: SPACING.lg,
+    paddingHorizontal: SPACING.screen_lg,
     justifyContent: 'space-between',
     marginTop: SPACING.md,
   },
@@ -214,7 +214,7 @@ const styles = StyleSheet.create({
 
   // Info Box
   infoBoxMargin: {
-    marginHorizontal: SPACING.lg,
+    marginHorizontal: SPACING.screen_lg,
     marginTop: SPACING.md,
   },
 

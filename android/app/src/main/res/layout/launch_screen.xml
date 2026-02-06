@@ -17,7 +17,7 @@
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="48dp"
-        android:text="Phát triển bởi qbis.vn © 2026 - v2.0.1"
+        android:text="Phát triển bởi qbis.vn © 2026"
         android:textColor="#666666"
         android:textSize="14sp" />
 

@@ -249,7 +249,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: SPACING.sm,
     backgroundColor: COLORS.white,
-    paddingHorizontal: SPACING.lg,
+    paddingHorizontal: SPACING.screen_lg,
     paddingVertical: SPACING.md,
     borderBottomWidth: 1,
     borderBottomColor: COLORS.gray200,
@@ -273,7 +273,7 @@ const styles = StyleSheet.create({
   },
   searchButton: {
     backgroundColor: COLORS.primary,
-    paddingHorizontal: SPACING.lg,
+    paddingHorizontal: SPACING.screen_lg,
     paddingVertical: SPACING.sm + 2,
     borderRadius: BORDER_RADIUS.md,
     height: 44,
@@ -291,7 +291,7 @@ const styles = StyleSheet.create({
   },
   errorCard: {
     backgroundColor: COLORS.white,
-    marginHorizontal: SPACING.lg,
+    marginHorizontal: SPACING.screen_lg,
     marginBottom: SPACING.md,
     borderRadius: BORDER_RADIUS.lg,
     overflow: 'hidden',

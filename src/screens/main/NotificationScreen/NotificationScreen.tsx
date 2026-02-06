@@ -172,7 +172,7 @@ const styles = StyleSheet.create({
 
   // Notification List
   notificationList: {
-    paddingHorizontal: SPACING.lg,
+    paddingHorizontal: SPACING.screen_lg,
     paddingTop: SPACING.md,
   },
   notificationCard: {

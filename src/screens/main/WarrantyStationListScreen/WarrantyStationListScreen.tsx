@@ -294,7 +294,7 @@ const styles = StyleSheet.create({
   // Filter Section
   filterSection: {
     backgroundColor: COLORS.white,
-    paddingHorizontal: SPACING.lg,
+    paddingHorizontal: SPACING.screen_lg,
     paddingVertical: SPACING.md,
     ...SHADOWS.sm,
   },
@@ -322,7 +322,7 @@ const styles = StyleSheet.create({
   // Page Header
   pageHeader: {
     backgroundColor: COLORS.white,
-    marginHorizontal: SPACING.lg,
+    marginHorizontal: SPACING.screen_lg,
     marginTop: SPACING.md,
     padding: SPACING.md,
     borderRadius: BORDER_RADIUS.lg,
@@ -344,7 +344,7 @@ const styles = StyleSheet.create({
   },
   stationCard: {
     backgroundColor: COLORS.white,
-    marginHorizontal: SPACING.lg,
+    marginHorizontal: SPACING.screen_lg,
     marginBottom: SPACING.md,
     borderRadius: BORDER_RADIUS.lg,
     overflow: 'hidden',

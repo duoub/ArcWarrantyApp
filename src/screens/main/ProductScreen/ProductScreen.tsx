@@ -272,7 +272,7 @@ const styles = StyleSheet.create({
   // Search Bar
   searchContainer: {
     backgroundColor: COLORS.white,
-    paddingHorizontal: SPACING.lg,
+    paddingHorizontal: SPACING.screen_lg,
     paddingVertical: SPACING.md,
     ...SHADOWS.sm,
   },
@@ -305,7 +305,7 @@ const styles = StyleSheet.create({
     ...SHADOWS.sm,
   },
   categoriesScrollContent: {
-    paddingHorizontal: SPACING.lg,
+    paddingHorizontal: SPACING.screen_lg,
     gap: SPACING.md,
   },
   categoryItem: {
@@ -348,7 +348,7 @@ const styles = StyleSheet.create({
   },
   sectionHeader: {
     backgroundColor: COLORS.white,
-    paddingHorizontal: SPACING.lg,
+    paddingHorizontal: SPACING.screen_lg,
     paddingVertical: SPACING.md,
     marginBottom: SPACING.sm,
     ...SHADOWS.sm,
@@ -363,7 +363,7 @@ const styles = StyleSheet.create({
   productGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    paddingHorizontal: SPACING.lg,
+    paddingHorizontal: SPACING.screen_lg,
     gap: SPACING.md,
   },
 

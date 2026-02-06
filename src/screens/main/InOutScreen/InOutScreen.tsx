@@ -484,7 +484,7 @@ const styles = StyleSheet.create({
   // Tab Switcher
   tabContainer: {
     flexDirection: 'row',
-    marginHorizontal: SPACING.lg,
+    marginHorizontal: SPACING.screen_lg,
     marginTop: SPACING.md,
     backgroundColor: COLORS.white,
     borderRadius: BORDER_RADIUS.lg,
@@ -521,7 +521,7 @@ const styles = StyleSheet.create({
   // Customer Card
   customerCard: {
     backgroundColor: COLORS.white,
-    marginHorizontal: SPACING.lg,
+    marginHorizontal: SPACING.screen_lg,
     marginTop: SPACING.md,
     padding: SPACING.md,
     borderRadius: BORDER_RADIUS.lg,
@@ -652,7 +652,7 @@ const styles = StyleSheet.create({
   // Scan Card
   scanCard: {
     backgroundColor: COLORS.white,
-    marginHorizontal: SPACING.lg,
+    marginHorizontal: SPACING.screen_lg,
     marginTop: SPACING.md,
     padding: SPACING.md,
     borderRadius: BORDER_RADIUS.xl,

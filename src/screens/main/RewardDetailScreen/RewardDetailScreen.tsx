@@ -295,7 +295,7 @@ const styles = StyleSheet.create({
   // Total Count Card
   totalCountCard: {
     backgroundColor: COLORS.white,
-    marginHorizontal: SPACING.lg,
+    marginHorizontal: SPACING.screen_lg,
     marginTop: SPACING.md,
     marginBottom: SPACING.sm,
     padding: SPACING.md,
@@ -319,7 +319,7 @@ const styles = StyleSheet.create({
   },
   transactionCard: {
     backgroundColor: COLORS.white,
-    marginHorizontal: SPACING.lg,
+    marginHorizontal: SPACING.screen_lg,
     marginBottom: SPACING.md,
     borderRadius: BORDER_RADIUS.lg,
     overflow: 'hidden',

@@ -883,7 +883,7 @@ const styles = StyleSheet.create({
   // Registration Card
   registrationCard: {
     backgroundColor: COLORS.white,
-    marginHorizontal: SPACING.lg,
+    marginHorizontal: SPACING.screen_lg,
     marginTop: SPACING.md,
     marginBottom: SPACING.xl,
     padding: SPACING.lg,

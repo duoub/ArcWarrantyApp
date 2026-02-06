@@ -193,7 +193,8 @@ const styles = StyleSheet.create({
   },
   sectionCard: {
     backgroundColor: COLORS.white,
-    marginHorizontal: SPACING.lg,
+    marginHorizontal: SPACING.screen_lg,
+    paddingHorizontal: SPACING.lg,
     borderRadius: BORDER_RADIUS.lg,
     overflow: 'hidden',
     ...SHADOWS.md,

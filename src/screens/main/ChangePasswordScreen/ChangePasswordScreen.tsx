@@ -296,7 +296,8 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   scrollContent: {
-    padding: SPACING.lg,
+    paddingHorizontal: SPACING.screen_lg,
+    paddingVertical: SPACING.lg,
   },
   backIcon: {
     fontSize: 28,

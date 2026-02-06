@@ -221,7 +221,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   listContent: {
-    paddingHorizontal: SPACING.lg,
+    paddingHorizontal: SPACING.screen_lg,
     paddingTop: SPACING.lg,
     paddingBottom: SPACING.xxl,
     gap: SPACING.lg,

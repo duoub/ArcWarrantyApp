@@ -62,6 +62,7 @@ export const SPACING = {
   sm: 8,
   md: 16,
   lg: 24,
+  screen_lg: 19, // Screen horizontal padding (wider content area)
   xl: 32,
   xxl: 48,
 };

@@ -275,7 +275,7 @@ const styles = StyleSheet.create({
   // Filter Section
   filterSection: {
     backgroundColor: COLORS.white,
-    paddingHorizontal: SPACING.lg,
+    paddingHorizontal: SPACING.screen_lg,
     paddingVertical: SPACING.md,
     ...SHADOWS.sm,
   },
@@ -309,7 +309,7 @@ const styles = StyleSheet.create({
   },
   distributorCard: {
     backgroundColor: COLORS.white,
-    marginHorizontal: SPACING.lg,
+    marginHorizontal: SPACING.screen_lg,
     marginBottom: SPACING.md,
     borderRadius: BORDER_RADIUS.lg,
     overflow: 'hidden',

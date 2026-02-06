@@ -226,7 +226,7 @@ const styles = StyleSheet.create({
     borderColor: `${COLORS.accent}60`,
   },
   header: {
-    paddingHorizontal: SPACING.lg,
+    paddingHorizontal: SPACING.screen_lg,
     paddingTop: SPACING.xl,
     marginBottom: SPACING.lg,
   },
@@ -249,7 +249,7 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
-    paddingHorizontal: SPACING.xl,
+    paddingHorizontal: SPACING.screen_lg,
     alignItems: 'center',
   },
   iconContainer: {

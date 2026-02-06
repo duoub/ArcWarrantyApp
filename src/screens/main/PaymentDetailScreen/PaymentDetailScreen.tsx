@@ -225,7 +225,7 @@ const styles = StyleSheet.create({
   },
   paymentCard: {
     backgroundColor: COLORS.white,
-    marginHorizontal: SPACING.lg,
+    marginHorizontal: SPACING.screen_lg,
     marginBottom: SPACING.md,
     borderRadius: BORDER_RADIUS.lg,
     overflow: 'hidden',

@@ -495,7 +495,7 @@ const styles = StyleSheet.create({
     paddingBottom: SPACING.xl,
   },
   resultCountCard: {
-    marginHorizontal: SPACING.lg,
+    marginHorizontal: SPACING.screen_lg,
     marginTop: SPACING.md,
   },
   resultCountText: {
@@ -531,7 +531,7 @@ const styles = StyleSheet.create({
     borderBottomColor: COLORS.gray200,
   },
   infoBoxMargin: {
-    marginHorizontal: SPACING.lg,
+    marginHorizontal: SPACING.screen_lg,
     marginTop: SPACING.md,
   },
 });

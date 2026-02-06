@@ -291,7 +291,7 @@ const HomeScreen = () => {
         {isAuthenticated && (
           <View style={styles.rewardSection}>
             <View style={styles.rewardHeader}>
-              <Text style={styles.rewardTitle}>Tiền thưởng</Text>
+              {/* <Text style={styles.rewardTitle}>Tiền thưởng</Text> */}
               {/* <TouchableOpacity
                 style={styles.rankingButton}
                 onPress={handleRankingPress}
@@ -406,7 +406,7 @@ const styles = StyleSheet.create({
   // User Profile Card
   userCard: {
     backgroundColor: COLORS.white,
-    marginHorizontal: SPACING.lg,
+    marginHorizontal: SPACING.screen_lg,
     marginBottom: SPACING.md,
     padding: SPACING.md,
     borderRadius: BORDER_RADIUS.lg,
@@ -452,7 +452,7 @@ const styles = StyleSheet.create({
   // Action Card
   actionCard: {
     backgroundColor: COLORS.white,
-    marginHorizontal: SPACING.lg,
+    marginHorizontal: SPACING.screen_lg,
     marginBottom: SPACING.md,
     padding: SPACING.md,
     borderRadius: BORDER_RADIUS.lg,
@@ -483,7 +483,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginHorizontal: SPACING.lg,
+    marginHorizontal: SPACING.screen_lg,
     marginBottom: SPACING.sm,
   },
   rankingButton: {
@@ -508,7 +508,7 @@ const styles = StyleSheet.create({
     color: COLORS.textPrimary,
   },
   tableCardWrapper: {
-    marginHorizontal: SPACING.lg,
+    marginHorizontal: SPACING.screen_lg,
     ...SHADOWS.md,
   },
   tableColLeft: {

@@ -16,7 +16,7 @@ import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import Clipboard from '@react-native-clipboard/clipboard';
 import ImagePicker from 'react-native-image-crop-picker';
-import { COLORS, SPACING, BORDER_RADIUS } from '../../../config/theme';
+import { COLORS, SPACING, BORDER_RADIUS, SHADOWS } from '../../../config/theme';
 import { commonStyles } from '../../../styles/commonStyles';
 import CustomHeader from '../../../components/CustomHeader';
 import Avatar from '../../../components/Avatar';
@@ -235,6 +235,7 @@ const ProfileScreen = () => {
 
       <ScrollView
         style={styles.scrollView}
+        contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
         {/* User Profile Card */}
@@ -378,7 +379,7 @@ const ProfileScreen = () => {
 
         {/* Settings Section */}
         <View style={styles.section}>
-          <View style={commonStyles.cardWithMarginLarge}>
+          <View style={styles.sectionCard}>
             {/* Change Password */}
             <TouchableOpacity
               style={commonStyles.menuItem}
@@ -402,12 +403,14 @@ const ProfileScreen = () => {
                 </View>
                 <Text style={commonStyles.menuItemLabel}>Thông báo</Text>
               </View>
-              <Switch
-                value={notificationsEnabled}
-                onValueChange={handleToggleNotification}
-                trackColor={{ false: COLORS.gray300, true: COLORS.primary }}
-                thumbColor={COLORS.white}
-              />
+              <View style={styles.switchContainer}>
+                <Switch
+                  value={notificationsEnabled}
+                  onValueChange={handleToggleNotification}
+                  trackColor={{ false: COLORS.gray300, true: COLORS.primary }}
+                  thumbColor={COLORS.white}
+                />
+              </View>
             </View>
           </View>
         </View>
@@ -423,10 +426,7 @@ const ProfileScreen = () => {
         </TouchableOpacity>
 
         {/* App Version */}
-        <Text style={styles.versionText}>Version 1.0.0</Text>
-
-        {/* Bottom Spacing */}
-        <View style={commonStyles.bottomSpacing} />
+        <Text style={styles.versionText}>Version 2.0.2</Text>
       </ScrollView>
     </View>
   );
@@ -439,6 +439,10 @@ const styles = StyleSheet.create({
   },
   scrollView: {
     flex: 1,
+  },
+  scrollContent: {
+    paddingTop: SPACING.lg,
+    paddingBottom: SPACING.xl,
   },
   avatarWrapper: {
     position: 'relative',
@@ -533,9 +537,17 @@ const styles = StyleSheet.create({
   section: {
     marginTop: SPACING.md,
   },
+  sectionCard: {
+    backgroundColor: COLORS.white,
+    marginHorizontal: SPACING.screen_lg,
+    paddingHorizontal: SPACING.lg,
+    borderRadius: BORDER_RADIUS.xl,
+    overflow: 'hidden',
+    ...SHADOWS.md,
+  },
   sectionHeader: {
     backgroundColor: COLORS.white,
-    marginHorizontal: SPACING.lg,
+    marginHorizontal: SPACING.screen_lg,
     padding: SPACING.md,
     borderRadius: BORDER_RADIUS.lg,
     flexDirection: 'row',
@@ -561,10 +573,14 @@ const styles = StyleSheet.create({
     color: COLORS.gray400,
     fontWeight: '600',
   },
+  switchContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   logoutButton: {
     backgroundColor: COLORS.white,
-    marginHorizontal: SPACING.lg,
-    marginTop: SPACING.lg,
+    marginHorizontal: SPACING.screen_lg,
+    marginTop: SPACING.xl,
     paddingVertical: SPACING.md,
     borderRadius: BORDER_RADIUS.lg,
     flexDirection: 'row',

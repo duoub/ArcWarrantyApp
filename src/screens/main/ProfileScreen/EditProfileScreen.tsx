@@ -438,7 +438,7 @@ const styles = StyleSheet.create({
   // Form Container
   formContainer: {
     backgroundColor: COLORS.white,
-    marginHorizontal: SPACING.lg,
+    marginHorizontal: SPACING.screen_lg,
     marginTop: SPACING.md,
     padding: SPACING.lg,
     borderRadius: BORDER_RADIUS.xl,
@@ -493,7 +493,7 @@ const styles = StyleSheet.create({
   // Update Button
   updateButton: {
     backgroundColor: COLORS.primary,
-    marginHorizontal: SPACING.lg,
+    marginHorizontal: SPACING.screen_lg,
     marginTop: SPACING.lg,
     paddingVertical: 0,
     alignItems: 'center',

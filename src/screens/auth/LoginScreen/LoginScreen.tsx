@@ -333,7 +333,7 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
-    paddingHorizontal: SPACING.lg,
+    paddingHorizontal: SPACING.screen_lg,
     paddingBottom: SPACING.lg,
     justifyContent: 'center',
   },
