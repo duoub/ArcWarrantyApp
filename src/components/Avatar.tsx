@@ -88,7 +88,7 @@ const styles = StyleSheet.create({
   defaultContainer: {
     backgroundColor: COLORS.white,
     borderWidth: 2,
-    borderColor: COLORS.error,
+    borderColor: COLORS.primaryLight,
     alignItems: 'center',
     justifyContent: 'center',
     overflow: 'hidden',

@@ -83,7 +83,7 @@ const iconMap: Record<IconName, IconConfig> = {
   'logout': { provider: 'MaterialCommunityIcons', name: 'logout' },
 
   // Menu Icons - Thiết bị gia dụng
-  'product-info': { provider: 'MaterialCommunityIcons', name: 'air-conditioner' },
+  'product-info': { provider: 'MaterialCommunityIcons', name: 'television' },
   'sales-policy': { provider: 'MaterialCommunityIcons', name: 'file-document' },
   'distribution': { provider: 'MaterialCommunityIcons', name: 'truck' },
   'dealer': { provider: 'MaterialCommunityIcons', name: 'store-marker' },

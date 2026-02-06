@@ -8,7 +8,6 @@ import {
   StatusBar,
   ActivityIndicator,
   Alert,
-  Platform,
 } from 'react-native';
 import {
   Camera,
@@ -16,7 +15,7 @@ import {
   useCodeScanner,
 } from 'react-native-vision-camera';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { COLORS, SPACING, BORDER_RADIUS, SHADOWS } from '../../config/theme';
+import { COLORS, SPACING, BORDER_RADIUS } from '../../config/theme';
 
 interface BarcodeScannerProps {
   visible: boolean;
@@ -91,7 +90,6 @@ const BarcodeScanner: React.FC<BarcodeScannerProps> = ({
         const scannedValue = codes[0].value;
         setIsActive(false);
         onScan(scannedValue);
-        onClose();
       }
     },
   });
@@ -247,7 +245,11 @@ const styles = StyleSheet.create({
 
   // Overlay
   overlay: {
-    ...StyleSheet.absoluteFillObject,
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    top: 0,
+    bottom: 0,
     justifyContent: 'center',
     alignItems: 'center',
   },

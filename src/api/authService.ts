@@ -19,12 +19,9 @@ import {
   CustomerSignupRequest,
   CustomerSignupResponse,
   CustomerLoginRequest,
-  CustomerLoginResponse,
-  User,
   UserProfileRaw,
 } from '../types/auth';
 import { buildApiUrl, buildStoreApiUrl } from '../utils/apiHelper';
-import { SimultaneousGesture } from 'react-native-gesture-handler/lib/typescript/handlers/gestures/gestureComposition';
 
 export const authService = {
   /**
