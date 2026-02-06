@@ -16,7 +16,6 @@ import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { COLORS, SPACING, BORDER_RADIUS, SHADOWS } from '../../../config/theme';
 import { useAuthStore } from '../../../store/authStore';
-import CustomHeader from '../../../components/CustomHeader';
 import Avatar from '../../../components/Avatar';
 import { HomeStackParamList } from '../../../navigation/MainNavigator';
 import { profileService } from '../../../api/profileService';
@@ -193,11 +192,12 @@ const HomeScreen = () => {
     <View style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor={COLORS.primary} />
 
-      {/* Custom Header */}
-      <CustomHeader title="Trang chủ" />
-
-      <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
-        {/* Banner Slider - Only show when there are banners */}
+      <ScrollView
+        style={styles.scrollView}
+        showsVerticalScrollIndicator={false}
+        contentInsetAdjustmentBehavior="never"
+      >
+        {/* Banner Slider - Only show when there are banners, tràn cả safe area */}
         {banners.length > 0 && (
           <View style={styles.bannerContainer}>
             <FlatList

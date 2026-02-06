@@ -18,7 +18,6 @@ import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { COLORS, SPACING, BORDER_RADIUS } from '../../../config/theme';
 import { PreLoginRootStackParamList } from '../../../navigation/PreLoginRootNavigator';
 import { loginSchema, LoginFormData } from '../../../utils/validation';
@@ -41,7 +40,6 @@ type LoginScreenNavigationProp = StackNavigationProp<PreLoginRootStackParamList,
 const LoginScreen = () => {
   const navigation = useNavigation<LoginScreenNavigationProp>();
   const { login } = useAuthStore();
-  const insets = useSafeAreaInsets();
 
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -138,14 +136,15 @@ const LoginScreen = () => {
       <StatusBar barStyle="light-content" backgroundColor={COLORS.primary} />
       <KeyboardAwareScrollView
         style={styles.scrollView}
-        contentContainerStyle={[styles.scrollContent, { paddingTop: insets.top }]}
+        contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
         enableOnAndroid={true}
         extraScrollHeight={Platform.OS === 'ios' ? 20 : 100}
         extraHeight={120}
+        contentInsetAdjustmentBehavior="never"
       >
-        {/* Banner Slider - full width, outside padded content */}
+        {/* Banner Slider - full width, tràn cả safe area */}
         {banners.length > 0 && (
           <View style={styles.bannerContainer}>
             <FlatList
@@ -182,7 +181,7 @@ const LoginScreen = () => {
           </View>
         )}
 
-        <View style={styles.content}>
+        <View style={[styles.content, { paddingTop: SPACING.sm }]}>
           {/* Login Card */}
           <View style={styles.loginCard}>
             {/* Customer Account Checkbox */}
@@ -335,7 +334,6 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
     paddingHorizontal: SPACING.lg,
-    paddingTop: SPACING.sm,
     paddingBottom: SPACING.lg,
     justifyContent: 'center',
   },
