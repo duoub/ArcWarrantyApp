@@ -258,6 +258,16 @@ const MainNavigator = () => {
         }}
         listeners={({ navigation }) => ({
           tabPress: (e) => {
+            const state = navigation.getState();
+            const currentRoute = state.routes[state.index];
+
+            // Nếu đang ở InOutStack thì không làm gì cả (giữ nguyên data form)
+            if (currentRoute.name === 'InOutStack') {
+              e.preventDefault();
+              return;
+            }
+
+            // Nếu đang ở tab khác thì reset về InOutStack
             e.preventDefault();
             navigation.dispatch(
               CommonActions.reset({

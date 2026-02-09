@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import {
   View,
   Text,
@@ -33,13 +33,16 @@ const BarcodeScanner: React.FC<BarcodeScannerProps> = ({
   const [hasPermission, setHasPermission] = useState(false);
   const [isActive, setIsActive] = useState(false);
   const [flashEnabled, setFlashEnabled] = useState(false);
+  const hasScannedRef = useRef(false);
   const device = useCameraDevice('back');
 
   useEffect(() => {
     if (visible) {
+      hasScannedRef.current = false;
       checkCameraPermission();
     } else {
       setIsActive(false);
+      hasScannedRef.current = false;
     }
   }, [visible]);
 
@@ -83,10 +86,11 @@ const BarcodeScanner: React.FC<BarcodeScannerProps> = ({
       'data-matrix',
     ],
     onCodeScanned: (codes) => {
-      if (codes.length > 0 && codes[0].value) {
+      if (codes.length > 0 && codes[0].value && !hasScannedRef.current) {
         // Vibrate on scan (optional)
         // Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
 
+        hasScannedRef.current = true;
         const scannedValue = codes[0].value;
         setIsActive(false);
         onScan(scannedValue);
@@ -96,6 +100,7 @@ const BarcodeScanner: React.FC<BarcodeScannerProps> = ({
 
   const handleClose = () => {
     setIsActive(false);
+    hasScannedRef.current = false;
     onClose();
   };
 
