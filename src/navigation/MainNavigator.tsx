@@ -15,6 +15,7 @@ import ProfileScreen from '../screens/main/ProfileScreen/ProfileScreen';
 import EditProfileScreen from '../screens/main/ProfileScreen/EditProfileScreen';
 import ChangePasswordScreen from '../screens/main/ChangePasswordScreen/ChangePasswordScreen';
 import SalesProgramScreen from '../screens/main/SalesProgramScreen/SalesProgramScreen';
+import SalesProgramDetailScreen from '../screens/main/SalesProgramDetailScreen/SalesProgramDetailScreen';
 import InventoryScreen from '../screens/main/InventoryScreen/InventoryScreen';
 import DealerListScreen from '../screens/main/DealerListScreen/DealerListScreen';
 import DealerSignupScreen from '../screens/auth/SignupScreen/DealerSignupScreen';
@@ -49,6 +50,10 @@ export type MainTabParamList = {
 export type HomeStackParamList = {
   Home: undefined;
   SalesProgram: undefined;
+  SalesProgramDetail: {
+    programName: string;
+    htmlContent: string;
+  };
   Inventory: undefined;
   PaymentDetail: undefined;
   RewardDetail: undefined;
@@ -122,6 +127,7 @@ const HomeStackNavigator = () => {
     <HomeStack.Navigator screenOptions={{ headerShown: false }}>
       <HomeStack.Screen name="Home" component={HomeScreen} />
       <HomeStack.Screen name="SalesProgram" component={SalesProgramScreen} />
+      <HomeStack.Screen name="SalesProgramDetail" component={SalesProgramDetailScreen} />
       <HomeStack.Screen name="Inventory" component={InventoryScreen} />
       <HomeStack.Screen name="PaymentDetail" component={PaymentDetailScreen} />
       <HomeStack.Screen name="RewardDetail" component={RewardDetailScreen} />

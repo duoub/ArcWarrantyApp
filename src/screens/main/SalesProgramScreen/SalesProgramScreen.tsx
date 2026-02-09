@@ -10,14 +10,18 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import type { StackNavigationProp } from '@react-navigation/stack';
+import { HomeStackParamList } from '../../../navigation/MainNavigator';
 import { COLORS, SPACING, BORDER_RADIUS, SHADOWS } from '../../../config/theme';
 import CustomHeader from '../../../components/CustomHeader';
 import { useAuthStore } from '../../../store/authStore';
 import { salesProgramService } from '../../../api/salesProgramService';
 import { SalesProgramItem } from '../../../types/salesProgram';
 
+type SalesProgramNavigationProp = StackNavigationProp<HomeStackParamList, 'SalesProgram'>;
+
 const SalesProgramScreen = () => {
-  const navigation = useNavigation();
+  const navigation = useNavigation<SalesProgramNavigationProp>();
   const { isAuthenticated } = useAuthStore();
   const [programs, setPrograms] = useState<SalesProgramItem[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -107,9 +111,11 @@ const SalesProgramScreen = () => {
     );
   };
 
-  const handleViewDetail = (id: string) => {
-    Alert.alert('Xem chi tiết', `Chi tiết gói chương trình ID: ${id}`);
-    // TODO: Navigate to detail screen or show modal
+  const handleViewDetail = (program: SalesProgramItem) => {
+    navigation.navigate('SalesProgramDetail', {
+      programName: program.name,
+      htmlContent: program.noidungchitiet,
+    });
   };
 
   const renderProgram = (item: SalesProgramItem) => (
@@ -189,7 +195,7 @@ const SalesProgramScreen = () => {
               )}
               <TouchableOpacity
                 style={[styles.button, styles.buttonSecondary]}
-                onPress={() => handleViewDetail(item.id)}
+                onPress={() => handleViewDetail(item)}
                 activeOpacity={0.8}
               >
                 <Text style={styles.buttonTextSecondary}>XEM CHI TIẾT</Text>
@@ -198,7 +204,7 @@ const SalesProgramScreen = () => {
           ) : (
             <TouchableOpacity
               style={[styles.button, styles.buttonPrimary, styles.buttonFull]}
-              onPress={() => handleViewDetail(item.id)}
+              onPress={() => handleViewDetail(item)}
               activeOpacity={0.8}
             >
               <Text style={styles.buttonTextPrimary}>XEM CHI TIẾT</Text>

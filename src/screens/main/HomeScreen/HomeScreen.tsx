@@ -22,6 +22,7 @@ import { profileService } from '../../../api/profileService';
 import { ProfileData } from '../../../types/profile';
 import { bannerService } from '../../../api/bannerService';
 import { BannerItem } from '../../../types/banner';
+import { salesProgramService } from '../../../api/salesProgramService';
 import { Icon } from '../../../components/common';
 import { NotificationService } from '../../../utils/notificationService';
 import { commonStyles } from '../../../styles/commonStyles';
@@ -44,6 +45,7 @@ const HomeScreen = () => {
   const [profileData, setProfileData] = useState<ProfileData | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [banners, setBanners] = useState<BannerItem[]>([]);
+  const [isBannerLoading, setIsBannerLoading] = useState(false);
 
   // Initialize Firebase Cloud Messaging
   useEffect(() => {
@@ -144,8 +146,36 @@ const HomeScreen = () => {
     return () => clearInterval(interval);
   }, [banners.length]);
 
-  const handleBannerPress = (banner: BannerItem) => {
-    Alert.alert('Banner', `${banner.id} - ${banner.title}`);
+  const handleBannerPress = async (banner: BannerItem) => {
+    // Prevent multiple clicks
+    if (isBannerLoading) return;
+
+    try {
+      setIsBannerLoading(true);
+
+      // Call API to get program detail
+      const response = await salesProgramService.getSalesProgramDetail({
+        typeget: 1,
+        idct: banner.id.toString(),
+      });
+
+      if (response.status && response.data) {
+        // Navigate to detail screen with HTML content
+        navigation.navigate('SalesProgramDetail', {
+          programName: response.data.name || banner.title,
+          htmlContent: response.data.noidungchitiet,
+        });
+      } else {
+        Alert.alert('Thông báo', response.message || 'Không tìm thấy thông tin chương trình');
+      }
+    } catch (error) {
+      Alert.alert(
+        'Lỗi',
+        error instanceof Error ? error.message : 'Không thể tải thông tin chương trình'
+      );
+    } finally {
+      setIsBannerLoading(false);
+    }
   };
 
   const handleSalesProgramPress = () => {
@@ -178,6 +208,7 @@ const HomeScreen = () => {
       activeOpacity={0.9}
       onPress={() => handleBannerPress(item)}
       style={styles.bannerItem}
+      disabled={isBannerLoading}
     >
       <Image
         source={{ uri: item.bannerurl }}
@@ -185,6 +216,11 @@ const HomeScreen = () => {
         resizeMode="cover"
         defaultSource={DEFAULT_BANNER_IMAGE}
       />
+      {isBannerLoading && (
+        <View style={styles.bannerLoadingOverlay}>
+          <ActivityIndicator size="large" color={COLORS.white} />
+        </View>
+      )}
     </TouchableOpacity>
   );
 
@@ -401,6 +437,16 @@ const styles = StyleSheet.create({
   bannerImage: {
     width: '100%',
     height: '100%',
+  },
+  bannerLoadingOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 
   // User Profile Card

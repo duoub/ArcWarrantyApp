@@ -12,6 +12,7 @@ import {
   Dimensions,
   FlatList,
   StatusBar,
+  Linking,
 } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { useNavigation } from '@react-navigation/native';
@@ -49,6 +50,7 @@ const LoginScreen = () => {
   const [banners, setBanners] = useState<BannerItem[]>([]);
   const [currentBannerIndex, setCurrentBannerIndex] = useState(0);
   const bannerListRef = useRef<FlatList>(null);
+  const [isBannerLoading, setIsBannerLoading] = useState(false);
 
   // Load banners on mount (no userid for pre-login)
   useEffect(() => {
@@ -80,15 +82,57 @@ const LoginScreen = () => {
     return () => clearInterval(interval);
   }, [banners.length]);
 
+  const handleBannerPress = async (banner: BannerItem) => {
+    // Prevent multiple clicks
+    if (isBannerLoading) return;
+
+    // --- IGNORE ---
+    // Check if banner has a valid link
+    if (!banner.link || banner.link.trim() === '') {
+      banner.link = 'https://arcjk.vn';
+      // Alert.alert('Thông báo', 'Banner không có liên kết');
+      // return;
+    }
+
+    try {
+      setIsBannerLoading(true);
+
+      // Check if link can be opened
+      const canOpen = await Linking.canOpenURL(banner.link);
+      if (canOpen) {
+        await Linking.openURL(banner.link);
+      } else {
+        Alert.alert('Lỗi', 'Không thể mở liên kết này');
+      }
+    } catch (error) {
+      Alert.alert(
+        'Lỗi',
+        error instanceof Error ? error.message : 'Không thể mở liên kết'
+      );
+    } finally {
+      setIsBannerLoading(false);
+    }
+  };
+
   const renderBanner = ({ item }: { item: BannerItem }) => (
-    <View style={styles.bannerItem}>
+    <TouchableOpacity
+      activeOpacity={0.9}
+      onPress={() => handleBannerPress(item)}
+      style={styles.bannerItem}
+      disabled={isBannerLoading}
+    >
       <Image
         source={{ uri: item.bannerurl }}
         style={styles.bannerImage}
         resizeMode="cover"
         defaultSource={DEFAULT_BANNER_IMAGE}
       />
-    </View>
+      {isBannerLoading && (
+        <View style={styles.bannerLoadingOverlay}>
+          <ActivityIndicator size="large" color={COLORS.white} />
+        </View>
+      )}
+    </TouchableOpacity>
   );
 
   const {
@@ -349,6 +393,16 @@ const styles = StyleSheet.create({
   bannerImage: {
     width: '100%',
     height: '100%',
+  },
+  bannerLoadingOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 
   // Login Card

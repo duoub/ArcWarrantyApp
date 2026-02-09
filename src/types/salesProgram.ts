@@ -59,6 +59,7 @@ export interface SalesProgramItem {
   tyledat: number;
   thamgia: 0 | 1;
   quyendangky: 0 | 1;
+  noidungchitiet: string; // HTML content for detail view
 }
 
 // API Request/Response types
@@ -78,5 +79,16 @@ export interface RegisterProgramRequest {
 
 export interface RegisterProgramResponse {
   status: boolean;
+  message?: string;
+}
+
+export interface GetSalesProgramDetailRequest {
+  typeget: number; // Type parameter (1 for sales program detail)
+  idct: string; // Program ID from banner
+}
+
+export interface GetSalesProgramDetailResponse {
+  status: boolean;
+  data: SalesProgramItem | null;
   message?: string;
 }

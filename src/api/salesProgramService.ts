@@ -7,6 +7,8 @@ import { buildApiUrl, getUserCredentials } from '../utils/apiHelper';
 import {
   GetSalesProgramRequest,
   GetSalesProgramResponse,
+  GetSalesProgramDetailRequest,
+  GetSalesProgramDetailResponse,
   RegisterProgramRequest,
   RegisterProgramResponse,
   SalesProgramDataRaw,
@@ -30,6 +32,7 @@ const parseSalesProgramItem = (raw: SalesProgramItemRaw): SalesProgramItem => {
     tyledat: typeof raw.tyledat === 'string' ? parseFloat(raw.tyledat) || 0 : raw.tyledat || 0,
     thamgia: raw.thamgia || 0,
     quyendangky: raw.quyendangky || 0,
+    noidungchitiet: raw.noidungchitiet || '',
   };
 };
 
@@ -71,6 +74,58 @@ export const salesProgramService = {
         };
       } else {
         throw new Error('Không thể tải danh sách chương trình bán hàng');
+      }
+    } catch (error) {
+      if (error instanceof Error) {
+        throw error;
+      }
+      throw new Error('Đã có lỗi xảy ra. Vui lòng thử lại.');
+    }
+  },
+
+  /**
+   * Get sales program detail by ID (for banner click)
+   * API: /getprofile?userid=xxx&storeid=xxx&typeget=1&idct=xxx
+   */
+  getSalesProgramDetail: async (
+    params: GetSalesProgramDetailRequest
+  ): Promise<GetSalesProgramDetailResponse> => {
+    try {
+      const credentials = getUserCredentials();
+      const { typeget, idct } = params;
+
+      // Build API URL with query params
+      const url = buildApiUrl('/getprofile', {
+        userid: credentials.username,
+        storeid: API_CONFIG.STORE_ID,
+        typeget: typeget,
+        idct: idct,
+      });
+
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      const result: SalesProgramDataRaw = await response.json();
+
+      // Check if we got valid data with program list
+      if (result && Array.isArray(result.listchuongtrinhsale) && result.listchuongtrinhsale.length > 0) {
+        // Get the first program (should be the one matching idct)
+        const program = parseSalesProgramItem(result.listchuongtrinhsale[0]);
+
+        return {
+          status: true,
+          data: program,
+        };
+      } else {
+        return {
+          status: false,
+          data: null,
+          message: 'Không tìm thấy thông tin chương trình',
+        };
       }
     } catch (error) {
       if (error instanceof Error) {
