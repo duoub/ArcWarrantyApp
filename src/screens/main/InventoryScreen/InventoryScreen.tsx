@@ -12,20 +12,18 @@ import {
   Image,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { StackNavigationProp } from '@react-navigation/stack';
 import { COLORS, SPACING, BORDER_RADIUS, SHADOWS } from '../../../config/theme';
 import CustomHeader from '../../../components/CustomHeader';
 import BarcodeScanner from '../../../components/BarcodeScanner/BarcodeScanner';
-import { HomeStackParamList } from '../../../navigation/MainNavigator';
 import { inventoryService } from '../../../api/inventoryService';
 import { InventoryItem } from '../../../types/inventory';
 import { Icon } from '../../../components/common';
 import { commonStyles } from '../../../styles/commonStyles';
-
-type InventoryScreenNavigationProp = StackNavigationProp<HomeStackParamList, 'Inventory'>;
+import { useAuthStore } from '../../../store/authStore';
 
 const InventoryScreen = () => {
-  const navigation = useNavigation<InventoryScreenNavigationProp>();
+  const navigation = useNavigation<any>();
+  const { user } = useAuthStore();
 
   const [activeTab, setActiveTab] = useState<'1' | '2'>('1'); // 1: Còn trong kho, 2: Đã bán
   const [keyword, setKeyword] = useState('');
@@ -104,7 +102,19 @@ const InventoryScreen = () => {
   };
 
   const handleAddInventory = () => {
-    Alert.alert('Xuất kho serial', 'Chức năng đang phát triển');
+    const role = user?.role?.toLowerCase();
+
+    // Check if user is "Thợ"
+    if (role === 'thợ') {
+      Alert.alert('Không có quyền', 'Thợ không được phép truy cập chức năng IN/OUT');
+      return;
+    }
+
+    // Navigate to InOut tab
+    const parent = navigation.getParent();
+    if (parent) {
+      parent.navigate('InOutStack');
+    }
   };
 
   const handleBackPress = () => {
@@ -308,14 +318,16 @@ const InventoryScreen = () => {
         />
       )}
 
-      {/* Floating Action Button */}
-      <TouchableOpacity
-        style={commonStyles.fab}
-        onPress={handleAddInventory}
-        activeOpacity={0.8}
-      >
-        <Text style={commonStyles.fabIcon}>+</Text>
-      </TouchableOpacity>
+      {/* Floating Action Button - Hide for "Thợ" role */}
+      {user?.role?.toLowerCase() !== 'thợ' && (
+        <TouchableOpacity
+          style={commonStyles.fab}
+          onPress={handleAddInventory}
+          activeOpacity={0.8}
+        >
+          <Text style={commonStyles.fabIcon}>+</Text>
+        </TouchableOpacity>
+      )}
 
       {/* Barcode Scanner Modal */}
       <BarcodeScanner

@@ -45,7 +45,16 @@ const InOutScreen = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [showScanner, setShowScanner] = useState(false);
   const { user } = useAuthStore();
-  const [activeTab, setActiveTab] = useState<TabMode>('sell-in');
+
+  // Determine initial tab based on user role
+  const getInitialTab = (): TabMode => {
+    const role = user?.role?.toLowerCase();
+    if (role === 'nhà phân phối') return 'sell-out';
+    if (role === 'đại lý') return 'sell-in';
+    return 'sell-in'; // Default fallback
+  };
+
+  const [activeTab, setActiveTab] = useState<TabMode>(getInitialTab());
   const [selectedDealer, setSelectedDealer] = useState<{
     id: number;
     name: string;
@@ -101,6 +110,19 @@ const InOutScreen = () => {
   };
 
   const handleTabChange = (tab: TabMode) => {
+    // Check if user has permission to access this tab
+    const role = user?.role?.toLowerCase();
+
+    if (tab === 'sell-out' && role === 'đại lý') {
+      Alert.alert('Chức năng không khả dụng', '');
+      return;
+    }
+
+    if (tab === 'sell-in' && role === 'nhà phân phối') {
+      Alert.alert('Chức năng không khả dụng', '');
+      return;
+    }
+
     setActiveTab(tab);
     if (tab === 'sell-in') {
       setSelectedDealer(null);
@@ -220,7 +242,8 @@ const InOutScreen = () => {
         extraScrollHeight={Platform.OS === 'ios' ? 20 : 100}
         extraHeight={120}
       >
-          {/* Tab Switcher */}
+        {/* Tab Switcher - Only show if user is not "Thợ" */}
+        {user?.role?.toLowerCase() !== 'thợ' && (
           <View style={styles.tabContainer}>
             <TouchableOpacity
               style={[
@@ -265,197 +288,198 @@ const InOutScreen = () => {
               </Text>
             </TouchableOpacity>
           </View>
+        )}
 
-          {/* Customer Info Card */}
-          <View style={[
-            styles.customerCard,
-            isSellOutMode && styles.customerCardSellOut,
-          ]}>
-            {/* Sell In Mode - Show logged in user */}
-            {!isSellOutMode && (
-              <View style={styles.customerContent}>
-                <Avatar
-                  key={avatarKey}
-                  uri={user?.avatar}
-                  size={50}
-                  style={styles.avatarContainer}
-                />
-                <View style={styles.customerInfo}>
-                  <Text style={styles.customerLabel}>Nhập kho cho</Text>
-                  <Text style={styles.customerName}>
-                    {user ? user.name : 'Chưa đăng nhập'}
-                  </Text>
-                  {user?.phone && (
-                    <Text style={styles.customerPhone}>SĐT: {user.phone}</Text>
-                  )}
-                </View>
+        {/* Customer Info Card */}
+        <View style={[
+          styles.customerCard,
+          isSellOutMode && styles.customerCardSellOut,
+        ]}>
+          {/* Sell In Mode - Show logged in user */}
+          {!isSellOutMode && (
+            <View style={styles.customerContent}>
+              <Avatar
+                key={avatarKey}
+                uri={user?.avatar}
+                size={50}
+                style={styles.avatarContainer}
+              />
+              <View style={styles.customerInfo}>
+                <Text style={styles.customerLabel}>Nhập kho cho</Text>
+                <Text style={styles.customerName}>
+                  {user ? user.name : 'Chưa đăng nhập'}
+                </Text>
+                {user?.phone && (
+                  <Text style={styles.customerPhone}>SĐT: {user.phone}</Text>
+                )}
               </View>
-            )}
+            </View>
+          )}
 
-            {/* Sell Out Mode */}
-            {isSellOutMode && (
-              <>
-                {/* Dealer Selection Option */}
-                {!hasDealerSelected ? (
-                  <View style={styles.sellOutOptions}>
-                    <Text style={styles.sellOutLabel}>Chọn đại lý để Sell Out</Text>
+          {/* Sell Out Mode */}
+          {isSellOutMode && (
+            <>
+              {/* Dealer Selection Option */}
+              {!hasDealerSelected ? (
+                <View style={styles.sellOutOptions}>
+                  <Text style={styles.sellOutLabel}>Chọn đại lý để Sell Out</Text>
+                  <TouchableOpacity
+                    style={styles.selectDealerButton}
+                    onPress={handleSelectDealer}
+                    activeOpacity={0.7}
+                  >
+                    <Icon name="store" size={24} color={COLORS.secondary} />
+                    <View style={styles.selectDealerContent}>
+                      <Text style={styles.selectDealerText}>Chọn đại lý cấp dưới</Text>
+                      <Text style={styles.selectDealerHint}>
+                        Nhấn để chọn đại lý từ danh sách
+                      </Text>
+                    </View>
+                    <Text style={commonStyles.chevronIcon}>›</Text>
+                  </TouchableOpacity>
+                </View>
+              ) : (
+                <View style={styles.selectedDealerContainer}>
+                  <View style={styles.customerContent}>
+                    <View style={styles.dealerAvatarPlaceholder}>
+                      <Icon name="store" size={24} color={COLORS.secondary} />
+                    </View>
+                    <View style={styles.customerInfo}>
+                      <Text style={[styles.customerLabel, styles.customerLabelSellOut]}>
+                        Sell Out cho
+                      </Text>
+                      <Text style={styles.customerName}>{selectedDealer.name}</Text>
+                      {selectedDealer.phone && (
+                        <Text style={styles.customerPhone}>
+                          SĐT: {selectedDealer.phone}
+                        </Text>
+                      )}
+                      {selectedDealer.address && (
+                        <Text style={styles.customerAddress} numberOfLines={1}>
+                          {selectedDealer.address}
+                        </Text>
+                      )}
+                    </View>
+                  </View>
+
+                  <View style={styles.dealerActions}>
                     <TouchableOpacity
-                      style={styles.selectDealerButton}
+                      style={styles.changeDealerButton}
                       onPress={handleSelectDealer}
                       activeOpacity={0.7}
                     >
-                      <Icon name="store" size={24} color={COLORS.secondary} />
-                      <View style={styles.selectDealerContent}>
-                        <Text style={styles.selectDealerText}>Chọn đại lý cấp dưới</Text>
-                        <Text style={styles.selectDealerHint}>
-                          Nhấn để chọn đại lý từ danh sách
-                        </Text>
-                      </View>
-                      <Text style={commonStyles.chevronIcon}>›</Text>
+                      <Icon name="store" size={14} color={COLORS.secondary} />
+                      <Text style={styles.changeDealerText}>Đổi đại lý</Text>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity
+                      style={styles.clearDealerButton}
+                      onPress={handleClearDealer}
+                      activeOpacity={0.7}
+                    >
+                      <Icon name="close" size={14} color={COLORS.gray500} />
+                      <Text style={styles.clearDealerText}>Bỏ chọn</Text>
                     </TouchableOpacity>
                   </View>
-                ) : (
-                  <View style={styles.selectedDealerContainer}>
-                    <View style={styles.customerContent}>
-                      <View style={styles.dealerAvatarPlaceholder}>
-                        <Icon name="store" size={24} color={COLORS.secondary} />
-                      </View>
-                      <View style={styles.customerInfo}>
-                        <Text style={[styles.customerLabel, styles.customerLabelSellOut]}>
-                          Sell Out cho
-                        </Text>
-                        <Text style={styles.customerName}>{selectedDealer.name}</Text>
-                        {selectedDealer.phone && (
-                          <Text style={styles.customerPhone}>
-                            SĐT: {selectedDealer.phone}
-                          </Text>
-                        )}
-                        {selectedDealer.address && (
-                          <Text style={styles.customerAddress} numberOfLines={1}>
-                            {selectedDealer.address}
-                          </Text>
-                        )}
-                      </View>
-                    </View>
-
-                    <View style={styles.dealerActions}>
-                      <TouchableOpacity
-                        style={styles.changeDealerButton}
-                        onPress={handleSelectDealer}
-                        activeOpacity={0.7}
-                      >
-                        <Icon name="store" size={14} color={COLORS.secondary} />
-                        <Text style={styles.changeDealerText}>Đổi đại lý</Text>
-                      </TouchableOpacity>
-
-                      <TouchableOpacity
-                        style={styles.clearDealerButton}
-                        onPress={handleClearDealer}
-                        activeOpacity={0.7}
-                      >
-                        <Icon name="close" size={14} color={COLORS.gray500} />
-                        <Text style={styles.clearDealerText}>Bỏ chọn</Text>
-                      </TouchableOpacity>
-                    </View>
-                  </View>
-                )}
-              </>
-            )}
-          </View>
-
-          {/* Scan Card */}
-          <View style={styles.scanCard}>
-            {/* QR Scan Button */}
-            <TouchableOpacity
-              style={styles.qrButton}
-              onPress={handleScanQR}
-              activeOpacity={0.8}
-            >
-              <Image
-                source={require('../../../assets/images/scan_me.png')}
-                style={styles.qrImage}
-                resizeMode="contain"
-              />
-            </TouchableOpacity>
-
-            {/* Serial Input */}
-            <Controller
-              control={control}
-              name="serial"
-              render={({ field: { onChange, onBlur, value } }) => (
-                <View style={styles.inputContainer}>
-                  <Text style={styles.inputLabel}>
-                    Số serial <Text style={styles.required}>*</Text>
-                  </Text>
-                  <View
-                    style={[
-                      styles.inputWrapper,
-                      errors.serial && styles.inputWrapperError,
-                    ]}
-                  >
-                    <TextInput
-                      style={styles.textArea}
-                      placeholder="Nhập hoặc quét mã serial"
-                      placeholderTextColor={COLORS.gray400}
-                      value={value}
-                      onChangeText={onChange}
-                      onBlur={onBlur}
-                      editable={!isLoading}
-                      multiline
-                      numberOfLines={4}
-                      textAlignVertical="top"
-                    />
-                  </View>
-                  {errors.serial && (
-                    <Text style={styles.errorText}>{errors.serial.message}</Text>
-                  )}
                 </View>
               )}
+            </>
+          )}
+        </View>
+
+        {/* Scan Card */}
+        <View style={styles.scanCard}>
+          {/* QR Scan Button */}
+          <TouchableOpacity
+            style={styles.qrButton}
+            onPress={handleScanQR}
+            activeOpacity={0.8}
+          >
+            <Image
+              source={require('../../../assets/images/scan_me.png')}
+              style={styles.qrImage}
+              resizeMode="contain"
             />
+          </TouchableOpacity>
 
-            {/* Info hint */}
-            <View style={commonStyles.infoBox}>
-              <Icon name="info" size={20} color={COLORS.info} />
-              <View style={commonStyles.infoBoxContent}>
-                <Text style={commonStyles.infoBoxText}>
-                  {isSellOutMode
-                    ? 'Quét mã QR hoặc nhập serial để xuất kho cho đại lý'
-                    : 'Quét mã QR hoặc nhập serial để nhập kho'
-                  }
+          {/* Serial Input */}
+          <Controller
+            control={control}
+            name="serial"
+            render={({ field: { onChange, onBlur, value } }) => (
+              <View style={styles.inputContainer}>
+                <Text style={styles.inputLabel}>
+                  Số serial <Text style={styles.required}>*</Text>
                 </Text>
-              </View>
-            </View>
-
-            {/* Save Button */}
-            <TouchableOpacity
-              style={[
-                styles.saveButton,
-                isSellOutMode && styles.saveButtonSellOut,
-                isLoading && styles.saveButtonDisabled,
-              ]}
-              onPress={handleSubmit(handleSaveInfo)}
-              activeOpacity={0.8}
-              disabled={isLoading}
-            >
-              {isLoading ? (
-                <ActivityIndicator color={COLORS.white} size="small" />
-              ) : (
-                <>
-                  <Icon
-                    name={isSellOutMode ? 'sell-out' : 'sell-in'}
-                    size={20}
-                    color={COLORS.white}
+                <View
+                  style={[
+                    styles.inputWrapper,
+                    errors.serial && styles.inputWrapperError,
+                  ]}
+                >
+                  <TextInput
+                    style={styles.textArea}
+                    placeholder="Nhập hoặc quét mã serial"
+                    placeholderTextColor={COLORS.gray400}
+                    value={value}
+                    onChangeText={onChange}
+                    onBlur={onBlur}
+                    editable={!isLoading}
+                    multiline
+                    numberOfLines={4}
+                    textAlignVertical="top"
                   />
-                  <Text style={styles.saveButtonText}>
-                    {isSellOutMode ? 'Sell Out' : 'Sell In'}
-                  </Text>
-                </>
-              )}
-            </TouchableOpacity>
+                </View>
+                {errors.serial && (
+                  <Text style={styles.errorText}>{errors.serial.message}</Text>
+                )}
+              </View>
+            )}
+          />
+
+          {/* Info hint */}
+          <View style={commonStyles.infoBox}>
+            <Icon name="info" size={20} color={COLORS.info} />
+            <View style={commonStyles.infoBoxContent}>
+              <Text style={commonStyles.infoBoxText}>
+                {isSellOutMode
+                  ? 'Quét mã QR hoặc nhập serial để xuất kho cho đại lý'
+                  : 'Quét mã QR hoặc nhập serial để nhập kho'
+                }
+              </Text>
+            </View>
           </View>
 
-          {/* Bottom Spacing */}
-          <View style={styles.bottomSpacing} />
+          {/* Save Button */}
+          <TouchableOpacity
+            style={[
+              styles.saveButton,
+              isSellOutMode && styles.saveButtonSellOut,
+              isLoading && styles.saveButtonDisabled,
+            ]}
+            onPress={handleSubmit(handleSaveInfo)}
+            activeOpacity={0.8}
+            disabled={isLoading}
+          >
+            {isLoading ? (
+              <ActivityIndicator color={COLORS.white} size="small" />
+            ) : (
+              <>
+                <Icon
+                  name={isSellOutMode ? 'sell-out' : 'sell-in'}
+                  size={20}
+                  color={COLORS.white}
+                />
+                <Text style={styles.saveButtonText}>
+                  {isSellOutMode ? 'Sell Out' : 'Sell In'}
+                </Text>
+              </>
+            )}
+          </TouchableOpacity>
+        </View>
+
+        {/* Bottom Spacing */}
+        <View style={styles.bottomSpacing} />
       </KeyboardAwareScrollView>
 
       {/* Barcode Scanner Modal */}

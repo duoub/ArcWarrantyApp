@@ -5,6 +5,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 import { CommonActions } from '@react-navigation/native';
 import { COLORS, SPACING, SHADOWS } from '../config/theme';
 import { Icon } from '../components/common';
+import { useAuthStore } from '../store/authStore';
 // import { DistributorType } from '../types/distributionSystem';
 import HomeScreen from '../screens/main/HomeScreen/HomeScreen';
 import MenuScreen from '../screens/main/MenuScreen/MenuScreen';
@@ -178,6 +179,9 @@ const ProfileStackNavigator = () => {
 };
 
 const MainNavigator = () => {
+  const { user } = useAuthStore();
+  const userRole = user?.role?.toLowerCase();
+
   return (
     <Tab.Navigator
       screenOptions={{
@@ -239,45 +243,48 @@ const MainNavigator = () => {
           ),
         }}
       />
-      <Tab.Screen
-        name="InOutStack"
-        component={InOutStackNavigator}
-        options={{
-          title: 'IN/OUT',
-          headerShown: false,
-          tabBarButton: (props) => (
-            <CenterTabButton
-              onPress={() => {
-                if (props.onPress) {
-                  props.onPress({} as any);
-                }
-              }}
-              focused={props.accessibilityState?.selected || false}
-            />
-          ),
-        }}
-        listeners={({ navigation }) => ({
-          tabPress: (e) => {
-            const state = navigation.getState();
-            const currentRoute = state.routes[state.index];
+      {/* Hide InOutStack tab for "Thợ" role */}
+      {userRole !== 'thợ' && (
+        <Tab.Screen
+          name="InOutStack"
+          component={InOutStackNavigator}
+          options={{
+            title: 'IN/OUT',
+            headerShown: false,
+            tabBarButton: (props) => (
+              <CenterTabButton
+                onPress={() => {
+                  if (props.onPress) {
+                    props.onPress({} as any);
+                  }
+                }}
+                focused={props.accessibilityState?.selected || false}
+              />
+            ),
+          }}
+          listeners={({ navigation }) => ({
+            tabPress: (e) => {
+              const state = navigation.getState();
+              const currentRoute = state.routes[state.index];
 
-            // Nếu đang ở InOutStack thì không làm gì cả (giữ nguyên data form)
-            if (currentRoute.name === 'InOutStack') {
+              // Nếu đang ở InOutStack thì không làm gì cả (giữ nguyên data form)
+              if (currentRoute.name === 'InOutStack') {
+                e.preventDefault();
+                return;
+              }
+
+              // Nếu đang ở tab khác thì reset về InOutStack
               e.preventDefault();
-              return;
-            }
-
-            // Nếu đang ở tab khác thì reset về InOutStack
-            e.preventDefault();
-            navigation.dispatch(
-              CommonActions.reset({
-                index: 0,
-                routes: [{ name: 'InOutStack' }],
-              })
-            );
-          },
-        })}
-      />
+              navigation.dispatch(
+                CommonActions.reset({
+                  index: 0,
+                  routes: [{ name: 'InOutStack' }],
+                })
+              );
+            },
+          })}
+        />
+      )}
       <Tab.Screen
         name="ProfileStack"
         component={ProfileStackNavigator}
