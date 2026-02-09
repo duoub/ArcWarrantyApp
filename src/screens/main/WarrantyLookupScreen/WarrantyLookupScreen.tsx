@@ -19,7 +19,9 @@ import BarcodeScanner from '../../../components/BarcodeScanner/BarcodeScanner';
 import { commonStyles } from '../../../styles/commonStyles';
 import { warrantyLookupService } from '../../../api/warrantyLookupService';
 import { WarrantyInfo, RepairInfo } from '../../../types/warrantyLookup';
-import { Icon } from '../../../components/common';
+import { productLookupService } from '../../../api/productLookupService';
+import { ProductInfo } from '../../../types/productLookup';
+import { Icon, IconName } from '../../../components/common';
 
 const WarrantyLookupScreen = () => {
   const navigation = useNavigation();
@@ -27,6 +29,7 @@ const WarrantyLookupScreen = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [results, setResults] = useState<WarrantyInfo[]>([]);
   const [repairResults, setRepairResults] = useState<RepairInfo[]>([]);
+  const [productResult, setProductResult] = useState<ProductInfo | null>(null);
   const [showScanner, setShowScanner] = useState(false);
 
   const handleScanQR = () => {
@@ -52,21 +55,26 @@ const WarrantyLookupScreen = () => {
       setIsLoading(true);
       setResults([]);
       setRepairResults([]);
+      setProductResult(null);
 
-      // Fetch both warranty and repair data in parallel
-      const [warrantyResponse, repairResponse] = await Promise.all([
+      // Fetch warranty, repair, and product data in parallel
+      const [warrantyResponse, repairResponse, productResponse] = await Promise.all([
         warrantyLookupService.lookupWarranty({
           keyword: keyword.trim(),
         }),
         warrantyLookupService.lookupRepair({
           keyword: keyword.trim(),
         }),
+        productLookupService.checkProduct({
+          imeiserial: keyword.trim(),
+        }),
       ]);
 
       const hasWarrantyData = warrantyResponse.data && warrantyResponse.data.length > 0;
       const hasRepairData = repairResponse.data && repairResponse.data.length > 0;
+      const hasProductData = productResponse.success && productResponse.data;
 
-      if (hasWarrantyData || hasRepairData) {
+      if (hasWarrantyData || hasRepairData || hasProductData) {
         // Set all results
         if (hasWarrantyData) {
           setResults(warrantyResponse.data);
@@ -74,10 +82,13 @@ const WarrantyLookupScreen = () => {
         if (hasRepairData) {
           setRepairResults(repairResponse.data);
         }
+        if (hasProductData) {
+          setProductResult(productResponse.data);
+        }
       } else {
         Alert.alert(
           'Không tìm thấy',
-          'Không tìm thấy thông tin bảo hành hoặc sửa chữa cho từ khóa này.'
+          'Không tìm thấy thông tin bảo hành, sửa chữa hoặc sản phẩm cho từ khóa này.'
         );
       }
     } catch (error) {
@@ -182,6 +193,79 @@ const WarrantyLookupScreen = () => {
           </TouchableOpacity>
         </View>
 
+        {/* Product Information Card */}
+        {productResult && productResult.isAuthentic && (
+          <View style={commonStyles.cardWithMarginLarge}>
+            {/* Status Header */}
+            <View style={[styles.productHeader]}>
+              <View style={styles.productIconContainer}>
+                <Icon name="product-lookup" size={80} color={COLORS.success} />
+              </View>
+              <Text style={styles.productTitle}>
+                Thông tin sản phẩm chính hãng
+              </Text>
+            </View>
+
+            {/* Product Details */}
+            <View style={styles.resultBody}>
+              {/* Serial */}
+              <View style={commonStyles.infoRowHorizontal}>
+                <Text style={commonStyles.infoLabelFixed}>Số serial:</Text>
+                <Text style={commonStyles.infoValueFlex}>{productResult.serial}</Text>
+              </View>
+
+              {/* Product Code */}
+              {productResult.code && (
+                <View style={commonStyles.infoRowHorizontal}>
+                  <Text style={commonStyles.infoLabelFixed}>Mã sản phẩm:</Text>
+                  <Text style={commonStyles.infoValueFlex}>{productResult.code}</Text>
+                </View>
+              )}
+
+              {/* Product Name */}
+              <View style={commonStyles.infoRowHorizontal}>
+                <Text style={commonStyles.infoLabelFixed}>Tên sản phẩm:</Text>
+                <Text style={commonStyles.infoValueFlex}>{productResult.name}</Text>
+              </View>
+
+              {/* Warranty Time */}
+              {productResult.warrantyTime && (
+                <View style={commonStyles.infoRowHorizontal}>
+                  <Text style={commonStyles.infoLabelFixed}>Thời gian BH:</Text>
+                  <Text style={commonStyles.infoValueFlex}>{productResult.warrantyTime}</Text>
+                </View>
+              )}
+
+              {/* Export Date */}
+              {productResult.exportDate && (
+                <View style={commonStyles.infoRowHorizontal}>
+                  <Text style={commonStyles.infoLabelFixed}>Ngày xuất kho:</Text>
+                  <Text style={commonStyles.infoValueFlex}>{productResult.exportDate}</Text>
+                </View>
+              )}
+
+              {/* Seller */}
+              {productResult.seller && (
+                <View style={commonStyles.infoRowHorizontal}>
+                  <Text style={commonStyles.infoLabelFixed}>Nơi bán:</Text>
+                  <Text style={commonStyles.infoValueFlex}>{productResult.seller}</Text>
+                </View>
+              )}
+
+              {/* Divider */}
+              <View style={styles.divider} />
+
+              {/* Authenticity Note */}
+              <View style={styles.authenticNote}>
+                <Text style={styles.authenticNoteText}>
+                  Sản phẩm này đã được xác thực là hàng chính hãng của ARC.
+                  Quý khách được hưởng đầy đủ chính sách bảo hành theo quy định.
+                </Text>
+              </View>
+            </View>
+          </View>
+        )}
+
         {/* Warranty Result Cards */}
         {results.length > 0 && (
           <>
@@ -195,7 +279,7 @@ const WarrantyLookupScreen = () => {
             {results.map((result, index) => (
               <View key={`${result.serial}-${index}`} style={commonStyles.cardWithMarginLarge}>
                 <View style={styles.resultHeader}>
-                  <Text style={commonStyles.sectionTitle}>
+                  <Text style={styles.headerTitle}>
                     Thông tin bảo hành {results.length > 1 ? `(${index + 1}/${results.length})` : ''}
                   </Text>
                   <View
@@ -330,7 +414,7 @@ const WarrantyLookupScreen = () => {
             {repairResults.map((repair, index) => (
               <View key={`repair-${repair.ticketCode}-${index}`} style={commonStyles.cardWithMarginLarge}>
                 <View style={styles.repairHeader}>
-                  <Text style={commonStyles.sectionTitle}>
+                  <Text style={styles.headerTitle}>
                     Thông tin sửa chữa {repairResults.length > 1 ? `(${index + 1}/${repairResults.length})` : ''}
                   </Text>
                   <View
@@ -504,6 +588,11 @@ const styles = StyleSheet.create({
     color: COLORS.primary,
     textAlign: 'center',
   },
+  headerTitle: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: COLORS.textPrimary,
+  },
   resultHeader: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -512,6 +601,7 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.primary + '12',
     borderBottomWidth: 1,
     borderBottomColor: COLORS.gray200,
+    minHeight: 56,
   },
   resultBody: {
     padding: SPACING.md,
@@ -529,10 +619,48 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.warning + '12',
     borderBottomWidth: 1,
     borderBottomColor: COLORS.gray200,
+    minHeight: 56,
   },
   infoBoxMargin: {
     marginHorizontal: SPACING.screen_lg,
     marginTop: SPACING.md,
+  },
+  productHeader: {
+    alignItems: 'center',
+    paddingVertical: SPACING.xl,
+    paddingHorizontal: SPACING.screen_lg,
+    backgroundColor: '#E8F5E9',
+  },
+  productIconContainer: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: COLORS.white,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: SPACING.md,
+  },
+  productTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    textAlign: 'center',
+    color: COLORS.success,
+  },
+  authenticNote: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    backgroundColor: '#E8F5E9',
+    borderRadius: 12,
+    padding: SPACING.md,
+    borderLeftWidth: 4,
+    borderLeftColor: COLORS.success,
+  },
+  authenticNoteText: {
+    flex: 1,
+    fontSize: 13,
+    color: COLORS.success,
+    lineHeight: 18,
+    fontWeight: '500',
   },
 });
 
