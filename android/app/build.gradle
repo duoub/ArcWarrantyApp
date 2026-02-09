@@ -110,10 +110,10 @@ android {
             keyPassword 'android'
         }
         release {
-            storeFile file('arc-release.keystore')
-            storePassword 'arc123456'
-            keyAlias 'arc-key'
-            keyPassword 'arc123456'
+            storeFile file('asiatic.keystore')
+            storePassword 'asiaticvn'
+            keyAlias 'ASIATIC'
+            keyPassword 'asiaticvn'
         }
     }
     buildTypes {

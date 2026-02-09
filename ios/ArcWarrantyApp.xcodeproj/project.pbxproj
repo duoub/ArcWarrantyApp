@@ -382,7 +382,7 @@
 				CODE_SIGN_ENTITLEMENTS = ArcWarrantyApp/ArcWarrantyApp.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_TEAM = WBXWW927P5;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = ArcWarrantyApp/Info.plist;
@@ -422,7 +422,7 @@
 				CODE_SIGN_ENTITLEMENTS = ArcWarrantyApp/ArcWarrantyApp.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_TEAM = WBXWW927P5;
 				INFOPLIST_FILE = ArcWarrantyApp/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = ARC;
