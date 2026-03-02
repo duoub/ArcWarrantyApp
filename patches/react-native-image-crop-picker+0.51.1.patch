@@ -1,0 +1,53 @@
+diff --git a/node_modules/react-native-image-crop-picker/ios/src/ImageCropPicker.mm b/node_modules/react-native-image-crop-picker/ios/src/ImageCropPicker.mm
+--- a/node_modules/react-native-image-crop-picker/ios/src/ImageCropPicker.mm
++++ b/node_modules/react-native-image-crop-picker/ios/src/ImageCropPicker.mm
+@@ -128,7 +128,28 @@
+ }
+
+ - (UIViewController*) getRootVC {
+-    UIViewController *root = [[[[UIApplication sharedApplication] delegate] window] rootViewController];
++    // UIViewController *root = [[[[UIApplication sharedApplication] delegate] window] rootViewController];
++    UIViewController *root = nil;
++
++    if (@available(iOS 13.0, *)) {
++        for (UIScene *scene in [UIApplication sharedApplication].connectedScenes) {
++            if ([scene isKindOfClass:[UIWindowScene class]]) {
++                UIWindowScene *windowScene = (UIWindowScene *)scene;
++                for (UIWindow *window in windowScene.windows) {
++                    if (window.isKeyWindow) {
++                        root = window.rootViewController;
++                        break;
++                    }
++                }
++            }
++            if (root) break;
++        }
++    }
++
++    if (!root) {
++        root = [[[[UIApplication sharedApplication] delegate] window] rootViewController];
++    }
++
+     while (root.presentedViewController != nil) {
+         root = root.presentedViewController;
+     }
+@@ -175,15 +196,16 @@
+                 picker.cameraDevice = UIImagePickerControllerCameraDeviceFront;
+             }
+
++            picker.modalPresentationStyle = UIModalPresentationFullScreen;
+             [[self getRootVC] presentViewController:picker animated:YES completion:nil];
+         });
+     }];
+ #endif
+ }
+
+-- (void)viewDidLoad {
+-    [self viewDidLoad];
+-}
++// - (void)viewDidLoad {
++//     [self viewDidLoad];
++// }
+
+ - (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary *)info {
+     NSString* mediaType = [info objectForKey:UIImagePickerControllerMediaType];

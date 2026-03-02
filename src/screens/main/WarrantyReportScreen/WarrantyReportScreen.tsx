@@ -11,6 +11,7 @@ import {
   StatusBar,
   Image,
   PermissionsAndroid,
+  Dimensions,
 } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { useNavigation } from '@react-navigation/native';
@@ -30,6 +31,10 @@ import { provinceService } from '../../../api/provinceService';
 import { Icon } from '../../../components/common';
 import CustomerLookupModal from '../../../components/CustomerLookupModal';
 import { WarrantyInfo } from '../../../types/warrantyLookup';
+
+const { width: SCREEN_WIDTH } = Dimensions.get('window');
+// cardPadding = SPACING.lg (mỗi bên), cardMargin = SPACING.screen_lg (mỗi bên), gap = SPACING.md
+const IMAGE_SIZE = (SCREEN_WIDTH - SPACING.screen_lg * 2 - SPACING.lg * 2 - SPACING.md) / 2;
 
 // Validation Schema
 const warrantyReportSchema = z.object({
@@ -683,14 +688,13 @@ const WarrantyReportScreen = () => {
             {images.length > 0 && (
               <View style={styles.imagesContainer}>
                 {images.map((image, index) => (
-                  <View key={index} style={styles.imageCard}>
+                  <View key={index} style={styles.imageItem}>
                     <Image source={{ uri: image }} style={styles.imagePreview} />
                     <TouchableOpacity
                       style={styles.removeImageButton}
                       onPress={() => handleRemoveImage(index)}
                     >
-                      <Text style={styles.removeImageIcon}>🗑️</Text>
-                      <Text style={styles.removeImageText}>Xóa</Text>
+                      <Text style={styles.removeImageText}>×</Text>
                     </TouchableOpacity>
                   </View>
                 ))}
@@ -862,37 +866,36 @@ const styles = StyleSheet.create({
     color: COLORS.textPrimary,
   },
   imagesContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: SPACING.md,
     marginBottom: SPACING.md,
   },
-  imageCard: {
-    marginBottom: SPACING.sm,
-    borderRadius: BORDER_RADIUS.md,
-    overflow: 'hidden',
-    borderWidth: 1,
-    borderColor: COLORS.gray200,
+  imageItem: {
+    position: 'relative',
+    width: IMAGE_SIZE,
+    height: IMAGE_SIZE,
   },
   imagePreview: {
     width: '100%',
-    height: 200,
-    backgroundColor: COLORS.gray100,
+    height: '100%',
+    borderRadius: BORDER_RADIUS.md,
   },
   removeImageButton: {
-    flexDirection: 'row',
+    position: 'absolute',
+    top: -8,
+    right: -8,
+    backgroundColor: COLORS.error,
+    width: 24,
+    height: 24,
+    borderRadius: 12,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: COLORS.white,
-    paddingVertical: SPACING.sm,
-    borderTopWidth: 1,
-    borderTopColor: COLORS.gray200,
-  },
-  removeImageIcon: {
-    fontSize: 16,
-    marginRight: SPACING.xs,
   },
   removeImageText: {
-    fontSize: 14,
-    color: COLORS.error,
-    fontWeight: '600',
+    color: COLORS.white,
+    fontSize: 16,
+    fontWeight: 'bold',
   },
 
   // Submit Button

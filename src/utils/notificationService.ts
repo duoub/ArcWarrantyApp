@@ -1,8 +1,21 @@
-import messaging from '@react-native-firebase/messaging';
+import {
+  getMessaging,
+  getToken,
+  onMessage,
+  onNotificationOpenedApp,
+  getInitialNotification,
+  isDeviceRegisteredForRemoteMessages,
+  registerDeviceForRemoteMessages,
+  requestPermission,
+  subscribeToTopic,
+  unsubscribeFromTopic,
+  setBackgroundMessageHandler,
+  AuthorizationStatus,
+} from '@react-native-firebase/messaging';
 import { Platform, PermissionsAndroid, Alert, NativeModules } from 'react-native';
 
 // Register background handler at module level (must be outside of any function)
-messaging().setBackgroundMessageHandler(async remoteMessage => {
+setBackgroundMessageHandler(getMessaging(), async remoteMessage => {
   console.log('Message handled in the background!', remoteMessage);
 });
 
@@ -38,10 +51,11 @@ export class NotificationService {
         }
       }
 
-      const authStatus = await messaging().requestPermission();
+      const messaging = getMessaging();
+      const authStatus = await requestPermission(messaging);
       const enabled =
-        authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
-        authStatus === messaging.AuthorizationStatus.PROVISIONAL;
+        authStatus === AuthorizationStatus.AUTHORIZED ||
+        authStatus === AuthorizationStatus.PROVISIONAL;
 
       if (enabled) {
         console.log('✅ Notification permission granted:', authStatus);
@@ -74,12 +88,13 @@ export class NotificationService {
         }
 
         // On real iOS device, register for remote messages first
-        if (!messaging().isDeviceRegisteredForRemoteMessages) {
-          await messaging().registerDeviceForRemoteMessages();
+        const messaging = getMessaging();
+        if (!isDeviceRegisteredForRemoteMessages(messaging)) {
+          await registerDeviceForRemoteMessages(messaging);
         }
       }
 
-      const token = await messaging().getToken();
+      const token = await getToken(getMessaging());
       console.log('✅ FCM Token:', token);
       return token;
     } catch (error) {
@@ -92,8 +107,10 @@ export class NotificationService {
    * Setup notification listeners
    */
   static setupNotificationListeners() {
+    const messaging = getMessaging();
+
     // Handle notification when app is in foreground
-    const unsubscribeForeground = messaging().onMessage(async remoteMessage => {
+    const unsubscribeForeground = onMessage(messaging, async remoteMessage => {
       console.log('Foreground notification received:', remoteMessage);
 
       // Show alert or custom notification UI
@@ -106,7 +123,7 @@ export class NotificationService {
     });
 
     // Handle notification when app is opened from background state
-    messaging().onNotificationOpenedApp(remoteMessage => {
+    onNotificationOpenedApp(messaging, remoteMessage => {
       console.log(
         'Notification caused app to open from background state:',
         remoteMessage,
@@ -115,17 +132,15 @@ export class NotificationService {
     });
 
     // Check if app was opened from a notification (when app was completely closed)
-    messaging()
-      .getInitialNotification()
-      .then(remoteMessage => {
-        if (remoteMessage) {
-          console.log(
-            'Notification caused app to open from quit state:',
-            remoteMessage,
-          );
-          // Navigate to specific screen if needed based on remoteMessage.data
-        }
-      });
+    getInitialNotification(messaging).then(remoteMessage => {
+      if (remoteMessage) {
+        console.log(
+          'Notification caused app to open from quit state:',
+          remoteMessage,
+        );
+        // Navigate to specific screen if needed based on remoteMessage.data
+      }
+    });
 
     return unsubscribeForeground;
   }
@@ -135,7 +150,7 @@ export class NotificationService {
    */
   static async subscribeToTopic(topic: string): Promise<void> {
     try {
-      await messaging().subscribeToTopic(topic);
+      await subscribeToTopic(getMessaging(), topic);
       console.log(`Subscribed to topic: ${topic}`);
     } catch (error) {
       console.error(`Error subscribing to topic ${topic}:`, error);
@@ -147,7 +162,7 @@ export class NotificationService {
    */
   static async unsubscribeFromTopic(topic: string): Promise<void> {
     try {
-      await messaging().unsubscribeFromTopic(topic);
+      await unsubscribeFromTopic(getMessaging(), topic);
       console.log(`Unsubscribed from topic: ${topic}`);
     } catch (error) {
       console.error(`Error unsubscribing from topic ${topic}:`, error);

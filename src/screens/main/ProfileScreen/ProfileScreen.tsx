@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -10,7 +10,6 @@ import {
   Switch,
   Platform,
   PermissionsAndroid,
-  ActivityIndicator,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -30,57 +29,26 @@ type ProfileScreenNavigationProp = StackNavigationProp<ProfileStackParamList, 'P
 
 const ProfileScreen = () => {
   const navigation = useNavigation<ProfileScreenNavigationProp>();
-  const { user, logout, updateAvatar, setUser } = useAuthStore();
+  const { user, logout, updateAvatar } = useAuthStore();
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
   const [showProfileInfo, setShowProfileInfo] = useState(true);
   const [isUploading, setIsUploading] = useState(false);
-  const [avatarKey, setAvatarKey] = useState(0);
-
-  // Refresh user profile when screen is focused
-  // useFocusEffect(
-  //   useCallback(() => {
-  //     const refreshUserProfile = async () => {
-  //       if (user?.id) {
-  //         try {
-  //           console.log('🔄 Refreshing user profile...');
-  //           const updatedProfile = await authService.getProfile(user.id, API_CONFIG.STORE_ID);
-
-  //           // Update user in store with fresh data
-  //           setUser({
-  //             ...user,
-  //             ...updatedProfile,
-  //           });
-
-  //           console.log('✅ Profile refreshed successfully');
-  //         } catch (error) {
-  //           console.error('❌ Failed to refresh profile:', error);
-  //         }
-  //       }
-  //     };
-
-  //     refreshUserProfile();
-  //   }, [user?.id])
-  // );
-
-  // Log when user avatar changes to debug re-render
-  useEffect(() => {
-    // Force Avatar component to re-render by changing key
-    setAvatarKey(prev => prev + 1);
-  }, [user?.avatar]);
+  const [localAvatarUri, setLocalAvatarUri] = useState<string | undefined>(undefined);
 
   const uploadImageToServer = async (imagePath: string) => {
     try {
       setIsUploading(true);
+      // Hiển thị ảnh local ngay lập tức, không cần chờ network
+      setLocalAvatarUri(imagePath);
 
-      // Upload image to server
       const response = await uploadService.uploadAvatar(imagePath);
-
-      // Update local avatar with the server response URL
       const avatarUrl = response.data || imagePath;
-      updateAvatar(avatarUrl);
+      updateAvatar(avatarUrl);       // Lưu server URL vào Zustand + storage
+      setLocalAvatarUri(undefined);  // Clear local override, dùng server URL
 
       Alert.alert('Thành công', 'Ảnh đại diện đã được cập nhật!');
     } catch (error: any) {
+      setLocalAvatarUri(undefined);
       Alert.alert('Lỗi', error.message || 'Không thể upload ảnh. Vui lòng thử lại.');
     } finally {
       setIsUploading(false);
@@ -241,7 +209,7 @@ const ProfileScreen = () => {
         {/* User Profile Card */}
         <View style={commonStyles.cardWithMarginLarge}>
           <View style={styles.avatarWrapper}>
-            <Avatar key={avatarKey} uri={user?.avatar} size={100} />
+            <Avatar uri={localAvatarUri || user?.avatar} size={100} />
             <TouchableOpacity
               style={styles.changeAvatarButton}
               onPress={handleChangeAvatar}

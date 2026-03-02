@@ -11,8 +11,6 @@ import {
   ActivityIndicator,
   FlatList,
   LayoutAnimation,
-  Platform,
-  UIManager,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { COLORS, SPACING, BORDER_RADIUS, SHADOWS } from '../../../config/theme';
@@ -21,10 +19,6 @@ import { Icon } from '../../../components/common';
 import { commonStyles } from '../../../styles/commonStyles';
 import { newsService } from '../../../api/newsService';
 import { NewsItem } from '../../../types/news';
-
-if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
-  UIManager.setLayoutAnimationEnabledExperimental(true);
-}
 
 const SalesPolicyScreen = () => {
   const navigation = useNavigation();

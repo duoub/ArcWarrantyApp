@@ -3,7 +3,6 @@
  * API calls for file uploads
  */
 
-import { Platform } from 'react-native';
 import ReactNativeBlobUtil from 'react-native-blob-util';
 import { getUserCredentials } from '../utils/apiHelper';
 import { API_CONFIG } from '../config/constants';
@@ -77,12 +76,8 @@ export const uploadService = {
 
       const mimeType = imageObj.mime || getMimeType(fileUri);
 
-      // Normalize file path for Android
-      let normalizedPath = fileUri;
-      if (Platform.OS === 'android') {
-        // Remove file:// prefix if present
-        normalizedPath = fileUri.replace('file://', '');
-      }
+      // Remove file:// prefix — ReactNativeBlobUtil.wrap() requires a plain path
+      const normalizedPath = fileUri.replace('file://', '');
 
       // Use react-native-blob-util for proper multipart upload
       const response = await ReactNativeBlobUtil.fetch(
@@ -172,11 +167,8 @@ export const uploadService = {
 
       const mimeType = imageObj.mime || getMimeType(fileUri);
 
-      // Normalize file path for Android
-      let normalizedPath = fileUri;
-      if (Platform.OS === 'android') {
-        normalizedPath = fileUri.replace('file://', '');
-      }
+      // Remove file:// prefix — ReactNativeBlobUtil.wrap() requires a plain path
+      const normalizedPath = fileUri.replace('file://', '');
 
       // Use react-native-blob-util for proper multipart upload
       const response = await ReactNativeBlobUtil.fetch(
