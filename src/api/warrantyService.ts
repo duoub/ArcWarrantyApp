@@ -34,7 +34,7 @@ export const warrantyService = {
         xaphuong: data.xaphuong,
         cusaddress: data.address,
         cusemail: data.email || '',
-        userid: credentials.userid,
+        userid: credentials.userid, // Empty string if not logged in
       };
 
       const response = await fetch(url, {

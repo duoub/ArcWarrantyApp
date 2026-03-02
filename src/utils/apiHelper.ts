@@ -8,12 +8,17 @@ import { API_CONFIG } from '../config/constants';
 
 /**
  * Get user credentials from storage for API calls
+ * Returns empty userid if user is not logged in
  */
 export const getUserCredentials = () => {
   try {
     const userData = storage.getString(StorageKeys.USER_DATA);
     if (!userData) {
-      throw new Error('User not authenticated');
+      return {
+        storeid: API_CONFIG.STORE_ID,
+        username: '',
+        userid: '',
+      };
     }
     const user = JSON.parse(userData);
     return {
@@ -22,7 +27,11 @@ export const getUserCredentials = () => {
       userid: user.username,
     };
   } catch (error) {
-    throw new Error('Failed to get user credentials');
+    return {
+      storeid: API_CONFIG.STORE_ID,
+      username: '',
+      userid: '',
+    };
   }
 };
 

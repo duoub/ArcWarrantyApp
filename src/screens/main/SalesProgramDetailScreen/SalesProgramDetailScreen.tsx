@@ -73,7 +73,7 @@ const SalesProgramDetailScreen = () => {
     <p><em>Mọi thắc mắc vui lòng liên hệ bộ phận chăm sóc khách hàng để được hỗ trợ.</em></p>
   `;
 
-  const decodedHtml = decodeHtml(htmlContent || mockHtmlContent);
+  const decodedHtml = decodeHtml(htmlContent);
 
   // Custom styles for HTML rendering
   const tagsStyles = {

@@ -1,6 +1,5 @@
-import React, { useRef, useCallback, useEffect } from 'react';
+import React, { useRef, useCallback, useEffect, useState } from 'react';
 import {
-  View,
   Image,
   TouchableOpacity,
   StyleSheet,
@@ -22,6 +21,7 @@ const GAP = 8;
 const { width: SCREEN_W, height: SCREEN_H } = Dimensions.get('window');
 
 const DraggableContact: React.FC = () => {
+  const [isExpanded, setIsExpanded] = useState(false);
   const expandedRef = useRef(false);
   const contactRef = useRef<{ hotline: string; zalo: string; website: string } | null>(null);
 
@@ -47,9 +47,11 @@ const DraggableContact: React.FC = () => {
   // Ref so PanResponder (created once) always calls the latest version
   const toggleExpandRef = useRef<(() => void) | undefined>(undefined);
   toggleExpandRef.current = () => {
-    expandedRef.current = !expandedRef.current;
+    const newExpanded = !expandedRef.current;
+    expandedRef.current = newExpanded;
+    setIsExpanded(newExpanded);
     Animated.spring(expandAnim, {
-      toValue: expandedRef.current ? 1 : 0,
+      toValue: newExpanded ? 1 : 0,
       useNativeDriver: true,
       tension: 60,
       friction: 7,
@@ -105,6 +107,7 @@ const DraggableContact: React.FC = () => {
   // --- actions -------------------------------------------------------------
   const collapse = useCallback(() => {
     expandedRef.current = false;
+    setIsExpanded(false);
     Animated.spring(expandAnim, { toValue: 0, useNativeDriver: true }).start();
   }, [expandAnim]);
 
@@ -149,7 +152,7 @@ const DraggableContact: React.FC = () => {
   return (
     <Animated.View
       style={[styles.container, { left: position.x, top: position.y }]}
-      {...panResponder.panHandlers}
+      pointerEvents="box-none"
     >
       {/* Zalo — furthest up */}
       <Animated.View
@@ -157,6 +160,7 @@ const DraggableContact: React.FC = () => {
           styles.floatButton,
           { opacity: expandAnim, transform: [{ translateY: zaloOffset }, { scale: expandAnim }] },
         ]}
+        pointerEvents={isExpanded ? 'auto' : 'none'}
       >
         <TouchableOpacity
           style={[styles.actionButton, styles.zaloButton]}
@@ -173,6 +177,7 @@ const DraggableContact: React.FC = () => {
           styles.floatButton,
           { opacity: expandAnim, transform: [{ translateY: facebookOffset }, { scale: expandAnim }] },
         ]}
+        pointerEvents={isExpanded ? 'auto' : 'none'}
       >
         <TouchableOpacity
           style={[styles.actionButton, styles.facebookButton]}
@@ -189,6 +194,7 @@ const DraggableContact: React.FC = () => {
           styles.floatButton,
           { opacity: expandAnim, transform: [{ translateY: phoneOffset }, { scale: expandAnim }] },
         ]}
+        pointerEvents={isExpanded ? 'auto' : 'none'}
       >
         <TouchableOpacity
           style={[styles.actionButton, styles.phoneButton]}
@@ -200,9 +206,9 @@ const DraggableContact: React.FC = () => {
       </Animated.View>
 
       {/* Main draggable handle */}
-      <View style={styles.handle}>
+      <Animated.View style={styles.handle} {...panResponder.panHandlers}>
         <Icon name="phone" size={26} color={COLORS.white} />
-      </View>
+      </Animated.View>
     </Animated.View>
   );
 };

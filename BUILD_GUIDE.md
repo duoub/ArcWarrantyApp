@@ -31,7 +31,7 @@ cd android
 
 ```bash
 cd android
-./gradlew bundleRelease
+./gradlew bundleRelease 2>&1
 ```
 
 **Output:** `android/app/build/outputs/bundle/release/app-release.aab`
