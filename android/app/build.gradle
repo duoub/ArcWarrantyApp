@@ -83,8 +83,8 @@ android {
         applicationId "vn.asiatic.bhdt"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 25
-        versionName "2.0.5"
+        versionCode 26
+        versionName "2.0.6"
         // Chỉ build cho arm64-v8a để giảm size APK (hầu hết thiết bị hiện nay)
         ndk {
             abiFilters "arm64-v8a"
