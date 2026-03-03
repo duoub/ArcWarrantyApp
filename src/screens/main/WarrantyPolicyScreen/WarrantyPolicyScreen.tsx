@@ -10,7 +10,6 @@ import {
   RefreshControl,
   ActivityIndicator,
   FlatList,
-  LayoutAnimation,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { COLORS, SPACING, BORDER_RADIUS, SHADOWS } from '../../../config/theme';
@@ -21,7 +20,7 @@ import { newsService } from '../../../api/newsService';
 import { NewsItem } from '../../../types/news';
 
 const WarrantyPolicyScreen = () => {
-  const navigation = useNavigation();
+  const navigation = useNavigation<any>();
   const [keyword, setKeyword] = useState('');
   const [articles, setArticles] = useState<NewsItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -29,7 +28,6 @@ const WarrantyPolicyScreen = () => {
   const [page, setPage] = useState(1);
   const [hasNextPage, setHasNextPage] = useState(false);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
-  const [expandedId, setExpandedId] = useState<number | null>(null);
 
   const loadData = useCallback(async (pageNum: number = 1, searchKeyword: string = '', isRefresh: boolean = false) => {
     if (pageNum === 1) {
@@ -66,10 +64,6 @@ const WarrantyPolicyScreen = () => {
     return () => clearTimeout(timeoutId);
   }, [keyword, loadData]);
 
-  const handleBackPress = () => {
-    navigation.goBack();
-  };
-
   const handleRefresh = () => {
     setRefreshing(true);
     loadData(1, keyword, true);
@@ -81,63 +75,43 @@ const WarrantyPolicyScreen = () => {
     }
   };
 
-  const toggleExpand = (id: number) => {
-    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-    setExpandedId(prev => (prev === id ? null : id));
+  const handleArticlePress = (article: NewsItem) => {
+    navigation.navigate('NewsDetail', { article, headerTitle: 'Chính sách bảo hành' });
   };
 
-  const renderArticleCard = ({ item }: { item: NewsItem }) => {
-    const isExpanded = expandedId === item.id;
+  const renderArticleCard = ({ item }: { item: NewsItem }) => (
+    <TouchableOpacity
+      style={styles.articleCard}
+      onPress={() => handleArticlePress(item)}
+      activeOpacity={0.7}
+    >
+      {item.imgurl ? (
+        <Image
+          source={{ uri: item.imgurl }}
+          style={styles.articleImage}
+          resizeMode="cover"
+        />
+      ) : null}
 
-    return (
-      <TouchableOpacity
-        style={styles.articleCard}
-        onPress={() => toggleExpand(item.id)}
-        activeOpacity={0.7}
-      >
-        {item.imgurl ? (
-          <Image
-            source={{ uri: item.imgurl }}
-            style={styles.articleImage}
-            resizeMode="cover"
-          />
-        ) : null}
+      <View style={styles.articleContent}>
+        <Text style={styles.articleTitle} numberOfLines={2}>
+          {item.title}
+        </Text>
 
-        <View style={styles.articleContent}>
-          <Text style={styles.articleTitle} numberOfLines={isExpanded ? undefined : 2}>
-            {item.title}
-          </Text>
+        <Text style={styles.articleDescription} numberOfLines={3}>
+          {item.description}
+        </Text>
 
-          <Text style={styles.articleDescription} numberOfLines={isExpanded ? undefined : 3}>
-            {item.description}
-          </Text>
-
-          <View style={styles.articleFooter}>
-            <View style={styles.dateContainer}>
-              <Icon name="calendar" size={14} color={COLORS.textSecondary} style={styles.metaIcon} />
-              <Text style={styles.metaText}>{item.createdate}</Text>
-            </View>
-            <View style={styles.expandIndicator}>
-              <Text style={styles.readMore}>{isExpanded ? 'Thu gọn' : 'Xem chi tiết'}</Text>
-              <Icon
-                name="chevron-down"
-                size={16}
-                color={COLORS.primary}
-                style={isExpanded ? styles.chevronUp : undefined}
-              />
-            </View>
+        <View style={styles.articleFooter}>
+          <View style={styles.dateContainer}>
+            <Icon name="calendar" size={14} color={COLORS.textSecondary} style={styles.metaIcon} />
+            <Text style={styles.metaText}>{item.createdate}</Text>
           </View>
-
-          {isExpanded && (
-            <View style={styles.expandedContent}>
-              <View style={styles.divider} />
-              <Text style={styles.content}>{item.content}</Text>
-            </View>
-          )}
+          <Text style={styles.readMore}>Xem chi tiết →</Text>
         </View>
-      </TouchableOpacity>
-    );
-  };
+      </View>
+    </TouchableOpacity>
+  );
 
   const renderFooter = () => {
     if (!isLoadingMore) return null;
@@ -164,7 +138,7 @@ const WarrantyPolicyScreen = () => {
       <CustomHeader
         title="Chính sách bảo hành"
         leftIcon={<Text style={commonStyles.backIconMedium}>‹</Text>}
-        onLeftPress={handleBackPress}
+        onLeftPress={() => navigation.goBack()}
       />
 
       <View style={commonStyles.searchContainer}>
@@ -263,31 +237,10 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: COLORS.textSecondary,
   },
-  expandIndicator: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-  },
   readMore: {
     fontSize: 14,
     color: COLORS.primary,
     fontWeight: '600',
-  },
-  chevronUp: {
-    transform: [{ rotate: '180deg' }],
-  },
-  expandedContent: {
-    marginTop: SPACING.md,
-  },
-  divider: {
-    height: 1,
-    backgroundColor: COLORS.gray200,
-    marginBottom: SPACING.md,
-  },
-  content: {
-    fontSize: 15,
-    color: COLORS.textPrimary,
-    lineHeight: 24,
   },
   loadingMore: {
     paddingVertical: SPACING.lg,

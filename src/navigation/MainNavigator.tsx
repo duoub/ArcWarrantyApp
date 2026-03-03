@@ -75,7 +75,7 @@ export type MenuStackParamList = {
   DistributionSystem: { type?: UserType } | undefined;
   Notification: undefined;
   News: undefined;
-  NewsDetail: { article: NewsItem };
+  NewsDetail: { article: NewsItem; headerTitle?: string };
   SalesPolicy: undefined;
   WarrantyPolicy: undefined;
   Contact: undefined;

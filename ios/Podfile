@@ -35,5 +35,29 @@ target 'ArcWarrantyApp' do
       :mac_catalyst_enabled => false,
       # :ccache_enabled => true
     )
+
+    installer.pods_project.targets.each do |target|
+      target.build_configurations.each do |config|
+        config.build_settings['CLANG_CXX_LANGUAGE_STANDARD'] = 'c++20'
+        config.build_settings['CLANG_CXX_LIBRARY'] = 'libc++'
+      end
+    end
+
+    # Fix RN 0.83 + Hermes: CDPAgent/inspector_modern symbols missing in Release hermesvm.
+    # The React-hermes compiled sources always reference these symbols even in Release.
+    # Solution: prevent the Hermes replace script from swapping to Release binary
+    # by keeping GCC_PREPROCESSOR_DEFINITIONS with DEBUG=1 on hermes-engine target.
+    hermes_engine_target = installer.pods_project.targets.find { |t| t.name == 'hermes-engine' }
+    if hermes_engine_target
+      hermes_engine_target.build_configurations.each do |config|
+        if config.name == 'Release'
+          # Keep DEBUG=1 so the hermes replace script uses debug binary (has CDP symbols)
+          defs = config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'] || ['$(inherited)']
+          defs = [defs] if defs.is_a?(String)
+          defs << 'DEBUG=1' unless defs.include?('DEBUG=1')
+          config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'] = defs
+        end
+      end
+    end
   end
 end

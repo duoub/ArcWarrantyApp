@@ -18,6 +18,7 @@ import { NewsItem } from '../../../types/news';
 type NewsDetailRouteParams = {
   NewsDetail: {
     article: NewsItem;
+    headerTitle?: string;
   };
 };
 
@@ -45,7 +46,7 @@ const buildHtml = (content: string) => `
 const NewsDetailScreen = () => {
   const navigation = useNavigation();
   const route = useRoute<RouteProp<NewsDetailRouteParams, 'NewsDetail'>>();
-  const { article } = route.params;
+  const { article, headerTitle = 'Chi tiết tin tức' } = route.params;
   const { width } = useWindowDimensions();
 
   return (
@@ -53,7 +54,7 @@ const NewsDetailScreen = () => {
       <StatusBar barStyle="light-content" backgroundColor={COLORS.primary} />
 
       <CustomHeader
-        title="Chi tiết tin tức"
+        title={headerTitle}
         leftIcon={<Text style={commonStyles.backIconMedium}>‹</Text>}
         onLeftPress={() => navigation.goBack()}
       />
