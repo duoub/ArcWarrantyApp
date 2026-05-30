@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, TouchableOpacity, StyleSheet } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
 import { CommonActions } from '@react-navigation/native';
@@ -187,6 +188,8 @@ const ProfileStackNavigator = () => {
 const MainNavigator = () => {
   const { user } = useAuthStore();
   const userRole = user?.role?.toLowerCase();
+  const insets = useSafeAreaInsets();
+  const tabBarHeight = 60 + insets.bottom;
 
   return (
     <Tab.Navigator
@@ -204,8 +207,8 @@ const MainNavigator = () => {
           borderTopWidth: 1,
           borderTopColor: COLORS.gray200,
           paddingTop: SPACING.xs,
-          paddingBottom: SPACING.xs,
-          height: 60,
+          paddingBottom: insets.bottom > 0 ? insets.bottom : SPACING.xs,
+          height: tabBarHeight,
         },
         tabBarActiveTintColor: COLORS.primary,
         tabBarInactiveTintColor: COLORS.gray500,

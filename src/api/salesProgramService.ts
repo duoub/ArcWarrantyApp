@@ -12,6 +12,7 @@ import {
   RegisterProgramRequest,
   RegisterProgramResponse,
   SalesProgramDataRaw,
+  SalesProgramDetailRaw,
   SalesProgramItemRaw,
   SalesProgramItem,
 } from '../types/salesProgram';
@@ -85,21 +86,16 @@ export const salesProgramService = {
 
   /**
    * Get sales program detail by ID (for banner click)
-   * API: /getprofile?userid=xxx&storeid=xxx&typeget=1&idct=xxx
+   * API: /getdetailchuongtrinhsale?storeid=xxx&userid=xxx&id=xxx
    */
   getSalesProgramDetail: async (
     params: GetSalesProgramDetailRequest
   ): Promise<GetSalesProgramDetailResponse> => {
     try {
       const credentials = getUserCredentials();
-      const { typeget, idct } = params;
 
-      // Build API URL with query params
-      const url = buildApiUrl('/getprofile', {
-        userid: credentials.username,
-        storeid: API_CONFIG.STORE_ID,
-        typeget: typeget,
-        idct: idct,
+      const url = buildApiUrl('/getdetailchuongtrinhsale', {
+        id: params.id,
       });
 
       const response = await fetch(url, {
@@ -109,16 +105,15 @@ export const salesProgramService = {
         },
       });
 
-      const result: SalesProgramDataRaw = await response.json();
+      const result: SalesProgramDetailRaw = await response.json();
 
-      // Check if we got valid data with program list
-      if (result && Array.isArray(result.listchuongtrinhsale) && result.listchuongtrinhsale.length > 0) {
-        // Get the first program (should be the one matching idct)
-        const program = parseSalesProgramItem(result.listchuongtrinhsale[0]);
-
+      if (result && result.title) {
         return {
           status: true,
-          data: program,
+          data: {
+            name: result.title,
+            noidungchitiet: result.content || '',
+          },
         };
       } else {
         return {

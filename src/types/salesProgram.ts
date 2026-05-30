@@ -83,12 +83,24 @@ export interface RegisterProgramResponse {
 }
 
 export interface GetSalesProgramDetailRequest {
-  typeget: number; // Type parameter (1 for sales program detail)
-  idct: string; // Program ID from banner
+  id: string; // Program ID from banner
+}
+
+export interface SalesProgramDetailRaw {
+  title: string;
+  content: string;
+  listFile: {
+    previewUrl: string;
+    imagename: string | null;
+    filename: string;
+    filesize: number;
+    fileid: string;
+    location: string;
+  }[];
 }
 
 export interface GetSalesProgramDetailResponse {
   status: boolean;
-  data: SalesProgramItem | null;
+  data: { name: string; noidungchitiet: string } | null;
   message?: string;
 }

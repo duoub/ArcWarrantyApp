@@ -16,9 +16,10 @@ export const bannerService = {
     try {
       const credentials = getUserCredentials();
 
-      const url = buildApiUrl('/getlisthomebanner', {
+      const url = buildApiUrl('/getinfoapp', {
         storeid: API_CONFIG.STORE_ID,
         userid: credentials.username,
+        typeget: '5', // typeget=2 returns banners3 which has detailed banner info
       });
 
       const response = await fetch(url, {

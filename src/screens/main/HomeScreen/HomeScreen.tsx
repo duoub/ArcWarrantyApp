@@ -11,6 +11,7 @@ import {
   Alert,
   StatusBar,
   ActivityIndicator,
+  Animated,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -23,7 +24,6 @@ import { ProfileData } from '../../../types/profile';
 import { bannerService } from '../../../api/bannerService';
 import { BannerItem } from '../../../types/banner';
 import { salesProgramService } from '../../../api/salesProgramService';
-import { Icon } from '../../../components/common';
 import { NotificationService } from '../../../utils/notificationService';
 import { commonStyles } from '../../../styles/commonStyles';
 
@@ -46,6 +46,8 @@ const HomeScreen = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [banners, setBanners] = useState<BannerItem[]>([]);
   const [isBannerLoading, setIsBannerLoading] = useState(false);
+  const [isBannerFetching, setIsBannerFetching] = useState(true);
+  const shimmerAnim = useRef(new Animated.Value(0)).current;
 
   // Initialize Firebase Cloud Messaging
   useEffect(() => {
@@ -81,50 +83,49 @@ const HomeScreen = () => {
     };
   }, []);
 
-  // Load profile data from API
+  // Load all data concurrently on mount, each processes as soon as its response arrives
   useEffect(() => {
+    // Banner: fire immediately, process as soon as done
+    bannerService.getHomeBanner()
+      .then(response => {
+        if (response.status && response.banners.length > 0) {
+          setBanners(response.banners);
+        }
+      })
+      .catch(() => {})
+      .finally(() => setIsBannerFetching(false));
+
+    // Profile: fire immediately (only process if authenticated), process as soon as done
     if (isAuthenticated) {
-      loadProfileData();
+      setIsLoading(true);
+      profileService.getProfile({ typeget: 5 })
+        .then(response => {
+          if (response.status && response.data) {
+            setProfileData(response.data);
+          }
+        })
+        .catch(() => {})
+        .finally(() => setIsLoading(false));
     }
   }, [isAuthenticated]);
-
-  // Load banners from API
-  useEffect(() => {
-    loadBanners();
-  }, []);
-
-  const loadBanners = async () => {
-    try {
-      const response = await bannerService.getHomeBanner();
-      if (response.status && response.banners.length > 0) {
-        setBanners(response.banners);
-      }
-    } catch (error) {
-      // Keep empty banners on error
-    }
-  };
 
   // Log when user avatar changes to debug re-render
   useEffect(() => {
   }, [user?.avatar]);
 
-  const loadProfileData = async () => {
-    try {
-      setIsLoading(true);
-
-      const response = await profileService.getProfile({
-        typeget: 5,
-      });
-
-      if (response.status && response.data) {
-        setProfileData(response.data);
-      }
-    } catch (error) {
-      // Keep using default banners and zero rewards on error
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  // Shimmer animation loop while banner is loading
+  useEffect(() => {
+    if (!isBannerFetching) return;
+    shimmerAnim.setValue(0);
+    const loop = Animated.loop(
+      Animated.sequence([
+        Animated.timing(shimmerAnim, { toValue: 1, duration: 600, useNativeDriver: true }),
+        Animated.timing(shimmerAnim, { toValue: 0, duration: 600, useNativeDriver: true }),
+      ])
+    );
+    loop.start();
+    return () => loop.stop();
+  }, [isBannerFetching]);
 
   // Auto-slide banners - only run when there are banners
   useEffect(() => {
@@ -155,8 +156,7 @@ const HomeScreen = () => {
 
       // Call API to get program detail
       const response = await salesProgramService.getSalesProgramDetail({
-        typeget: 1,
-        idct: banner.id.toString(),
+        id: banner.id.toString(),
       });
 
       if (response.status && response.data) {
@@ -233,8 +233,23 @@ const HomeScreen = () => {
         showsVerticalScrollIndicator={false}
         contentInsetAdjustmentBehavior="never"
       >
+        {/* Banner Skeleton */}
+        {isBannerFetching && (
+          <View style={styles.bannerSkeleton}>
+            <Animated.View
+              style={[
+                StyleSheet.absoluteFill,
+                {
+                  backgroundColor: '#ffffff',
+                  opacity: shimmerAnim.interpolate({ inputRange: [0, 1], outputRange: [0, 0.35] }),
+                },
+              ]}
+            />
+          </View>
+        )}
+
         {/* Banner Slider - Only show when there are banners, tràn cả safe area */}
-        {banners.length > 0 && (
+        {!isBannerFetching && banners.length > 0 && (
           <View style={styles.bannerContainer}>
             <FlatList
               ref={bannerListRef}
@@ -424,6 +439,15 @@ const styles = StyleSheet.create({
   },
   scrollView: {
     flex: 1,
+  },
+
+  // Banner Skeleton
+  bannerSkeleton: {
+    width: BANNER_WIDTH,
+    height: BANNER_HEIGHT,
+    backgroundColor: '#c8c8c8',
+    marginBottom: SPACING.md,
+    overflow: 'hidden',
   },
 
   // Banner Slider
