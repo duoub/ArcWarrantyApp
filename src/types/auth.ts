@@ -75,6 +75,9 @@ export interface SignupRequest {
   sotaikhoan: string; // Bank account number
   nganhang: string; // Bank name
   tentaikhoan: string; // Bank account holder name
+  mst?: string; // Tax code (mã số thuế) - chỉ dùng cho Doanh nghiệp (C2)
+  socccd?: string; // Số CCCD - chỉ dùng cho Hộ kinh doanh (C2)
+  tenphapnhan?: string; // Tên pháp nhân - dùng cho C2 (Doanh nghiệp & Hộ kinh doanh)
 }
 
 export interface SignupResponse {

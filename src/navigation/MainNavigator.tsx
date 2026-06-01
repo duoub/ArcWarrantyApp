@@ -1,9 +1,9 @@
 import React from 'react';
-import { View, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
-import { CommonActions } from '@react-navigation/native';
+import { CommonActions, useNavigationState } from '@react-navigation/native';
 import { COLORS, SPACING, SHADOWS } from '../config/theme';
 import { Icon } from '../components/common';
 import { useAuthStore } from '../store/authStore';
@@ -110,17 +110,31 @@ const ProfileStack = createStackNavigator<ProfileStackParamList>();
 const Tab = createBottomTabNavigator<MainTabParamList>();
 
 // Custom Tab Button Component for Center Button
-const CenterTabButton = ({ onPress, focused }: { onPress: () => void; focused: boolean }) => (
-  <TouchableOpacity
-    style={styles.centerButton}
-    onPress={onPress}
-    activeOpacity={0.8}
-  >
-    <View style={[styles.centerButtonInner, focused && styles.centerButtonFocused]}>
-      <Icon name="in-out" size={32} color={COLORS.white} />
-    </View>
-  </TouchableOpacity>
-);
+const CenterTabButton = ({ onPress }: { onPress: () => void }) => {
+  // Lấy tab đang active trực tiếp từ navigation state cho chắc chắn
+  const focused = useNavigationState(
+    (state) => state.routes[state.index]?.name === 'InOutStack'
+  );
+
+  return (
+    <TouchableOpacity
+      style={styles.centerButton}
+      onPress={onPress}
+      activeOpacity={0.8}
+    >
+      {/* Box giữ chỗ = đúng wrapperUikit của tab thường (31x28) → label rơi
+          đúng cao độ. Vòng tròn thật là lớp absolute nổi lên trên. */}
+      <View style={styles.centerIconSlot} />
+      <Text style={[styles.centerButtonLabel, focused && styles.centerButtonLabelFocused]}>
+        IN/OUT
+      </Text>
+      {/* Vòng tròn nổi tuyệt đối → không ảnh hưởng layout/căn của label */}
+      <View style={[styles.centerButtonInner, focused && styles.centerButtonFocused]}>
+        <Icon name="in-out" size={32} color={COLORS.white} />
+      </View>
+    </TouchableOpacity>
+  );
+};
 
 // Home Stack Navigator
 const HomeStackNavigator = () => {
@@ -267,7 +281,6 @@ const MainNavigator = () => {
                     props.onPress({} as any);
                   }
                 }}
-                focused={props.accessibilityState?.selected || false}
               />
             ),
           }}
@@ -332,13 +345,25 @@ const MainNavigator = () => {
 };
 
 const styles = StyleSheet.create({
+  // Sao chép đúng tabVerticalUiKit của bottom-tabs v7: từ trên xuống,
+  // padding 5 → box icon → label. (Tab thường KHÔNG center dọc.)
   centerButton: {
     flex: 1,
-    justifyContent: 'center',
+    flexDirection: 'column',
     alignItems: 'center',
-    marginTop: -30,
+    justifyContent: 'flex-start',
+    paddingTop: 5,
+  },
+  // = wrapperUikit của TabBarIcon (31x28) → label rơi đúng cao độ tab thường
+  centerIconSlot: {
+    width: 31,
+    height: 28,
   },
   centerButtonInner: {
+    // Nổi tuyệt đối: không tham gia layout nên không đè/đẩy label.
+    // top âm lớn → vòng tròn nhô cao khỏi thanh tab, đáy không chạm label.
+    position: 'absolute',
+    top: -38,
     width: 70,
     height: 70,
     borderRadius: 35,
@@ -352,6 +377,16 @@ const styles = StyleSheet.create({
   centerButtonFocused: {
     backgroundColor: COLORS.primaryDark,
     transform: [{ scale: 1.05 }],
+  },
+  // Giống hệt tabBarLabelStyle: fontSize 12, weight 600, marginTop 4
+  centerButtonLabel: {
+    marginTop: 4,
+    fontSize: 12,
+    fontWeight: '600',
+    color: COLORS.gray500,
+  },
+  centerButtonLabelFocused: {
+    color: COLORS.primary,
   },
 });
 

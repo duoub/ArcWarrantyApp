@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import {
   View,
   Text,
@@ -14,6 +14,7 @@ import {
   StatusBar,
   Linking,
 } from 'react-native';
+import LinearGradient from 'react-native-linear-gradient';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -26,6 +27,7 @@ import { Icon } from '../../../components/common';
 import { authService } from '../../../api/authService';
 import { useAuthStore } from '../../../store/authStore';
 import { bannerService } from '../../../api/bannerService';
+import { appInfoService } from '../../../api/appInfoService';
 import { BannerItem } from '../../../types/banner';
 import { commonStyles } from '../../../styles/commonStyles';
 import PreLoginNavigator from '../../../navigation/PreLoginNavigator';
@@ -34,9 +36,23 @@ const { width } = Dimensions.get('window');
 const BANNER_WIDTH = width;
 const BANNER_HEIGHT = width;
 
+// Fade-to-white overlay ở 2 đầu banner cho cảm giác liền mạch
+const FADE_HEIGHT = 56;
+const FADE_WHITE = 'rgba(255,255,255,1)';
+const FADE_CLEAR = 'rgba(255,255,255,0)';
+
 const DEFAULT_BANNER_IMAGE = require('../../../assets/images/banner.jpg');
 
 type LoginScreenNavigationProp = StackNavigationProp<PreLoginRootStackParamList, 'Login'>;
+
+// Gradient trắng → trong suốt mượt (LinearGradient thật, không bị banding)
+const FadeEdge = ({ position }: { position: 'top' | 'bottom' }) => (
+  <LinearGradient
+    pointerEvents="none"
+    colors={position === 'top' ? [FADE_WHITE, FADE_CLEAR] : [FADE_CLEAR, FADE_WHITE]}
+    style={[styles.fadeEdge, position === 'top' ? { top: 0 } : { bottom: 0 }]}
+  />
+);
 
 const LoginScreen = () => {
   const navigation = useNavigation<LoginScreenNavigationProp>();
@@ -51,6 +67,26 @@ const LoginScreen = () => {
   const [currentBannerIndex, setCurrentBannerIndex] = useState(0);
   const bannerListRef = useRef<FlatList>(null);
   const [isBannerLoading, setIsBannerLoading] = useState(false);
+
+  // Hotline cho "Quên mật khẩu?" (gọi tổng đài hỗ trợ)
+  const hotlineRef = useRef<string | null>(null);
+  useEffect(() => {
+    appInfoService.getContactInfo().then((info) => {
+      if (info?.hotline) hotlineRef.current = info.hotline;
+    });
+  }, []);
+
+  const handleForgotPassword = useCallback(() => {
+    const phone = hotlineRef.current;
+    if (phone) {
+      Linking.openURL(`tel:${phone.replace(/\s/g, '')}`);
+    } else {
+      Alert.alert(
+        'Hỗ trợ',
+        'Vui lòng liên hệ hotline để được hỗ trợ đặt lại mật khẩu.'
+      );
+    }
+  }, []);
 
   // Load banners on mount (no userid for pre-login)
   useEffect(() => {
@@ -164,7 +200,6 @@ const LoginScreen = () => {
       }
 
       login(response.token, response.user);
-      Alert.alert('Đăng nhập thành công', response.message || 'Chào mừng bạn trở lại!');
     } catch (error) {
       Alert.alert(
         'Đăng nhập thất bại',
@@ -207,6 +242,10 @@ const LoginScreen = () => {
                 setCurrentBannerIndex(index);
               }}
             />
+
+            {/* Mờ 2 đầu top/bottom cho liền mạch với nền trắng */}
+            <FadeEdge position="top" />
+            <FadeEdge position="bottom" />
 
             {/* Pagination Dots */}
             {banners.length > 1 && (
@@ -316,20 +355,20 @@ const LoginScreen = () => {
               )}
             />
 
-            {/* Forgot Password Link */}
+            {/* Forgot Password Link → gọi hotline hỗ trợ */}
             <TouchableOpacity
               style={styles.forgotPassword}
-              onPress={() => navigation.navigate('ForgotPassword')}
+              onPress={handleForgotPassword}
               disabled={isLoading}
             >
               <Text style={styles.forgotPasswordText}>Quên mật khẩu?</Text>
             </TouchableOpacity>
 
-            {/* Login Button */}
+            {/* Login Button - flat phẳng */}
             <TouchableOpacity
               style={[styles.loginButton, isLoading && styles.loginButtonDisabled]}
               onPress={handleSubmit(handleLogin)}
-              activeOpacity={0.8}
+              activeOpacity={0.85}
               disabled={isLoading}
             >
               {isLoading ? (
@@ -390,6 +429,12 @@ const styles = StyleSheet.create({
     width: BANNER_WIDTH,
     height: BANNER_HEIGHT,
   },
+  fadeEdge: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    height: FADE_HEIGHT,
+  },
   bannerImage: {
     width: '100%',
     height: '100%',
@@ -409,14 +454,13 @@ const styles = StyleSheet.create({
   loginCard: {
     backgroundColor: COLORS.white,
     borderRadius: BORDER_RADIUS.xl,
-    padding: SPACING.lg,
-    shadowColor: COLORS.black,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.08,
-    shadowRadius: 12,
-    elevation: 4,
-    borderWidth: 1,
-    borderColor: COLORS.gray200,
+    paddingHorizontal: SPACING.lg,
+    paddingVertical: SPACING.lg,
+    shadowColor: '#1B2B4B',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.06,
+    shadowRadius: 20,
+    elevation: 3,
   },
 
   // Checkbox
@@ -463,12 +507,18 @@ const styles = StyleSheet.create({
   inputWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: COLORS.gray50,
-    borderRadius: BORDER_RADIUS.md,
-    borderWidth: 2,
-    borderColor: COLORS.gray200,
+    backgroundColor: COLORS.white,
+    borderRadius: BORDER_RADIUS.lg,
+    borderWidth: 1.5,
+    borderColor: '#D5DEEC',
     paddingHorizontal: SPACING.md,
-    height: 52,
+    height: 54,
+    // bóng nhẹ để input nổi khối, nét hơn trên nền trắng
+    shadowColor: '#1B2B4B',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.06,
+    shadowRadius: 5,
+    elevation: 1,
   },
   inputWrapperError: {
     borderColor: COLORS.error,
@@ -476,6 +526,7 @@ const styles = StyleSheet.create({
   input: {
     flex: 1,
     fontSize: 15,
+    fontWeight: '500',
     color: COLORS.textPrimary,
     paddingVertical: 0,
     height: '100%',
@@ -502,26 +553,20 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
 
-  // Login Button
+  // Login Button - flat phẳng (màu đặc, không gradient/shadow)
   loginButton: {
+    height: 54,
+    borderRadius: BORDER_RADIUS.lg,
     backgroundColor: COLORS.primary,
-    paddingVertical: 0,
     alignItems: 'center',
     justifyContent: 'center',
-    height: 52,
-    borderRadius: BORDER_RADIUS.md,
-    shadowColor: COLORS.primary,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 4,
-    elevation: 3,
     marginBottom: SPACING.md,
   },
   loginButtonText: {
     fontSize: 16,
     fontWeight: '700',
     color: COLORS.white,
-    letterSpacing: 0.5,
+    letterSpacing: 0.3,
   },
   loginButtonDisabled: {
     opacity: 0.6,

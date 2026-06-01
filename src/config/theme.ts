@@ -4,10 +4,10 @@
  */
 
 export const COLORS = {
-  // Primary Colors (from ARC logo)
-  primary: '#2B3BA0',        // ARC Navy Blue
-  primaryDark: '#1E2B7A',    // Darker navy for pressed states
-  primaryLight: '#4A5BC4',   // Lighter navy for backgrounds
+  // Primary Colors (brighter ARC blue - sáng & nét hơn)
+  primary: '#1877F2',        // Bright azure blue
+  primaryDark: '#0B5ED7',    // Darker blue for pressed states
+  primaryLight: '#5AA0FF',   // Lighter blue for backgrounds
 
   // Secondary Colors
   secondary: '#2D2D2D',      // Black from logo text
@@ -57,6 +57,19 @@ export const COLORS = {
   overlayLight: 'rgba(0, 0, 0, 0.3)',
 };
 
+// Gradient palettes (glossy / bóng bẩy)
+export const GRADIENTS: {
+  primary: string[];
+  primaryDiagonal: string[];
+  sheen: string[];
+} = {
+  // Tương phản mạnh: sáng rực trên → xanh đậm dưới, nổi khối & nét
+  primary: ['#5AB4FF', '#1E83F7', '#0653CC'],
+  primaryDiagonal: ['#5AB4FF', '#1877F2', '#0653CC'],
+  // Vệt sáng bóng (gloss) phủ nửa trên: trắng mờ → trong suốt
+  sheen: ['rgba(255,255,255,0.55)', 'rgba(255,255,255,0.12)', 'rgba(255,255,255,0)'],
+};
+
 export const SPACING = {
   xs: 4,
   sm: 8,
@@ -67,12 +80,15 @@ export const SPACING = {
   xxl: 48,
 };
 
+// Style vuông phẳng: đặt mọi mức bo góc = 0 ở MỘT nơi → toàn bộ nút/input/card
+// trong app thành vuông góc. Giữ `full` để các phần tử tròn (avatar, FAB, nút tròn)
+// vẫn tròn. Muốn quay lại bo góc thì chỉ cần đổi lại các giá trị bên dưới.
 export const BORDER_RADIUS = {
   none: 0,
-  sm: 4,
-  md: 8,
-  lg: 12,
-  xl: 16,
+  sm: 0,
+  md: 0,
+  lg: 0,
+  xl: 0,
   full: 9999,
 };
 
@@ -240,6 +256,7 @@ export const SIZES = {
 
 export default {
   COLORS,
+  GRADIENTS,
   SPACING,
   BORDER_RADIUS,
   TYPOGRAPHY,

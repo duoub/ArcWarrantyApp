@@ -19,6 +19,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
     // Configure Firebase
     FirebaseApp.configure()
 
+    // Đăng ký view manager cũ với legacy interop layer (New Architecture)
+    // để <LinearGradient /> (BVLinearGradient) render được dưới Fabric.
+    LegacyInterop.registerLegacyViewManagers()
+
     // Configure push notifications for iOS
     if #available(iOS 10.0, *) {
       UNUserNotificationCenter.current().delegate = self

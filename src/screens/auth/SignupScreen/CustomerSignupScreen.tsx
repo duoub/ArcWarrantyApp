@@ -327,7 +327,7 @@ const CustomerSignupScreen: React.FC = () => {
             </View>
             <Text style={styles.termsText}>
               Tôi đã đọc, hiểu và chấp nhận{' '}
-              <Text style={styles.termsLink}>Điều kiện và điều khoản hội viên</Text>
+              <Text style={styles.termsLink}>Điều kiện và Điều khoản hội viên</Text>
             </Text>
           </TouchableOpacity>
 

@@ -13,6 +13,7 @@ import {
   ActivityIndicator,
   Animated,
 } from 'react-native';
+import LinearGradient from 'react-native-linear-gradient';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { COLORS, SPACING, BORDER_RADIUS, SHADOWS } from '../../../config/theme';
@@ -33,8 +34,22 @@ const { width } = Dimensions.get('window');
 const BANNER_WIDTH = width;
 const BANNER_HEIGHT = width;
 
+// Fade-to-white overlay ở 2 đầu banner cho cảm giác liền mạch
+const FADE_HEIGHT = 56;
+const FADE_WHITE = 'rgba(255,255,255,1)';
+const FADE_CLEAR = 'rgba(255,255,255,0)';
+
 // Default banner image if API doesn't return any
 const DEFAULT_BANNER_IMAGE = require('../../../assets/images/banner.jpg');
+
+// Gradient trắng → trong suốt mượt (LinearGradient thật, không bị banding)
+const FadeEdge = ({ position }: { position: 'top' | 'bottom' }) => (
+  <LinearGradient
+    pointerEvents="none"
+    colors={position === 'top' ? [FADE_WHITE, FADE_CLEAR] : [FADE_CLEAR, FADE_WHITE]}
+    style={[styles.fadeEdge, position === 'top' ? { top: 0 } : { bottom: 0 }]}
+  />
+);
 
 const HomeScreen = () => {
   const navigation = useNavigation<HomeScreenNavigationProp>();
@@ -268,6 +283,10 @@ const HomeScreen = () => {
               }}
             />
 
+            {/* Mờ 2 đầu top/bottom cho liền mạch với nền trắng */}
+            <FadeEdge position="top" />
+            <FadeEdge position="bottom" />
+
             {/* Pagination Dots - Only show when more than 1 banner */}
             {banners.length > 1 && (
               <View style={commonStyles.paginationContainer}>
@@ -453,6 +472,12 @@ const styles = StyleSheet.create({
   // Banner Slider
   bannerContainer: {
     marginBottom: SPACING.md,
+  },
+  fadeEdge: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    height: FADE_HEIGHT,
   },
   bannerItem: {
     width: BANNER_WIDTH,

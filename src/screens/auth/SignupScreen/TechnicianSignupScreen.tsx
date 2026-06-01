@@ -14,7 +14,7 @@ import {
 } from 'react-native';
 import ImagePicker from 'react-native-image-crop-picker';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -24,11 +24,13 @@ import { AuthStackParamList } from '../../../navigation/PreLoginRootNavigator';
 import CustomHeader from '../../../components/CustomHeader';
 import { Icon } from '../../../components/common';
 import ProvinceSelector from '../../../components/ProvinceSelector';
+import BarcodeScanner from '../../../components/BarcodeScanner/BarcodeScanner';
 import { authService } from '../../../api/authService';
 import { uploadService, UploadedFile } from '../../../api/uploadService';
 import { USER_TYPES } from '../../../types/user';
 
 type TechnicianSignupScreenNavigationProp = StackNavigationProp<AuthStackParamList, 'TechnicianSignup'>;
+type TechnicianSignupScreenRouteProp = RouteProp<AuthStackParamList, 'TechnicianSignup'>;
 
 interface ImageItem {
   src: string;
@@ -37,6 +39,7 @@ interface ImageItem {
 
 // Technician Signup Validation Schema
 const technicianSignupSchema = z.object({
+  socccd: z.string().optional().or(z.literal('')),
   hoten: z.string().min(1, 'Họ và tên là bắt buộc'),
   phone: z.string().min(1, 'Số điện thoại là bắt buộc').regex(/^[0-9]{10}$/, 'Số điện thoại không hợp lệ'),
   email: z.string().email('Email không hợp lệ').optional().or(z.literal('')),
@@ -54,47 +57,93 @@ type TechnicianSignupFormData = z.infer<typeof technicianSignupSchema>;
 
 const TechnicianSignupScreen: React.FC = () => {
   const navigation = useNavigation<TechnicianSignupScreenNavigationProp>();
+  const route = useRoute<TechnicianSignupScreenRouteProp>();
+  const prefill = route.params;
+  // Khi đến từ AccountInfoScreen, SĐT/mật khẩu đã nhập ở bước trước → ẩn 3 field
+  // này (data vẫn giữ trong form để gửi API).
+  const hideAccountFields = !!prefill?.phone;
+  // Cá nhân không có cửa hàng (C3): hiển thị section "Thông tin pháp nhân" +
+  // Ảnh CCCD → Số CCCD (quét QR) → Họ và tên ở đầu form (giống Hộ kinh doanh ở DealerSignup)
+  const isIndividualNoShop = prefill?.subType === 'individual-no-shop';
+  // Cá nhân có cửa hàng (C3): như trên, nhưng thêm section Ảnh cửa hàng
+  const isIndividualShop = prefill?.subType === 'individual-shop';
+  // Cả 2 loại cá nhân đều hiển thị block "Thông tin pháp nhân" + CCCD + Số CCCD + Họ tên ở đầu form
+  const isIndividual = isIndividualNoShop || isIndividualShop;
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showRePassword, setShowRePassword] = useState(false);
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [provinceCode, setProvinceCode] = useState('');
+  const [scannerVisible, setScannerVisible] = useState(false);
   // Image states for CCCD
   const [idCardFront, setIdCardFront] = useState<ImageItem | null>(null);
   const [idCardBack, setIdCardBack] = useState<ImageItem | null>(null);
+  // Ảnh cửa hàng (chỉ dùng cho Cá nhân có cửa hàng)
+  const [shopImages, setShopImages] = useState<ImageItem[]>([]);
 
   const {
     control,
     handleSubmit,
     formState: { errors },
+    setValue,
   } = useForm<TechnicianSignupFormData>({
     resolver: zodResolver(technicianSignupSchema),
     defaultValues: {
+      socccd: '',
       hoten: '',
-      phone: '',
+      phone: prefill?.phone || '',
       email: '',
       address: '',
       city: '',
-      tendangnhap: '',
-      password: '',
-      repassword: '',
+      // Tên đăng nhập = số điện thoại (ẩn field khi đến từ AccountInfoScreen)
+      tendangnhap: prefill?.phone || '',
+      password: prefill?.password || '',
+      repassword: prefill?.repassword || '',
     },
   });
 
-  type ImageType = 'idCardFront' | 'idCardBack';
+  // Parse QR CCCD VN (định dạng chuẩn, các trường ngăn cách bởi dấu "|"):
+  // <Số CCCD>|<Số CMND cũ>|<Họ và tên>|<Ngày sinh>|<Giới tính>|<Địa chỉ>|<Ngày cấp>
+  const handleScanCccd = (raw: string) => {
+    setScannerVisible(false);
+    const parts = (raw || '').split('|');
+    const soCccd = parts[0]?.trim() || '';
+    const hoTen = parts[2]?.trim() || '';
 
-  const handleAddImage = (imageType: ImageType) => {
+    // QR CCCD hợp lệ: đủ số trường, số CCCD là 9-12 chữ số và có họ tên
+    const isValidCccd =
+      parts.length >= 3 && /^\d{9,12}$/.test(soCccd) && hoTen.length > 0;
+
+    if (!isValidCccd) {
+      Alert.alert(
+        'Mã QR không hợp lệ',
+        'Mã QR không đúng định dạng. Vui lòng quét lại.',
+        [
+          { text: 'Đóng', style: 'cancel' },
+          { text: 'Quét lại', onPress: () => setScannerVisible(true) },
+        ]
+      );
+      return;
+    }
+
+    setValue('socccd', soCccd, { shouldValidate: true });
+    setValue('hoten', hoTen, { shouldValidate: true });
+  };
+
+  type ImageType = 'idCardFront' | 'idCardBack' | 'shopImages';
+
+  const handleAddImage = (imageType: ImageType, shopImageIndex?: number) => {
     Alert.alert(
       'Thêm ảnh',
       'Chọn nguồn ảnh',
       [
         {
           text: 'Chụp ảnh',
-          onPress: () => handleTakePhoto(imageType),
+          onPress: () => handleTakePhoto(imageType, shopImageIndex),
         },
         {
           text: 'Thư viện',
-          onPress: () => handlePickFromLibrary(imageType),
+          onPress: () => handlePickFromLibrary(imageType, shopImageIndex),
         },
         {
           text: 'Hủy',
@@ -105,7 +154,27 @@ const TechnicianSignupScreen: React.FC = () => {
     );
   };
 
-  const handleTakePhoto = async (imageType: ImageType) => {
+  const setImageByType = (imageType: ImageType, image: ImageItem, shopImageIndex?: number) => {
+    switch (imageType) {
+      case 'idCardFront':
+        setIdCardFront(image);
+        break;
+      case 'idCardBack':
+        setIdCardBack(image);
+        break;
+      case 'shopImages':
+        if (shopImageIndex !== undefined) {
+          const newShopImages = [...shopImages];
+          newShopImages[shopImageIndex] = image;
+          setShopImages(newShopImages);
+        } else {
+          setShopImages([...shopImages, image]);
+        }
+        break;
+    }
+  };
+
+  const handleTakePhoto = async (imageType: ImageType, shopImageIndex?: number) => {
     try {
       // Request camera permission for Android
       if (Platform.OS === 'android') {
@@ -135,11 +204,7 @@ const TechnicianSignupScreen: React.FC = () => {
         uri: image.path,
       };
 
-      if (imageType === 'idCardFront') {
-        setIdCardFront(newImage);
-      } else {
-        setIdCardBack(newImage);
-      }
+      setImageByType(imageType, newImage, shopImageIndex);
     } catch (error: any) {
       if (error.code !== 'E_PICKER_CANCELLED') {
         Alert.alert('Lỗi', 'Không thể chụp ảnh. Vui lòng thử lại.');
@@ -147,7 +212,7 @@ const TechnicianSignupScreen: React.FC = () => {
     }
   };
 
-  const handlePickFromLibrary = async (imageType: ImageType) => {
+  const handlePickFromLibrary = async (imageType: ImageType, shopImageIndex?: number) => {
     try {
       const selectedImage = await ImagePicker.openPicker({
         multiple: false,
@@ -160,11 +225,7 @@ const TechnicianSignupScreen: React.FC = () => {
         uri: selectedImage.path,
       };
 
-      if (imageType === 'idCardFront') {
-        setIdCardFront(newImage);
-      } else {
-        setIdCardBack(newImage);
-      }
+      setImageByType(imageType, newImage, shopImageIndex);
     } catch (error: any) {
       if (error.code !== 'E_PICKER_CANCELLED') {
         Alert.alert('Lỗi', 'Không thể chọn ảnh. Vui lòng thử lại.');
@@ -172,18 +233,40 @@ const TechnicianSignupScreen: React.FC = () => {
     }
   };
 
-  const handleRemoveImage = (imageType: ImageType) => {
-    if (imageType === 'idCardFront') {
-      setIdCardFront(null);
-    } else {
-      setIdCardBack(null);
+  const handleRemoveImage = (imageType: ImageType, shopImageIndex?: number) => {
+    switch (imageType) {
+      case 'idCardFront':
+        setIdCardFront(null);
+        break;
+      case 'idCardBack':
+        setIdCardBack(null);
+        break;
+      case 'shopImages':
+        if (shopImageIndex !== undefined) {
+          const newShopImages = [...shopImages];
+          newShopImages.splice(shopImageIndex, 1);
+          setShopImages(newShopImages);
+        }
+        break;
     }
   };
 
   const onSubmit = async (data: TechnicianSignupFormData) => {
+    // Số CCCD bắt buộc với loại Cá nhân (điền từ QR)
+    if (isIndividual && !data.socccd?.trim()) {
+      Alert.alert('Thông báo', 'Vui lòng quét mã QR trên CCCD để lấy Số CCCD');
+      return;
+    }
+
     // Validate images
     if (!idCardFront || !idCardBack) {
       Alert.alert('Thông báo', 'Vui lòng tải lên đầy đủ ảnh Căn cước công dân (mặt trước và mặt sau)');
+      return;
+    }
+
+    // Ảnh cửa hàng bắt buộc (đủ 3 ảnh) với Cá nhân có cửa hàng
+    if (isIndividualShop && shopImages.filter(Boolean).length < 3) {
+      Alert.alert('Thông báo', 'Vui lòng tải lên đầy đủ 3 ảnh cửa hàng');
       return;
     }
 
@@ -200,7 +283,12 @@ const TechnicianSignupScreen: React.FC = () => {
 
       // Step 1: Upload images
       try {
-        const imagePaths = [idCardFront.uri, idCardBack.uri];
+        const imagePaths = [
+          idCardFront.uri,
+          idCardBack.uri,
+          // Kèm ảnh cửa hàng nếu là Cá nhân có cửa hàng
+          ...(isIndividualShop ? shopImages.filter(Boolean).map((img) => img.uri) : []),
+        ];
         uploadedFiles = await uploadService.uploadMultipleImages(imagePaths);
       } catch (uploadError: any) {
         Alert.alert(
@@ -216,6 +304,7 @@ const TechnicianSignupScreen: React.FC = () => {
       const signupData = {
         tendangnhap: data.tendangnhap,
         pasword: data.password, // Note: API uses 'pasword' typo
+        socccd: data.socccd || '',
         hoten: data.hoten,
         phone: data.phone,
         email: data.email || '',
@@ -239,7 +328,9 @@ const TechnicianSignupScreen: React.FC = () => {
         [
           {
             text: 'OK',
-            onPress: () => navigation.navigate('Login'),
+            // Reset stack về Login: không cho back lại form đã submit, luồng sạch.
+            onPress: () =>
+              navigation.reset({ index: 0, routes: [{ name: 'Login' }] }),
           },
         ]
       );
@@ -260,7 +351,7 @@ const TechnicianSignupScreen: React.FC = () => {
 
       {/* Custom Header */}
       <CustomHeader
-        title="Đăng ký tài khoản kỹ thuật viên"
+        title={prefill?.title || 'Tạo mới tài khoản hội viên C3'}
         leftIcon={<Text style={styles.backIconHeader}>‹</Text>}
         onLeftPress={() => navigation.goBack()}
       />
@@ -276,54 +367,182 @@ const TechnicianSignupScreen: React.FC = () => {
       >
         {/* Technician Registration Form */}
         <View style={styles.registrationCard}>
-          {/* Họ và tên */}
-          <Controller
-            control={control}
-            name="hoten"
-            render={({ field: { onChange, onBlur, value } }) => (
-              <View style={styles.inputContainer}>
-                <Text style={styles.inputLabel}>
-                  Họ và tên <Text style={styles.required}>*</Text>
-                </Text>
-                <TextInput
-                  style={[styles.input, errors.hoten && styles.inputError]}
-                  placeholder="Nhập họ và tên"
-                  placeholderTextColor={COLORS.textSecondary}
-                  value={value}
-                  onChangeText={onChange}
-                  onBlur={onBlur}
-                />
-                {errors.hoten && (
-                  <Text style={styles.errorText}>{errors.hoten.message}</Text>
-                )}
+          {/* Cá nhân (có/không cửa hàng): Thông tin pháp nhân → Ảnh CCCD → Số CCCD → Họ và tên */}
+          {isIndividual ? (
+            <>
+              {/* Section "Thông tin pháp nhân" */}
+              <View style={styles.legalHeader}>
+                <View style={styles.legalIconWrap}>
+                  <Icon name="warranty-policy" size={26} color={COLORS.primary} />
+                </View>
+                <View style={styles.legalHeaderText}>
+                  <Text style={styles.legalTitle}>Thông tin pháp nhân</Text>
+                  <Text style={styles.legalSubtitle}>
+                    Để ARC phục vụ quý hội viên tốt hơn, vui lòng nhập thông tin sau:
+                  </Text>
+                </View>
               </View>
-            )}
-          />
 
-          {/* Số điện thoại */}
-          <Controller
-            control={control}
-            name="phone"
-            render={({ field: { onChange, onBlur, value } }) => (
-              <View style={styles.inputContainer}>
-                <Text style={styles.inputLabel}>
-                  Số điện thoại <Text style={styles.required}>*</Text>
+              {/* Hình ảnh CCCD */}
+              <View style={styles.imageUploadSection}>
+                <Text style={styles.sectionTitle}>
+                  Hình ảnh CCCD <Text style={styles.required}>*</Text>
                 </Text>
-                <TextInput
-                  style={[styles.input, errors.phone && styles.inputError]}
-                  placeholder="Nhập số điện thoại"
-                  placeholderTextColor={COLORS.textSecondary}
-                  value={value}
-                  onChangeText={onChange}
-                  onBlur={onBlur}
-                  keyboardType="phone-pad"
-                />
-                {errors.phone && (
-                  <Text style={styles.errorText}>{errors.phone.message}</Text>
-                )}
+                <View style={styles.imageRow}>
+                  <View style={styles.imageColumn}>
+                    <Text style={styles.imageLabel}>Mặt trước</Text>
+                    {idCardFront ? (
+                      <View style={styles.imageItem}>
+                        <Image source={{ uri: idCardFront.uri }} style={styles.imagePreview} />
+                        <TouchableOpacity
+                          style={styles.removeImageButton}
+                          onPress={() => handleRemoveImage('idCardFront')}
+                        >
+                          <Text style={styles.removeImageText}>×</Text>
+                        </TouchableOpacity>
+                      </View>
+                    ) : (
+                      <TouchableOpacity
+                        style={styles.addImageButton}
+                        onPress={() => handleAddImage('idCardFront')}
+                        activeOpacity={0.7}
+                      >
+                        <Text style={styles.addImageIcon}>+</Text>
+                        <Text style={styles.addImageText}>Mặt trước</Text>
+                      </TouchableOpacity>
+                    )}
+                  </View>
+                  <View style={styles.imageColumn}>
+                    <Text style={styles.imageLabel}>Mặt sau</Text>
+                    {idCardBack ? (
+                      <View style={styles.imageItem}>
+                        <Image source={{ uri: idCardBack.uri }} style={styles.imagePreview} />
+                        <TouchableOpacity
+                          style={styles.removeImageButton}
+                          onPress={() => handleRemoveImage('idCardBack')}
+                        >
+                          <Text style={styles.removeImageText}>×</Text>
+                        </TouchableOpacity>
+                      </View>
+                    ) : (
+                      <TouchableOpacity
+                        style={styles.addImageButton}
+                        onPress={() => handleAddImage('idCardBack')}
+                        activeOpacity={0.7}
+                      >
+                        <Text style={styles.addImageIcon}>+</Text>
+                        <Text style={styles.addImageText}>Mặt sau</Text>
+                      </TouchableOpacity>
+                    )}
+                  </View>
+                </View>
               </View>
-            )}
-          />
+
+              {/* Số CCCD + nút Quét mã QR (số CCCD chỉ điền từ QR, không cho sửa) */}
+              <Controller
+                control={control}
+                name="socccd"
+                render={({ field: { value } }) => (
+                  <View style={styles.inputContainer}>
+                    <Text style={styles.inputLabel}>
+                      Số CCCD <Text style={styles.required}>*</Text>
+                    </Text>
+                    <View style={styles.cccdRow}>
+                      <Text style={value ? styles.cccdValue : styles.cccdHint}>
+                        {value || 'Quét mã QR trên CCCD'}
+                      </Text>
+                      <TouchableOpacity
+                        style={styles.scanButton}
+                        onPress={() => setScannerVisible(true)}
+                        activeOpacity={0.85}
+                      >
+                        <Icon name="in-out" size={18} color={COLORS.white} />
+                        <Text style={styles.scanButtonText}>Quét mã QR</Text>
+                      </TouchableOpacity>
+                    </View>
+                    {errors.socccd && (
+                      <Text style={styles.errorText}>{errors.socccd.message}</Text>
+                    )}
+                  </View>
+                )}
+              />
+
+              {/* Họ và tên (auto điền từ QR, vẫn cho sửa) */}
+              <Controller
+                control={control}
+                name="hoten"
+                render={({ field: { onChange, onBlur, value } }) => (
+                  <View style={styles.inputContainer}>
+                    <Text style={styles.inputLabel}>
+                      Họ và tên <Text style={styles.required}>*</Text>
+                    </Text>
+                    <TextInput
+                      style={[styles.input, errors.hoten && styles.inputError]}
+                      placeholder="VD: Nguyễn Văn A"
+                      placeholderTextColor={COLORS.textSecondary}
+                      value={value}
+                      onChangeText={onChange}
+                      onBlur={onBlur}
+                    />
+                    {errors.hoten && (
+                      <Text style={styles.errorText}>{errors.hoten.message}</Text>
+                    )}
+                  </View>
+                )}
+              />
+            </>
+          ) : (
+            /* Họ và tên (mặc định cho các loại C3 khác) */
+            <Controller
+              control={control}
+              name="hoten"
+              render={({ field: { onChange, onBlur, value } }) => (
+                <View style={styles.inputContainer}>
+                  <Text style={styles.inputLabel}>
+                    Họ và tên <Text style={styles.required}>*</Text>
+                  </Text>
+                  <TextInput
+                    style={[styles.input, errors.hoten && styles.inputError]}
+                    placeholder="Nhập họ và tên"
+                    placeholderTextColor={COLORS.textSecondary}
+                    value={value}
+                    onChangeText={onChange}
+                    onBlur={onBlur}
+                  />
+                  {errors.hoten && (
+                    <Text style={styles.errorText}>{errors.hoten.message}</Text>
+                  )}
+                </View>
+              )}
+            />
+          )}
+
+          {/* Số điện thoại (ẩn nếu đã nhập ở AccountInfoScreen) */}
+          {!hideAccountFields && (
+            <Controller
+              control={control}
+              name="phone"
+              render={({ field: { onChange, onBlur, value } }) => (
+                <View style={styles.inputContainer}>
+                  <Text style={styles.inputLabel}>
+                    Số điện thoại <Text style={styles.required}>*</Text>
+                  </Text>
+                  <TextInput
+                    style={[styles.input, errors.phone && styles.inputError]}
+                    placeholder="Nhập số điện thoại"
+                    placeholderTextColor={COLORS.textSecondary}
+                    value={value}
+                    onChangeText={onChange}
+                    onBlur={onBlur}
+                    keyboardType="phone-pad"
+                  />
+                  {errors.phone && (
+                    <Text style={styles.errorText}>{errors.phone.message}</Text>
+                  )}
+                </View>
+              )}
+            />
+          )}
 
           {/* Email */}
           <Controller
@@ -397,114 +616,157 @@ const TechnicianSignupScreen: React.FC = () => {
             )}
           />
 
-          {/* Tên đăng nhập */}
-          <Controller
-            control={control}
-            name="tendangnhap"
-            render={({ field: { onChange, onBlur, value } }) => (
-              <View style={styles.inputContainer}>
-                <Text style={styles.inputLabel}>
-                  Tên đăng nhập <Text style={styles.required}>*</Text>
-                </Text>
-                <TextInput
-                  style={[styles.input, errors.tendangnhap && styles.inputError]}
-                  placeholder="Nhập tên đăng nhập"
-                  placeholderTextColor={COLORS.textSecondary}
-                  value={value}
-                  onChangeText={onChange}
-                  onBlur={onBlur}
-                  autoCapitalize="none"
-                />
-                {errors.tendangnhap && (
-                  <Text style={styles.errorText}>{errors.tendangnhap.message}</Text>
-                )}
-              </View>
-            )}
-          />
-
-          {/* Mật khẩu */}
-          <Controller
-            control={control}
-            name="password"
-            render={({ field: { onChange, onBlur, value } }) => (
-              <View style={styles.inputContainer}>
-                <Text style={styles.inputLabel}>
-                  Mật khẩu <Text style={styles.required}>*</Text>
-                </Text>
-                <View style={styles.passwordContainer}>
+          {/* Tên đăng nhập = số điện thoại → ẩn khi đã nhập ở AccountInfoScreen */}
+          {!hideAccountFields && (
+            <Controller
+              control={control}
+              name="tendangnhap"
+              render={({ field: { onChange, onBlur, value } }) => (
+                <View style={styles.inputContainer}>
+                  <Text style={styles.inputLabel}>
+                    Tên đăng nhập <Text style={styles.required}>*</Text>
+                  </Text>
                   <TextInput
-                    style={[
-                      styles.input,
-                      styles.passwordInput,
-                      errors.password && styles.inputError,
-                    ]}
-                    placeholder="Nhập mật khẩu"
+                    style={[styles.input, errors.tendangnhap && styles.inputError]}
+                    placeholder="Nhập tên đăng nhập"
                     placeholderTextColor={COLORS.textSecondary}
                     value={value}
                     onChangeText={onChange}
                     onBlur={onBlur}
-                    secureTextEntry={!showPassword}
+                    autoCapitalize="none"
                   />
-                  <TouchableOpacity
-                    style={styles.eyeIcon}
-                    onPress={() => setShowPassword(!showPassword)}
-                  >
-                    <Icon
-                      name={showPassword ? 'eye-off' : 'eye'}
-                      size={20}
-                      color={COLORS.gray500}
-                    />
-                  </TouchableOpacity>
+                  {errors.tendangnhap && (
+                    <Text style={styles.errorText}>{errors.tendangnhap.message}</Text>
+                  )}
                 </View>
-                {errors.password && (
-                  <Text style={styles.errorText}>{errors.password.message}</Text>
-                )}
-              </View>
-            )}
-          />
+              )}
+            />
+          )}
 
-          {/* Nhập lại mật khẩu */}
-          <Controller
-            control={control}
-            name="repassword"
-            render={({ field: { onChange, onBlur, value } }) => (
-              <View style={styles.inputContainer}>
-                <Text style={styles.inputLabel}>
-                  Nhập lại mật khẩu <Text style={styles.required}>*</Text>
-                </Text>
-                <View style={styles.passwordContainer}>
-                  <TextInput
-                    style={[
-                      styles.input,
-                      styles.passwordInput,
-                      errors.repassword && styles.inputError,
-                    ]}
-                    placeholder="Nhập lại mật khẩu"
-                    placeholderTextColor={COLORS.textSecondary}
-                    value={value}
-                    onChangeText={onChange}
-                    onBlur={onBlur}
-                    secureTextEntry={!showRePassword}
-                  />
-                  <TouchableOpacity
-                    style={styles.eyeIcon}
-                    onPress={() => setShowRePassword(!showRePassword)}
-                  >
-                    <Icon
-                      name={showRePassword ? 'eye-off' : 'eye'}
-                      size={20}
-                      color={COLORS.gray500}
-                    />
-                  </TouchableOpacity>
-                </View>
-                {errors.repassword && (
-                  <Text style={styles.errorText}>{errors.repassword.message}</Text>
+          {/* Mật khẩu + Nhập lại mật khẩu (ẩn nếu đã nhập ở AccountInfoScreen) */}
+          {!hideAccountFields && (
+            <>
+              <Controller
+                control={control}
+                name="password"
+                render={({ field: { onChange, onBlur, value } }) => (
+                  <View style={styles.inputContainer}>
+                    <Text style={styles.inputLabel}>
+                      Mật khẩu <Text style={styles.required}>*</Text>
+                    </Text>
+                    <View style={styles.passwordContainer}>
+                      <TextInput
+                        style={[
+                          styles.input,
+                          styles.passwordInput,
+                          errors.password && styles.inputError,
+                        ]}
+                        placeholder="Nhập mật khẩu"
+                        placeholderTextColor={COLORS.textSecondary}
+                        value={value}
+                        onChangeText={onChange}
+                        onBlur={onBlur}
+                        secureTextEntry={!showPassword}
+                      />
+                      <TouchableOpacity
+                        style={styles.eyeIcon}
+                        onPress={() => setShowPassword(!showPassword)}
+                      >
+                        <Icon
+                          name={showPassword ? 'eye-off' : 'eye'}
+                          size={20}
+                          color={COLORS.gray500}
+                        />
+                      </TouchableOpacity>
+                    </View>
+                    {errors.password && (
+                      <Text style={styles.errorText}>{errors.password.message}</Text>
+                    )}
+                  </View>
                 )}
-              </View>
-            )}
-          />
+              />
 
-          {/* Section: Căn cước công dân */}
+              <Controller
+                control={control}
+                name="repassword"
+                render={({ field: { onChange, onBlur, value } }) => (
+                  <View style={styles.inputContainer}>
+                    <Text style={styles.inputLabel}>
+                      Nhập lại mật khẩu <Text style={styles.required}>*</Text>
+                    </Text>
+                    <View style={styles.passwordContainer}>
+                      <TextInput
+                        style={[
+                          styles.input,
+                          styles.passwordInput,
+                          errors.repassword && styles.inputError,
+                        ]}
+                        placeholder="Nhập lại mật khẩu"
+                        placeholderTextColor={COLORS.textSecondary}
+                        value={value}
+                        onChangeText={onChange}
+                        onBlur={onBlur}
+                        secureTextEntry={!showRePassword}
+                      />
+                      <TouchableOpacity
+                        style={styles.eyeIcon}
+                        onPress={() => setShowRePassword(!showRePassword)}
+                      >
+                        <Icon
+                          name={showRePassword ? 'eye-off' : 'eye'}
+                          size={20}
+                          color={COLORS.gray500}
+                        />
+                      </TouchableOpacity>
+                    </View>
+                    {errors.repassword && (
+                      <Text style={styles.errorText}>{errors.repassword.message}</Text>
+                    )}
+                  </View>
+                )}
+              />
+            </>
+          )}
+
+          {/* Ảnh cửa hàng (chỉ Cá nhân có cửa hàng) */}
+          {isIndividualShop && (
+            <View style={styles.imageUploadSection}>
+              <Text style={styles.sectionTitle}>
+                Ảnh cửa hàng <Text style={styles.required}>*</Text>
+              </Text>
+              <Text style={styles.sectionSubtitle}>Tải lên 3 ảnh cửa hàng</Text>
+              <View style={styles.imageGrid}>
+                {[0, 1, 2].map((index) => (
+                  <View key={index} style={styles.imageColumn}>
+                    <Text style={styles.imageLabel}>Ảnh {index + 1}</Text>
+                    {shopImages[index] ? (
+                      <View style={styles.imageItem}>
+                        <Image source={{ uri: shopImages[index].uri }} style={styles.imagePreview} />
+                        <TouchableOpacity
+                          style={styles.removeImageButton}
+                          onPress={() => handleRemoveImage('shopImages', index)}
+                        >
+                          <Text style={styles.removeImageText}>×</Text>
+                        </TouchableOpacity>
+                      </View>
+                    ) : (
+                      <TouchableOpacity
+                        style={styles.addImageButton}
+                        onPress={() => handleAddImage('shopImages', index)}
+                        activeOpacity={0.7}
+                      >
+                        <Text style={styles.addImageIcon}>+</Text>
+                        <Text style={styles.addImageText}>Thêm ảnh</Text>
+                      </TouchableOpacity>
+                    )}
+                  </View>
+                ))}
+              </View>
+            </View>
+          )}
+
+          {/* Section: Căn cước công dân (ẩn với loại Cá nhân vì đã có ở đầu form) */}
+          {!isIndividual && (
           <View style={styles.imageUploadSection}>
             <Text style={styles.sectionTitle}>
               Căn cước công dân <Text style={styles.required}>*</Text>
@@ -560,6 +822,7 @@ const TechnicianSignupScreen: React.FC = () => {
               </View>
             </View>
           </View>
+          )}
 
           {/* Terms and Conditions */}
           <TouchableOpacity
@@ -572,7 +835,7 @@ const TechnicianSignupScreen: React.FC = () => {
             </View>
             <Text style={styles.termsText}>
               Tôi đã đọc, hiểu và chấp nhận{' '}
-              <Text style={styles.termsLink}>Điều kiện và điều khoản hội viên</Text>
+              <Text style={styles.termsLink}>Điều kiện và Điều khoản hội viên</Text>
             </Text>
           </TouchableOpacity>
 
@@ -591,6 +854,14 @@ const TechnicianSignupScreen: React.FC = () => {
           </TouchableOpacity>
         </View>
       </KeyboardAwareScrollView>
+
+      {/* Quét QR trên CCCD → tự điền Số CCCD + Họ và tên */}
+      <BarcodeScanner
+        visible={scannerVisible}
+        onClose={() => setScannerVisible(false)}
+        onScan={handleScanCccd}
+        title="Quét mã QR trên CCCD"
+      />
     </View>
   );
 };
@@ -627,6 +898,70 @@ const styles = StyleSheet.create({
     elevation: 4,
     borderWidth: 1,
     borderColor: COLORS.gray200,
+  },
+
+  // Section "Thông tin pháp nhân"
+  legalHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: SPACING.lg,
+    gap: SPACING.md,
+  },
+  legalIconWrap: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: COLORS.gray100,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  legalHeaderText: {
+    flex: 1,
+  },
+  legalTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: COLORS.textPrimary,
+    marginBottom: 2,
+  },
+  legalSubtitle: {
+    fontSize: 13,
+    color: COLORS.textSecondary,
+    fontStyle: 'italic',
+    lineHeight: 18,
+  },
+  // Số CCCD + nút quét QR
+  cccdRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: SPACING.sm,
+  },
+  cccdHint: {
+    flex: 1,
+    fontSize: 13,
+    color: COLORS.textSecondary,
+    fontStyle: 'italic',
+  },
+  cccdValue: {
+    flex: 1,
+    fontSize: 16,
+    fontWeight: '600',
+    color: COLORS.textPrimary,
+  },
+  scanButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: SPACING.xs,
+    backgroundColor: COLORS.primary,
+    paddingVertical: SPACING.sm,
+    paddingHorizontal: SPACING.md,
+    borderRadius: BORDER_RADIUS.lg,
+  },
+  scanButtonText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: COLORS.white,
   },
 
   // Input Fields
@@ -688,9 +1023,19 @@ const styles = StyleSheet.create({
     color: COLORS.textPrimary,
     marginBottom: SPACING.md,
   },
+  sectionSubtitle: {
+    fontSize: 12,
+    color: COLORS.textSecondary,
+    marginBottom: SPACING.md,
+  },
   imageRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+    gap: SPACING.md,
+  },
+  imageGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
     gap: SPACING.md,
   },
   imageColumn: {

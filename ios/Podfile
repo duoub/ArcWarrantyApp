@@ -5,7 +5,14 @@ require Pod::Executable.execute_command('node', ['-p',
     {paths: [process.argv[1]]},
   )', __dir__]).strip
 
-platform :ios, '15.1'
+# Nâng lên 15.5 do GoogleMLKit/BarcodeScanning (RNMLKitBarcodeScanning) yêu cầu iOS >= 15.5
+platform :ios, '15.5'
+
+# VisionCamera tự bật Frame Processors khi thấy react-native-worklets-core trong
+# node_modules (bị kéo vào theo transitive dep). Ta KHÔNG dùng frame processor
+# (chỉ dùng useCodeScanner) nên tắt hẳn để không phải cài pod worklets-core.
+$VCEnableFrameProcessors = false
+
 prepare_react_native_project!
 
 linkage = ENV['USE_FRAMEWORKS']
@@ -40,6 +47,11 @@ target 'ArcWarrantyApp' do
       target.build_configurations.each do |config|
         config.build_settings['CLANG_CXX_LANGUAGE_STANDARD'] = 'c++20'
         config.build_settings['CLANG_CXX_LIBRARY'] = 'libc++'
+        # Đồng bộ deployment target tối thiểu 15.5 (ML Kit) cho mọi pod
+        current = config.build_settings['IPHONEOS_DEPLOYMENT_TARGET']
+        if current.nil? || current.to_f < 15.5
+          config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '15.5'
+        end
       end
     end
 

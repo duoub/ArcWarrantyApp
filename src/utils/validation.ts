@@ -36,7 +36,8 @@ export const signupStep1Schema = z.object({
 });
 
 // Signup Schema - Step 2 (Password)
-export const signupStep2Schema = z.object({
+// Tách object thuần để còn .merge() được; refinement áp riêng ở dưới.
+export const signupStep2Object = z.object({
   password: z
     .string()
     .min(1, 'Mật khẩu là bắt buộc')
@@ -44,10 +45,12 @@ export const signupStep2Schema = z.object({
   passwordConfirm: z
     .string()
     .min(1, 'Xác nhận mật khẩu là bắt buộc'),
-}).refine((data) => data.password === data.passwordConfirm, {
-  message: 'Mật khẩu xác nhận không khớp',
-  path: ['passwordConfirm'],
 });
+
+export const signupStep2Schema = signupStep2Object.refine(
+  (data) => data.password === data.passwordConfirm,
+  { message: 'Mật khẩu xác nhận không khớp', path: ['passwordConfirm'] }
+);
 
 // Signup Schema - Step 3 (Verification Method)
 export const signupStep3Schema = z.object({
@@ -61,8 +64,12 @@ export const signupStep3Schema = z.object({
 
 // Complete Signup Schema
 export const signupSchema = signupStep1Schema
-  .merge(signupStep2Schema)
-  .merge(signupStep3Schema);
+  .merge(signupStep2Object)
+  .merge(signupStep3Schema)
+  .refine((data) => data.password === data.passwordConfirm, {
+    message: 'Mật khẩu xác nhận không khớp',
+    path: ['passwordConfirm'],
+  });
 
 export type SignupFormData = z.infer<typeof signupSchema>;
 

@@ -22,6 +22,7 @@
 		95D4E670130841BC9B7BC610 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = CE0778BFCD46473EAA1471FC /* GoogleService-Info.plist */; };
 		A8FABD3970B14EE688C262FB /* MaterialCommunityIcons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = EE5AC285813142C9B4818E64 /* MaterialCommunityIcons.ttf */; };
 		A9A73C7166344A6FAEC493E4 /* FontAwesome5_Brands.ttf in Resources */ = {isa = PBXBuildFile; fileRef = F3C32D78E3A9481B814B9A41 /* FontAwesome5_Brands.ttf */; };
+		AA0001000000000000000002 /* LegacyInterop.mm in Sources */ = {isa = PBXBuildFile; fileRef = AA0001000000000000000001 /* LegacyInterop.mm */; };
 		BE39376767864D5C9651A21A /* FontAwesome5_Solid.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 44CA9A5A8BAC4EA48CF51B01 /* FontAwesome5_Solid.ttf */; };
 		D061C5BDFF6945E4817BD3CA /* Entypo.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 3279949C5B3844AE8B796484 /* Entypo.ttf */; };
 		D0D66F72029F4FB1A59B6F41 /* MaterialIcons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 9E9A0BA53AA14B499A7225C6 /* MaterialIcons.ttf */; };
@@ -58,6 +59,8 @@
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = ArcWarrantyApp/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		9E24828BA6C649B5A2D8A829 /* Ionicons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Ionicons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Ionicons.ttf"; sourceTree = "<group>"; };
 		9E9A0BA53AA14B499A7225C6 /* MaterialIcons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = MaterialIcons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/MaterialIcons.ttf"; sourceTree = "<group>"; };
+		AA0001000000000000000001 /* LegacyInterop.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; name = LegacyInterop.mm; path = ArcWarrantyApp/LegacyInterop.mm; sourceTree = "<group>"; };
+		AA0001000000000000000003 /* LegacyInterop.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = LegacyInterop.h; path = ArcWarrantyApp/LegacyInterop.h; sourceTree = "<group>"; };
 		B42DDBF0DA8E46A8B0031EC5 /* EvilIcons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = EvilIcons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/EvilIcons.ttf"; sourceTree = "<group>"; };
 		B4F0C88F03C84778AAF8EE9F /* AntDesign.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = AntDesign.ttf; path = "../node_modules/react-native-vector-icons/Fonts/AntDesign.ttf"; sourceTree = "<group>"; };
 		BBB583A5E359412D8FFA47A1 /* FontAwesome.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = FontAwesome.ttf; path = "../node_modules/react-native-vector-icons/Fonts/FontAwesome.ttf"; sourceTree = "<group>"; };
@@ -89,6 +92,8 @@
 				13B07FB51A68108700A75B9A /* Images.xcassets */,
 				761780EC2CA45674006654EE /* AppDelegate.swift */,
 				761780EE2CA45675006654EF /* SceneDelegate.swift */,
+				AA0001000000000000000003 /* LegacyInterop.h */,
+				AA0001000000000000000001 /* LegacyInterop.mm */,
 				13B07FB61A68108700A75B9A /* Info.plist */,
 				CE0778BFCD46473EAA1471FC /* GoogleService-Info.plist */,
 				81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */,
@@ -366,6 +371,7 @@
 			files = (
 				761780ED2CA45674006654EE /* AppDelegate.swift in Sources */,
 				761780EF2CA45675006654EF /* SceneDelegate.swift in Sources */,
+				AA0001000000000000000002 /* LegacyInterop.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -382,7 +388,7 @@
 				CODE_SIGN_ENTITLEMENTS = ArcWarrantyApp/ArcWarrantyApp.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_TEAM = WBXWW927P5;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = ArcWarrantyApp/Info.plist;
@@ -392,7 +398,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 2.0.4;
+				MARKETING_VERSION = 2.0.5;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -405,6 +411,7 @@
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_OBJC_BRIDGING_HEADER = "ArcWarrantyApp/ArcWarrantyApp-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -422,7 +429,7 @@
 				CODE_SIGN_ENTITLEMENTS = ArcWarrantyApp/ArcWarrantyApp.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_TEAM = WBXWW927P5;
 				INFOPLIST_FILE = ArcWarrantyApp/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = ARC;
@@ -431,7 +438,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 2.0.4;
+				MARKETING_VERSION = 2.0.5;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -444,6 +451,7 @@
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_OBJC_BRIDGING_HEADER = "ArcWarrantyApp/ArcWarrantyApp-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VERSIONING_SYSTEM = "apple-generic";
@@ -501,7 +509,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 15.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.5;
 				LD_RUNPATH_SEARCH_PATHS = (
 					/usr/lib/swift,
 					"$(inherited)",
@@ -574,7 +582,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 15.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.5;
 				LD_RUNPATH_SEARCH_PATHS = (
 					/usr/lib/swift,
 					"$(inherited)",

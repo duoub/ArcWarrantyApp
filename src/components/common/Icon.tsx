@@ -41,6 +41,7 @@ export type IconName =
   | 'lock'
   | 'checkbox-checked'
   | 'checkbox-unchecked'
+  | 'check-circle'
   | 'store'
   | 'list'
   | 'factory'
@@ -111,6 +112,7 @@ const iconMap: Record<IconName, IconConfig> = {
   'back': { provider: 'Feather', name: 'chevron-left' },
   'lock': { provider: 'MaterialCommunityIcons', name: 'lock' },
   'checkbox-checked': { provider: 'Feather', name: 'check-square' },
+  'check-circle': { provider: 'MaterialCommunityIcons', name: 'check-circle' },
   'checkbox-unchecked': { provider: 'Feather', name: 'square' },
   'store': { provider: 'MaterialCommunityIcons', name: 'storefront-outline' },
   'list': { provider: 'Feather', name: 'list' },
