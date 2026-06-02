@@ -2,6 +2,9 @@
 #
 .DS_Store
 
+# Standardized on npm — do not track yarn.lock
+yarn.lock
+
 # Xcode
 #
 build/
